@@ -4,15 +4,7 @@
 
 ---
 
-[View This Page in 中文](https://github.com/GZhonghui/reSimulate/blob/main/readMe/readMe_CN.md)  
-[View This Page in 日本語](https://github.com/GZhonghui/reSimulate/blob/main/readMe/readMe_JP.md)
-
----
-
-[reRender](https://github.com/GZhonghui/reRender)  
-[reEngine](https://github.com/GZhonghui/reEngine)
-
----
+View This Page in [中文](https://github.com/GZhonghui/reSimulate/blob/main/readMe/readMe_CN.md)/[日本語](https://github.com/GZhonghui/reSimulate/blob/main/readMe/readMe_JP.md)
 
 ## About
 
