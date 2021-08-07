@@ -1,20 +1,27 @@
 # reEngine
-
 ![reEngine](readMe/reEngine.png)
-
 ---
-
-View This Page in [中文](https://github.com/GZhonghui/reSimulate/blob/main/readMe/readMe_CN.md)/[日本語](https://github.com/GZhonghui/reSimulate/blob/main/readMe/readMe_JP.md)
+> View This Page in [中文](readMe/readMe_CN.md)/[日本語](readMe/readMe_JP.md)  
+> More Projects from the reFamily [**reRender**](https://github.com/GZhonghui/reRender)/[**reSimulate**](https://github.com/GZhonghui/reSimulate)
 
 ## About
-
-**reEngine** is  a Open Source Game Engine, Powered by C++ & Vulkan Backend  
-
-- Support OS: Microsoft Windows  
-- Support Language: C++  
+**reEngine** is  a Open Source Game Engine, Powered by C++
 
 ## Features
+### ✔Vulkan Backend
+### ✔OpenGL Core Backend
+### ✔C++ Reflection
+### ✔C++ Scripts
+### ✔Import Assets
+### ✔Editor by ImGui
 
-- Vulkan Backend
-- C++ Scripts
-- Load Art Assets
+## Credits
+> This Project Depends on the Following Libs
+* Assimp
+* Boost
+* Eigen
+* Glad
+* GLFW
+* GLM
+* ImGui
+* STB
