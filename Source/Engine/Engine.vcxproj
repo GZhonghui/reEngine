@@ -166,11 +166,12 @@
     <ClCompile Include="..\Support\Include\ImGUI\imgui_widgets.cpp" />
     <ClCompile Include="EngineCore.cpp" />
     <ClCompile Include="GLManager.cpp" />
-    <ClCompile Include="main.cpp" />
+    <ClCompile Include="Main.cpp" />
     <ClCompile Include="VulkanManager.cpp" />
     <ClCompile Include="VulkanManagerUI.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Actor.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="EngineCore.h" />
     <ClInclude Include="Event.h" />

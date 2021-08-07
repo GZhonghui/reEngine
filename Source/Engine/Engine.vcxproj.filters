@@ -9,20 +9,25 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
     </Filter>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
-    </Filter>
     <Filter Include="ImGUI">
       <UniqueIdentifier>{0dc9fa9c-f3a8-4e3a-aa6a-9795834c121c}</UniqueIdentifier>
     </Filter>
     <Filter Include="Glad">
       <UniqueIdentifier>{be7bb4fe-5796-441e-982c-ca3a2bcba684}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Engine Source">
+      <UniqueIdentifier>{b3bfbba6-f5e3-4f03-9170-16c322120c3f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine Header">
+      <UniqueIdentifier>{44e3ec83-63ff-456f-a696-f2bd9b6b58b4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core">
+      <UniqueIdentifier>{233f7be5-17c2-4db5-a06a-18a062ac53e4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="Main.cpp">
+      <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="..\Support\Include\ImGUI\imgui.cpp">
       <Filter>ImGUI</Filter>
@@ -46,10 +51,10 @@
       <Filter>ImGUI</Filter>
     </ClCompile>
     <ClCompile Include="VulkanManager.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Engine Source</Filter>
     </ClCompile>
     <ClCompile Include="VulkanManagerUI.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Engine Source</Filter>
     </ClCompile>
     <ClCompile Include="..\Support\Include\ImGUI\backends\imgui_impl_opengl3.cpp">
       <Filter>ImGUI</Filter>
@@ -58,42 +63,45 @@
       <Filter>Glad</Filter>
     </ClCompile>
     <ClCompile Include="GLManager.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Engine Source</Filter>
     </ClCompile>
     <ClCompile Include="EngineCore.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Engine Source</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h">
-      <Filter>Header Files</Filter>
+      <Filter>Engine Header</Filter>
     </ClInclude>
     <ClInclude Include="Event.h">
-      <Filter>Header Files</Filter>
+      <Filter>Engine Header</Filter>
     </ClInclude>
     <ClInclude Include="Loader.h">
-      <Filter>Header Files</Filter>
+      <Filter>Engine Header</Filter>
     </ClInclude>
     <ClInclude Include="MathAIO.h">
-      <Filter>Header Files</Filter>
+      <Filter>Engine Header</Filter>
     </ClInclude>
     <ClInclude Include="Shader.h">
-      <Filter>Header Files</Filter>
+      <Filter>Engine Header</Filter>
     </ClInclude>
     <ClInclude Include="ToolAIO.h">
-      <Filter>Header Files</Filter>
+      <Filter>Engine Header</Filter>
     </ClInclude>
     <ClInclude Include="VulkanManager.h">
-      <Filter>Header Files</Filter>
+      <Filter>Engine Header</Filter>
     </ClInclude>
     <ClInclude Include="VulkanMisc.h">
-      <Filter>Header Files</Filter>
+      <Filter>Engine Header</Filter>
     </ClInclude>
     <ClInclude Include="GLManager.h">
-      <Filter>Header Files</Filter>
+      <Filter>Engine Header</Filter>
     </ClInclude>
     <ClInclude Include="EngineCore.h">
-      <Filter>Header Files</Filter>
+      <Filter>Engine Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Actor.h">
+      <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
