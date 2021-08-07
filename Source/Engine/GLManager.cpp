@@ -1,11 +1,11 @@
 #include"GLManager.h"
 
-bool GlManager::Init()
+bool GLManager::Init()
 {
     return true;
 }
 
-bool GlManager::Destroy()
+bool GLManager::Destroy()
 {
     return true;
 }

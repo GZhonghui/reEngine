@@ -1,7 +1,6 @@
 #pragma once
 
-//Switch to Build Mode
-//#define BUILD_GAME
+#include"Config.h"
 
 //Construction Function
 #pragma warning(disable:26495)
@@ -11,6 +10,7 @@
 
 #include<unordered_set>
 #include<unordered_map>
+#include<filesystem>
 #include<algorithm>
 #include<cstdint>
 #include<cstdarg>
@@ -19,9 +19,15 @@
 #include<cstdio>
 #include<ctime>
 
+#include<boost/property_tree/ptree.hpp>
+#include<boost/property_tree/xml_parser.hpp>
+#include<boost/foreach.hpp>
+#include<boost/lexical_cast.hpp>
+
 #include<imgui.h>
 #include<imgui_impl_glfw.h>
 #include<imgui_impl_vulkan.h>
+#include<imgui_impl_opengl3.h>
 
 #include<glad/glad.h>
 
@@ -65,6 +71,8 @@ public:
 #ifndef DEBUG_MESSAGE
         return;
 #endif
+
+        if (!G_ENABLE_OUTPUT) return;
 
         switch (Type)
         {

@@ -103,5 +103,14 @@
     <ClInclude Include="Actor.h">
       <Filter>Core</Filter>
     </ClInclude>
+    <ClInclude Include="Init.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Config.h">
+      <Filter>Engine Header</Filter>
+    </ClInclude>
+    <ClInclude Include="CodeTemplate.h">
+      <Filter>Engine Header</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

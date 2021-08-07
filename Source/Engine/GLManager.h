@@ -3,11 +3,11 @@
 #include"ToolAIO.h"
 #include"MathAIO.h"
 
-class GlManager
+class GLManager
 {
 public:
-    GlManager() = default;
-    ~GlManager() = default;
+    GLManager() = default;
+    ~GLManager() = default;
 
 public:
     bool Init();
