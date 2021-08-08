@@ -97,3 +97,24 @@ public:
         puts("");
     }
 };
+
+inline bool checkClassOrActorName(const char* inputName)
+{
+    auto checkIndex = inputName;
+
+    auto isAlpha = [](char x)
+    {
+        return ('a' <= x && x <= 'z') || ('A' <= x && x < 'Z');
+    };
+
+    while (*checkIndex)
+    {
+        if (!isAlpha(*checkIndex))
+        {
+            return false;
+        }
+        ++checkIndex;
+    }
+
+    return true;
+}

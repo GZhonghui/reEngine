@@ -6,6 +6,13 @@
 class Actor
 {
 public:
+    Actor(const std::string& Name) :m_Name(Name) {}
+    ~Actor() = default;
+protected:
+    std::string m_Name;
+public:
+    std::string getName() const noexcept { return m_Name; }
+public:
     virtual void Init() = 0;
     virtual void Update(float Delta) = 0;
     virtual void Destroy() = 0;

@@ -18,6 +18,10 @@ namespace EngineCore
         const float toolBoxHeight = 96;
         // CONST
 
+        // STATIC
+        static bool havePopWindow = false;
+        // STATIC
+
         int displayW, displayH;
         glfwGetFramebufferSize(mainWindow, &displayW, &displayH);
 
@@ -109,8 +113,11 @@ namespace EngineCore
 
         // STATIC
         static bool showAddNewClassWindow = false;
+        static bool showAddNewActorWindow = false;
         static bool showAboutWindow = false;
         static char newClassName[16];
+        static char newActorName[32];
+        static int selectClassInNewActor = 0;
         // STATIC
 
         auto centerWidth = displayW - leftWindowWidth - rightWindowWidth;
@@ -139,7 +146,11 @@ namespace EngineCore
                 {
                     if (ImGui::Button("Add a Class"))
                     {
-                        showAddNewClassWindow = true;
+                        if (!havePopWindow)
+                        {
+                            showAddNewClassWindow = true;
+                            havePopWindow = true;
+                        }
                     }
                     ImGui::EndTabItem();
                 }
@@ -148,6 +159,11 @@ namespace EngineCore
                 {
                     if (ImGui::Button("Add a Actor"))
                     {
+                        if (!havePopWindow)
+                        {
+                            showAddNewActorWindow = true;
+                            havePopWindow = true;
+                        }
                         
                     }
                     ImGui::SameLine();
@@ -181,9 +197,9 @@ namespace EngineCore
                 ImGui::Text("Input the Class Name");
                 ImGui::InputText("", newClassName, IM_ARRAYSIZE(newClassName));
 
-                if (ImGui::Button("Add"))
+                if (ImGui::Button("Add & Save"))
                 {
-                    if (*newClassName)
+                    if (checkClassOrActorName(newClassName))
                     {
                         addClassToProject(newClassName);
 
@@ -191,7 +207,10 @@ namespace EngineCore
                         newClass.m_Name = std::string(newClassName);
                         classItems.push_back(newClass);
 
+                        saveProject(classItems, actorItems);
+
                         showAddNewClassWindow = false;
+                        havePopWindow = false;
                     }
                 }
 
@@ -199,6 +218,51 @@ namespace EngineCore
                 if (ImGui::Button("Cancel"))
                 {
                     showAddNewClassWindow = false;
+                    havePopWindow = false;
+                }
+                ImGui::End();
+            }
+        }
+
+        if (showAddNewActorWindow)
+        {
+            if (ImGui::Begin("Add a Actor", nullptr, popWinFlag))
+            {
+                ImGui::Text("Guide for Create new Actor");
+                ImGui::Separator();
+
+                if (classItemsChar.empty())
+                {
+                    ImGui::Text("Please Add a Class First");
+                }
+                else
+                {
+                    ImGui::Text("Input the Actor Name");
+                    ImGui::InputText("", newActorName, IM_ARRAYSIZE(newActorName));
+                    ImGui::Text("Selete the Class");
+                    ImGui::Combo("", &selectClassInNewActor, classItemsChar.data(), classItemsChar.size());
+
+                    if (ImGui::Button("Add"))
+                    {
+                        if (checkClassOrActorName(newActorName) && selectClassInNewActor < classItemsChar.size())
+                        {
+                            ActorItem newActor;
+                            newActor.m_Name = std::string(newActorName);
+                            newActor.m_ClassName = classItems[selectClassInNewActor].m_Name;
+
+                            actorItems.push_back(newActor);
+
+                            showAddNewActorWindow = false;
+                            havePopWindow = false;
+                        }
+                    }
+                    ImGui::SameLine();
+                }
+
+                if (ImGui::Button("Cancel"))
+                {
+                    showAddNewActorWindow = false;
+                    havePopWindow = false;
                 }
                 ImGui::End();
             }

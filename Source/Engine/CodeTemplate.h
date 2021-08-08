@@ -40,9 +40,13 @@ inline void addClassToProject(const char* className)
     if (headerFile)
     {
         fprintf(headerFile, "#include \"Actor.h\"\n");
+        fprintf(headerFile, "#include \"EngineCore.h\"\n");
         fprintf(headerFile, "\n");
         fprintf(headerFile, "class %s : public Actor\n", className);
         fprintf(headerFile, "{\n");
+        fprintf(headerFile, "public:\n");
+        fprintf(headerFile, "    %s(const std::string& Name) : Actor(Name) { }\n",className);
+        fprintf(headerFile, "    ~%s() = default;\n", className);
         fprintf(headerFile, "public:\n");
         fprintf(headerFile, "    virtual void Init();\n");
         fprintf(headerFile, "    virtual void Update(float Delta);\n");
@@ -117,6 +121,10 @@ inline void updateInitHeader()
         fprintf(initHeader, "\n");
 
         //For Each
+        auto addInclude = [initHeader](const char* className)
+        {
+            fprintf(initHeader, "#include\"impl%s.h\"\n", className);
+        };
 
         fprintf(initHeader, "\n");
         fprintf(initHeader, "inline void initScene(std::vector<std::shared_ptr<Actor>>* actorsInScene)\n");
@@ -124,6 +132,10 @@ inline void updateInitHeader()
         fprintf(initHeader, "\n");
 
         //For Each
+        auto addActor = [initHeader](const char* actorName, const char* className)
+        {
+            fprintf(initHeader, "    actorsInScene->push_back(std::make_shared<%s>(\"%s\"));\n", className, actorName);
+        };
 
         fprintf(initHeader, "\n");
         fprintf(initHeader, "}\n");
@@ -161,6 +173,7 @@ inline void readProject
 
     if (!std::filesystem::exists(std::filesystem::path(projectFilePath)))
     {
+        Out::Log(pType::WARNING, "No Project File");
         return;
     }
 

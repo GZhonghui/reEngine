@@ -18,8 +18,12 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
     <ClCompile Include="EditorUI.cpp"/>
-    <ClCompile Include="implApple.cpp"/>
-    <ClInclude Include="implApple.h"/>
+    <ClCompile Include="implCar.cpp"/>
+    <ClInclude Include="implCar.h"/>
+    <ClCompile Include="implPhone.cpp"/>
+    <ClInclude Include="implPhone.h"/>
+    <ClCompile Include="implMesh.cpp"/>
+    <ClInclude Include="implMesh.h"/>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
