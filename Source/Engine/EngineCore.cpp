@@ -16,6 +16,9 @@ namespace EngineCore
 
     std::vector<std::shared_ptr<Actor>> actorsInScene;
 
+    std::vector<ClassItem> classItems;
+    std::vector<ActorItem> actorItems;
+
     void initGLFW()
     {
         glfwInit();
@@ -158,6 +161,9 @@ namespace EngineCore
 
 int engineMain(void (*initScene)(std::vector<std::shared_ptr<Actor>>* actorsInScene))
 {
+
+    readProject(EngineCore::classItems, EngineCore::actorItems);
+
     if (G_BUILD_GAME_MODE)
     {
         EngineCore::actorsInScene.clear();

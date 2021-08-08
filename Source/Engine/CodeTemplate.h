@@ -3,7 +3,28 @@
 #include"ToolAIO.h"
 #include"MathAIO.h"
 
-const char* projectFilePath = "Game.rpj";
+const std::string projectFilePath("Game.rpj");
+
+class ClassItem
+{
+public:
+    ClassItem() = default;
+    ~ClassItem() = default;
+
+public:
+    std::string m_Name;
+};
+
+class ActorItem
+{
+public:
+    ActorItem() = default;
+    ~ActorItem() = default;
+
+public:
+    std::string m_Name;
+    std::string m_ClassName;
+};
 
 inline void addClassToProject(const char* className)
 {
@@ -77,7 +98,7 @@ inline void addClassToProject(const char* className)
     ptree& headerItem = ptProject.add("Project.ItemGroup.ClInclude", "");
     headerItem.put("<xmlattr>.Include", headerFileName.c_str());
 
-    boost::property_tree::xml_writer_settings<ptree::key_type> writeSettings(' ', 2);
+    const boost::property_tree::xml_writer_settings<ptree::key_type> writeSettings(' ', 2);
     write_xml("Engine.vcxproj", ptProject, std::locale(), writeSettings);
 }
 
@@ -117,29 +138,109 @@ Project
     Class
         ClassItem
             Name=""
+        ClassItem
+            Name=""
 
     Actor
+        ActorItem
+            Name=""
+            ClassName=""
         ActorItem
             Name=""
             ClassName=""
 */
 // Project File Struction
 
-inline void readProject()
+inline void readProject
+(
+    std::vector<ClassItem>& classItems,
+    std::vector<ActorItem>& actorItems
+)
 {
     using namespace boost::property_tree;
 
-    if (!std::filesystem::exists(projectFilePath))
+    if (!std::filesystem::exists(std::filesystem::path(projectFilePath)))
     {
         return;
     }
 
+    classItems.clear();
+    actorItems.clear();
 
+    ptree ptProject;
+    read_xml(projectFilePath, ptProject, xml_parser::trim_whitespace);
+
+    try
+    {
+        BOOST_FOREACH(const ptree::value_type & classItem, ptProject.get_child("Project.Class"))
+        {
+            if (classItem.first == "ClassItem")
+            {
+                std::string thisClassName = classItem.second.get<std::string>("<xmlattr>.Name");
+
+                ClassItem thisClass;
+                thisClass.m_Name = thisClassName;
+
+                classItems.push_back(thisClass);
+            }
+        }
+    }
+    catch (...)
+    {
+
+    }
+    
+    try
+    {
+        BOOST_FOREACH(const ptree::value_type & actorItem, ptProject.get_child("Project.Actor"))
+        {
+            if (actorItem.first == "ActorItem")
+            {
+                std::string thisActorName = actorItem.second.get<std::string>("<xmlattr>.Name");
+                std::string thisActorClassName = actorItem.second.get<std::string>("ClassName");
+
+                ActorItem thisActor;
+                thisActor.m_Name = thisActorName;
+                thisActor.m_ClassName = thisActorClassName;
+
+                actorItems.push_back(thisActor);
+            }
+        }
+    }
+    catch (...)
+    {
+
+    }
+
+    Out::Log(pType::MESSAGE, "Read %d Class", classItems.size());
+    Out::Log(pType::MESSAGE, "Read %d Actor", actorItems.size());
 }
 
-inline void saveProject()
+inline void saveProject
+(
+    const std::vector<ClassItem>& classItems,
+    const std::vector<ActorItem>& actorItems
+)
 {
     using namespace boost::property_tree;
 
-    
+    ptree ptProject;
+
+    for (auto classIndex = classItems.begin(); classIndex != classItems.end(); ++classIndex)
+    {
+        ptree& classItem = ptProject.add("Project.Class.ClassItem", "");
+        classItem.put("<xmlattr>.Name", classIndex->m_Name.c_str());
+    }
+
+    for (auto actorIndex = actorItems.begin(); actorIndex != actorItems.end(); ++actorIndex)
+    {
+        ptree& actorItem = ptProject.add("Project.Actor.ActorItem", "");
+        actorItem.put("<xmlattr>.Name", actorIndex->m_Name.c_str());
+        actorItem.put("ClassName", actorIndex->m_ClassName.c_str());
+    }
+
+    const boost::property_tree::xml_writer_settings<ptree::key_type> writeSettings(' ', 2);
+    write_xml(projectFilePath, ptProject, std::locale(), writeSettings);
+
+    Out::Log(pType::MESSAGE, "Save File Done");
 }

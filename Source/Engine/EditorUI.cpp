@@ -7,6 +7,9 @@ namespace EngineCore
 
     extern std::vector<std::shared_ptr<Actor>> actorsInScene;
 
+    extern std::vector<ClassItem> classItems;
+    extern std::vector<ActorItem> actorItems;
+
     void RenderEditorUI()
     {
         // CONST
@@ -25,20 +28,27 @@ namespace EngineCore
         auto mainWinFlag =
             ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse |
             ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoBringToFrontOnFocus;
+        auto popWinFlag =
+            ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse;
 
         // STATIC
         static uint8_t leftEnableTab = 0;
-        static std::vector<const char*> actorItems;
+        static std::vector<const char*> actorItemsChar;
         static int actorCurrent = 0;
-        static std::vector<const char*> classItems;
+        static std::vector<const char*> classItemsChar;
         static int classCurrent = 0;
         // STATIC
 
-        static std::string a("some text");
+        classItemsChar.clear();
+        actorItemsChar.clear();
 
-        if (actorItems.empty())
+        for (auto classIndex = classItems.begin(); classIndex != classItems.end(); ++classIndex)
         {
-            actorItems.push_back(a.c_str());
+            classItemsChar.push_back(classIndex->m_Name.c_str());
+        }
+        for (auto actorIndex = actorItems.begin(); actorIndex != actorItems.end(); ++actorIndex)
+        {
+            actorItemsChar.push_back(actorIndex->m_Name.c_str());
         }
 
         int listBoxHeightCount = ((displayH - 64) / ImGui::GetTextLineHeightWithSpacing());
@@ -52,7 +62,7 @@ namespace EngineCore
                 {
                     leftEnableTab = 0;
                     ImGui::PushItemWidth(-1);
-                    ImGui::ListBox("", &actorCurrent, actorItems.data(), actorItems.size(), listBoxHeightCount);
+                    ImGui::ListBox("", &actorCurrent, actorItemsChar.data(), actorItemsChar.size(), listBoxHeightCount);
                     ImGui::EndTabItem();
                 }
 
@@ -60,7 +70,7 @@ namespace EngineCore
                 {
                     leftEnableTab = 1;
                     ImGui::PushItemWidth(-1);
-                    ImGui::ListBox("", &classCurrent, classItems.data(), classItems.size(), listBoxHeightCount);
+                    ImGui::ListBox("", &classCurrent, classItemsChar.data(), classItemsChar.size(), listBoxHeightCount);
                     ImGui::EndTabItem();
                 }
 
@@ -78,17 +88,21 @@ namespace EngineCore
             {
                 ImGui::Text("Actor Details");
                 ImGui::Separator();
-                if (actorCurrent < actorItems.size())
+                if (actorCurrent < actorItemsChar.size())
                 {
-                    ImGui::Text("Actor Name: %s", actorItems[actorCurrent]);
+                    ImGui::Text("Actor Name: %s", actorItemsChar[actorCurrent]);
+                    ImGui::Text("Actor Type: %s", actorItems[actorCurrent].m_ClassName.c_str());
                 }
             }
             else if (leftEnableTab == 1)
             {
                 ImGui::Text("Class Details");
                 ImGui::Separator();
+                if (classCurrent < classItemsChar.size())
+                {
+                    ImGui::Text("Class Name: %s", classItemsChar[classCurrent]);
+                }
             }
-            
 
             ImGui::End();
         }
@@ -106,6 +120,21 @@ namespace EngineCore
         {
             if (ImGui::BeginTabBar("Tools"))
             {
+                if (ImGui::BeginTabItem("File"))
+                {
+                    if (ImGui::Button("Reload Project"))
+                    {
+                        readProject(classItems, actorItems);
+                    }
+                    ImGui::SameLine();
+                    if (ImGui::Button("Write Project"))
+                    {
+                        saveProject(classItems, actorItems);
+                    }
+
+                    ImGui::EndTabItem();
+                }
+
                 if (ImGui::BeginTabItem("Class"))
                 {
                     if (ImGui::Button("Add a Class"))
@@ -145,7 +174,7 @@ namespace EngineCore
 
         if (showAddNewClassWindow)
         {
-            if (ImGui::Begin("Add a Class", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse))
+            if (ImGui::Begin("Add a Class", nullptr, popWinFlag))
             {
                 ImGui::Text("Guide for Create new Class");
                 ImGui::Separator();
@@ -157,6 +186,11 @@ namespace EngineCore
                     if (*newClassName)
                     {
                         addClassToProject(newClassName);
+
+                        ClassItem newClass;
+                        newClass.m_Name = std::string(newClassName);
+                        classItems.push_back(newClass);
+
                         showAddNewClassWindow = false;
                     }
                 }
@@ -172,7 +206,7 @@ namespace EngineCore
 
         if (showAboutWindow)
         {
-            if (ImGui::Begin("About", &showAboutWindow, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse))
+            if (ImGui::Begin("About", &showAboutWindow, popWinFlag))
             {
                 ImGui::Text("About reEngine");
                 ImGui::Separator();
@@ -188,8 +222,6 @@ namespace EngineCore
         {
             ImGui::End();
         }
-
-        ImGui::ShowDemoWindow();
 
         ImGui::Render();
 
