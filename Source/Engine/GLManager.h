@@ -19,4 +19,5 @@ public:
 
 public:
     unsigned int RenderScene(uint32_t viewWidth, uint32_t viewHeight);
+    void RenderGame(uint32_t viewWidth, uint32_t viewHeight);
 };

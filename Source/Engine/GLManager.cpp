@@ -55,3 +55,13 @@ unsigned int GLManager::RenderScene(uint32_t viewWidth, uint32_t viewHeight)
 
     return m_SceneTextureID;
 }
+
+void GLManager::RenderGame(uint32_t viewWidth, uint32_t viewHeight)
+{
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    glViewport(0, 0, viewWidth, viewHeight);
+
+    glClearColor(colorGreen.x(), colorGreen.y(), colorGreen.z(), 1.0);
+    glClear(GL_COLOR_BUFFER_BIT);
+}

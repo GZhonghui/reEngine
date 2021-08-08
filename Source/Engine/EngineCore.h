@@ -10,10 +10,6 @@
 
 #include"CodeTemplate.h"
 
-#ifdef BUILD_GAME_MODE
-#include"Init.h"
-#endif
-
 #define RUN_ENGINE engineMain(initScene)
 
 int engineMain(void (*initScene)(std::vector<std::shared_ptr<Actor>>* actorsInScene));
@@ -30,7 +26,6 @@ namespace EngineCore
 
     //EditorUI.cpp
     void RenderEditorUI();
-    void RenderEditorScene();
     void Render();
 
     void initActors();

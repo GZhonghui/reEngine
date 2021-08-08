@@ -1,11 +1,11 @@
 #include "Actor.h"
 #include "EngineCore.h"
 
-class Mesh : public Actor
+class Apple : public Actor
 {
 public:
-    Mesh(const std::string& Name) : Actor(Name) { }
-    ~Mesh() = default;
+    Apple(const std::string& Name) : Actor(Name) { }
+    virtual ~Apple() = default;
 public:
     virtual void Init();
     virtual void Update(float Delta);
@@ -13,6 +13,6 @@ public:
 public:
     virtual const char* getType() const noexcept
     {
-        return "Mesh";
+        return "Apple";
     }
 };

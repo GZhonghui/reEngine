@@ -46,7 +46,7 @@ inline void addClassToProject(const char* className)
         fprintf(headerFile, "{\n");
         fprintf(headerFile, "public:\n");
         fprintf(headerFile, "    %s(const std::string& Name) : Actor(Name) { }\n",className);
-        fprintf(headerFile, "    ~%s() = default;\n", className);
+        fprintf(headerFile, "    virtual ~%s() = default;\n", className);
         fprintf(headerFile, "public:\n");
         fprintf(headerFile, "    virtual void Init();\n");
         fprintf(headerFile, "    virtual void Update(float Delta);\n");
@@ -106,7 +106,11 @@ inline void addClassToProject(const char* className)
     write_xml("Engine.vcxproj", ptProject, std::locale(), writeSettings);
 }
 
-inline void updateInitHeader()
+inline void updateInitHeader
+(
+    const std::vector<ClassItem>& classItems,
+    const std::vector<ActorItem>& actorItems
+)
 {
     FILE* initHeader = fopen("Init.h", "wt");
 
@@ -126,10 +130,14 @@ inline void updateInitHeader()
             fprintf(initHeader, "#include\"impl%s.h\"\n", className);
         };
 
+        for (auto classIndex = classItems.begin(); classIndex != classItems.end(); ++classIndex)
+        {
+            addInclude(classIndex->m_Name.c_str());
+        }
+
         fprintf(initHeader, "\n");
         fprintf(initHeader, "inline void initScene(std::vector<std::shared_ptr<Actor>>* actorsInScene)\n");
         fprintf(initHeader, "{\n");
-        fprintf(initHeader, "\n");
 
         //For Each
         auto addActor = [initHeader](const char* actorName, const char* className)
@@ -137,9 +145,12 @@ inline void updateInitHeader()
             fprintf(initHeader, "    actorsInScene->push_back(std::make_shared<%s>(\"%s\"));\n", className, actorName);
         };
 
-        fprintf(initHeader, "\n");
+        for (auto actorIndex = actorItems.begin(); actorIndex != actorItems.end(); ++actorIndex)
+        {
+            addActor(actorIndex->m_Name.c_str(), actorIndex->m_ClassName.c_str());
+        }
+
         fprintf(initHeader, "}\n");
-        fprintf(initHeader, "\n");
     }
 }
 
@@ -198,10 +209,7 @@ inline void readProject
             }
         }
     }
-    catch (...)
-    {
-
-    }
+    catch (...) {}
     
     try
     {
@@ -220,10 +228,7 @@ inline void readProject
             }
         }
     }
-    catch (...)
-    {
-
-    }
+    catch (...) {}
 
     Out::Log(pType::MESSAGE, "Read %d Class", classItems.size());
     Out::Log(pType::MESSAGE, "Read %d Actor", actorItems.size());
@@ -256,4 +261,8 @@ inline void saveProject
     write_xml(projectFilePath, ptProject, std::locale(), writeSettings);
 
     Out::Log(pType::MESSAGE, "Save File Done");
+
+    updateInitHeader(classItems, actorItems);
+
+    Out::Log(pType::MESSAGE, "Generated Init Header");
 }

@@ -7,7 +7,7 @@ class Actor
 {
 public:
     Actor(const std::string& Name) :m_Name(Name) {}
-    ~Actor() = default;
+    virtual ~Actor() = default;
 protected:
     std::string m_Name;
 public:

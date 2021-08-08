@@ -87,23 +87,20 @@ namespace EngineCore
         glManager.Destroy();
     }
 
-    void RenderEditorScene()
-    {
-
-    }
-
     void Render()
     {
         glClearColor(colorGray.x(), colorGray.y(), colorGray.z(), 1.0);
         glClear(GL_COLOR_BUFFER_BIT);
 
+        int nowWidth, nowHeight;
+        glfwGetFramebufferSize(mainWindow, &nowWidth, &nowHeight);
+
         if (G_BUILD_GAME_MODE)
         {
-
+            glManager.RenderGame(nowWidth, nowHeight);
         }
         else
         {
-            RenderEditorScene();
             RenderEditorUI();
         }
     }
@@ -126,7 +123,13 @@ namespace EngineCore
 
     void Update()
     {
-        float Delta = 0;
+        static double lastUpdateTime = glfwGetTime();
+        
+        double thisUpdateTime = glfwGetTime();
+
+        float Delta = static_cast<float>(thisUpdateTime - lastUpdateTime);
+
+        lastUpdateTime = thisUpdateTime;
 
         for (auto aIndex = actorsInScene.begin(); aIndex != actorsInScene.end(); ++aIndex)
         {

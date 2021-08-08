@@ -109,7 +109,7 @@ inline bool checkClassOrActorName(const char* inputName)
 
     while (*checkIndex)
     {
-        if (!isAlpha(*checkIndex))
+        if (!isAlpha(*checkIndex) && (*checkIndex != '_'))
         {
             return false;
         }

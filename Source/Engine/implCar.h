@@ -1,10 +1,11 @@
 #include "Actor.h"
+#include "EngineCore.h"
 
 class Car : public Actor
 {
 public:
     Car(const std::string& Name) : Actor(Name) { }
-    ~Car() = default;
+    virtual ~Car() = default;
 public:
     virtual void Init();
     virtual void Update(float Delta);

@@ -1,19 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project>
   <Class>
+    <ClassItem Name="Apple"/>
     <ClassItem Name="Car"/>
-    <ClassItem Name="Phone"/>
-    <ClassItem Name="Mesh"/>
+    <ClassItem Name="Love"/>
   </Class>
   <Actor>
     <ActorItem Name="myCar">
       <ClassName>Car</ClassName>
     </ActorItem>
-    <ActorItem Name="PQQ_Car">
-      <ClassName>Car</ClassName>
-    </ActorItem>
-    <ActorItem Name="iPhoneX">
-      <ClassName>Phone</ClassName>
+    <ActorItem Name="myApple">
+      <ClassName>Apple</ClassName>
     </ActorItem>
   </Actor>
 </Project>

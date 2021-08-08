@@ -17,6 +17,19 @@ typedef Eigen::Vector3d Point;
 typedef Eigen::Vector3d Color;
 
 const Color colorGray(105 / 255.999, 105 / 255.999, 105 / 255.999);
+const Color colorGreen(32 / 255.999, 127 / 255.999, 76 / 255.999);
+
+class Transform
+{
+public:
+    Transform() = default;
+    ~Transform() = default;
+
+public:
+    Eigen::Vector3d Location;
+    Eigen::Vector3d Rotation;
+    Eigen::Vector3d Scale;
+};
 
 inline void Convert(const Eigen::Vector3d& From, glm::vec3& To)
 {
@@ -42,7 +55,7 @@ inline Eigen::Vector3d Convert(const glm::vec3& From)
     return Eigen::Vector3d(From[0], From[1], From[2]);
 }
 
-inline bool Near(double x, double y)
+inline bool Near(double x, double y, double localEPS = eps)
 {
-    return std::abs(x - y) < eps;
+    return std::abs(x - y) < localEPS;
 }
