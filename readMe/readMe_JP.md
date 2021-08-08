@@ -3,19 +3,19 @@
 ---
 > More Projects from the reFamily [**reRender**](https://github.com/GZhonghui/reRender)/[**reSimulate**](https://github.com/GZhonghui/reSimulate)
 
-## About
-**reEngine** is a Open Source Game Engine
+## 約
+**reEngine**はオープンソースのゲームエンジンです
 
-## Features
-### ✔Vulkan Backend
-### ✔OpenGL Core Backend
-### ✔C++ Reflection
-### ✔C++ Scripts
-### ✔Import Assets
-### ✔Editor by ImGui
+## 特徴
+### ✔Vulkanバックエンド
+### ✔OpenGL Coreバックエンド
+### ✔C++反射
+### ✔C++スクリプト
+### ✔アセットのインポート
+### ✔ImGuiに基づくエディター
 
-## Credits
-> This Project Depends on the Following Libs
+## クレジット
+> このプロジェクトは以下のライブラリに依存しています
 * Assimp
 * Boost
 * Eigen
