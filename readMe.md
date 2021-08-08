@@ -24,4 +24,6 @@
 * GLFW
 * GLM
 * ImGui
+* OpenGL Core
 * STB
+* Vulkan
