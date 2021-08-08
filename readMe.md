@@ -5,7 +5,7 @@
 > More Projects from the reFamily [**reRender**](https://github.com/GZhonghui/reRender)/[**reSimulate**](https://github.com/GZhonghui/reSimulate)
 
 ## About
-**reEngine** is  a Open Source Game Engine, Powered by C++
+**reEngine** is a Open Source Game Engine
 
 ## Features
 ### ✔Vulkan Backend
