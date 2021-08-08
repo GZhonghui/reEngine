@@ -284,6 +284,13 @@ namespace EngineCore
         ImGui::SetNextWindowPos(ImVec2(leftWindowWidth, toolBoxHeight), ImGuiCond_Always);
         if (ImGui::Begin("Scene", nullptr, mainWinFlag))
         {
+            auto sceneWindowSize = ImGui::GetWindowSize();
+            sceneWindowSize.x -= 16;
+            sceneWindowSize.y -= 36;
+
+            auto sceneTextureID = glManager.RenderScene(sceneWindowSize.x, sceneWindowSize.y);
+            ImGui::Image((void*)sceneTextureID, sceneWindowSize);
+
             ImGui::End();
         }
 

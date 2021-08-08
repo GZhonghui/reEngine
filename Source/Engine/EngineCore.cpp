@@ -35,7 +35,7 @@ namespace EngineCore
 
         if (!mainWindow)
         {
-            Out::Log(pType::ERROR, "init GLFW Failed");
+            Out::Log(pType::ERROR, "init GLFW Window Failed");
 
             return;
         }
