@@ -68,6 +68,9 @@
     <ClCompile Include="EngineCore.cpp">
       <Filter>Engine Source</Filter>
     </ClCompile>
+    <ClCompile Include="EditorUI.cpp">
+      <Filter>Engine Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h">

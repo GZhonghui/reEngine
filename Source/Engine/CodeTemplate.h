@@ -3,6 +3,8 @@
 #include"ToolAIO.h"
 #include"MathAIO.h"
 
+const char* projectFilePath = "Game.rpj";
+
 inline void addClassToProject(const char* className)
 {
     std::string sourceFileName(className);
@@ -108,12 +110,36 @@ inline void updateInitHeader()
     }
 }
 
+// Project File Struction
+/*
+
+Project
+    Class
+        ClassItem
+            Name=""
+
+    Actor
+        ActorItem
+            Name=""
+            ClassName=""
+*/
+// Project File Struction
+
 inline void readProject()
 {
+    using namespace boost::property_tree;
+
+    if (!std::filesystem::exists(projectFilePath))
+    {
+        return;
+    }
+
 
 }
 
 inline void saveProject()
 {
+    using namespace boost::property_tree;
+
     
 }

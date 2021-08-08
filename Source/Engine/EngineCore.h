@@ -28,6 +28,7 @@ namespace EngineCore
     void destroyImGuiForGL();
     void destroyOpenGL();
 
+    //EditorUI.cpp
     void RenderEditorUI();
     void RenderEditorScene();
     void Render();

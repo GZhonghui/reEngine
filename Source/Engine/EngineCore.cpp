@@ -55,7 +55,7 @@ namespace EngineCore
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();
 
-        ImGui::StyleColorsDark();
+        ImGui::StyleColorsClassic();
 
         ImGui_ImplGlfw_InitForOpenGL(mainWindow, true);
         ImGui_ImplOpenGL3_Init("#version 330 core");
@@ -82,96 +82,6 @@ namespace EngineCore
     void destroyOpenGL()
     {
         glManager.Destroy();
-    }
-
-    void RenderEditorUI()
-    {
-        const float leftWindowWidth = 256;
-        const float rightWindowWidth = 256;
-        const float toolBoxHeight = 96;
-
-        int displayW, displayH;
-        glfwGetFramebufferSize(mainWindow, &displayW, &displayH);
-
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();
-
-        auto WinFlag = 
-            ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse |
-            ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoBringToFrontOnFocus;
-
-        ImGui::SetNextWindowSize(ImVec2(leftWindowWidth, displayH), ImGuiCond_Always);
-        ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always);
-
-        if (ImGui::Begin("Actors", nullptr, WinFlag))
-        {
-            ImGui::End();
-        }
-
-        ImGui::SetNextWindowSize(ImVec2(rightWindowWidth, displayH), ImGuiCond_Always);
-        ImGui::SetNextWindowPos(ImVec2(displayW - rightWindowWidth, 0), ImGuiCond_Always);
-
-        if (ImGui::Begin("Files", nullptr, WinFlag))
-        {
-            ImGui::End();
-        }
-
-        auto centerWidth = displayW - leftWindowWidth - rightWindowWidth;
-        ImGui::SetNextWindowSize(ImVec2(centerWidth, toolBoxHeight), ImGuiCond_Always);
-        ImGui::SetNextWindowPos(ImVec2(leftWindowWidth, 0), ImGuiCond_Always);
-
-        static bool showAddNewClassWindow = false;
-
-        if (ImGui::Begin("Tools", nullptr, WinFlag))
-        {
-            if (ImGui::Button("Add a Class"))
-            {
-                showAddNewClassWindow = true;
-            }
-
-            ImGui::End();
-        }
-
-        if (showAddNewClassWindow)
-        {
-            if (ImGui::Begin("Add a Class", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse))
-            {
-                char newClassName[16];
-                memset(newClassName, 0, sizeof(newClassName));
-
-                ImGui::Text("Guide for Create new Class");
-                ImGui::Separator();
-                ImGui::Text("Input the Class Name");
-                ImGui::InputText("", newClassName, 16);
-
-                if (ImGui::Button("Add"))
-                {
-                    showAddNewClassWindow = false;
-                }
-
-                if (ImGui::Button("Cancel"))
-                {
-                    showAddNewClassWindow = false;
-                }
-
-                ImGui::End();
-            }
-        }
-
-        ImGui::SetNextWindowSize(ImVec2(centerWidth, displayH - toolBoxHeight), ImGuiCond_Always);
-        ImGui::SetNextWindowPos(ImVec2(leftWindowWidth, toolBoxHeight), ImGuiCond_Always);
-
-        if (ImGui::Begin("Scene", nullptr, WinFlag))
-        {
-            ImGui::End();
-        }
-
-        ImGui::Render();
-
-        glViewport(0, 0, displayW, displayH);
-
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     }
 
     void RenderEditorScene()
