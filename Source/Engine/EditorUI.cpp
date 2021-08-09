@@ -2,6 +2,7 @@
 
 namespace EngineCore
 {
+    // FROM EngineCore.cpp
     extern GLFWwindow* mainWindow;
     extern GLManager glManager;
 
@@ -9,6 +10,10 @@ namespace EngineCore
 
     extern std::vector<ClassItem> classItems;
     extern std::vector<ActorItem> actorItems;
+
+    extern std::unordered_set<std::string> classNameSet;
+    extern std::unordered_set<std::string> actorNameSet;
+    // FROM EngineCore.cpp
 
     void RenderEditorUI()
     {
@@ -54,6 +59,8 @@ namespace EngineCore
         {
             actorItemsChar.push_back(actorIndex->m_Name.c_str());
         }
+
+        ImGui::ShowDemoWindow();
 
         int listBoxHeightCount = ((displayH - 64) / ImGui::GetTextLineHeightWithSpacing());
         ImGui::SetNextWindowSize(ImVec2(leftWindowWidth, displayH), ImGuiCond_Always);
@@ -131,7 +138,7 @@ namespace EngineCore
                 {
                     if (ImGui::Button("Reload Project"))
                     {
-                        readProject(classItems, actorItems);
+                        readProject(classItems, actorItems, classNameSet, actorNameSet);
                     }
                     ImGui::SameLine();
                     if (ImGui::Button("Write Project"))

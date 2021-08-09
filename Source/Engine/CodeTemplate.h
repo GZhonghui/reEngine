@@ -177,7 +177,9 @@ Project
 inline void readProject
 (
     std::vector<ClassItem>& classItems,
-    std::vector<ActorItem>& actorItems
+    std::vector<ActorItem>& actorItems,
+    std::unordered_set<std::string>& classNameSet,
+    std::unordered_set<std::string>& actorNameSet
 )
 {
     using namespace boost::property_tree;
@@ -191,6 +193,9 @@ inline void readProject
     classItems.clear();
     actorItems.clear();
 
+    classNameSet.clear();
+    actorNameSet.clear();
+
     ptree ptProject;
     read_xml(projectFilePath, ptProject, xml_parser::trim_whitespace);
 
@@ -202,10 +207,15 @@ inline void readProject
             {
                 std::string thisClassName = classItem.second.get<std::string>("<xmlattr>.Name");
 
-                ClassItem thisClass;
-                thisClass.m_Name = thisClassName;
+                if (!classNameSet.count(thisClassName))
+                {
+                    classNameSet.insert(thisClassName);
 
-                classItems.push_back(thisClass);
+                    ClassItem thisClass;
+                    thisClass.m_Name = thisClassName;
+
+                    classItems.push_back(thisClass);
+                }
             }
         }
     }
@@ -220,11 +230,16 @@ inline void readProject
                 std::string thisActorName = actorItem.second.get<std::string>("<xmlattr>.Name");
                 std::string thisActorClassName = actorItem.second.get<std::string>("ClassName");
 
-                ActorItem thisActor;
-                thisActor.m_Name = thisActorName;
-                thisActor.m_ClassName = thisActorClassName;
+                if (!actorNameSet.count(thisActorName))
+                {
+                    actorNameSet.insert(thisActorName);
 
-                actorItems.push_back(thisActor);
+                    ActorItem thisActor;
+                    thisActor.m_Name = thisActorName;
+                    thisActor.m_ClassName = thisActorClassName;
+
+                    actorItems.push_back(thisActor);
+                }
             }
         }
     }

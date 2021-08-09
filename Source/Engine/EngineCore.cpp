@@ -19,6 +19,9 @@ namespace EngineCore
     std::vector<ClassItem> classItems;
     std::vector<ActorItem> actorItems;
 
+    std::unordered_set<std::string> classNameSet;
+    std::unordered_set<std::string> actorNameSet;
+
     void initGLFW()
     {
         glfwInit();
@@ -165,7 +168,11 @@ namespace EngineCore
 int engineMain(void (*initScene)(std::vector<std::shared_ptr<Actor>>* actorsInScene))
 {
 
-    readProject(EngineCore::classItems, EngineCore::actorItems);
+    readProject
+    (
+        EngineCore::classItems, EngineCore::actorItems,
+        EngineCore::classNameSet, EngineCore::actorNameSet
+    );
 
     if (G_BUILD_GAME_MODE)
     {
