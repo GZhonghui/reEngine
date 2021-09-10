@@ -38,6 +38,7 @@ protected:
         {
             m_ShaderCode.push_back(read);
         }
+        m_ShaderCode.push_back(0);
 
         fclose(shaderFile);
         return true;
@@ -51,4 +52,5 @@ protected:
 
 public:
     friend class VulkanManager;
+    friend class GLManager;
 };

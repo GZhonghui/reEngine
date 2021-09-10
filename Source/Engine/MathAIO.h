@@ -6,6 +6,7 @@
 #include<Eigen/Eigen>
 
 #include<glm/glm.hpp>
+#include<glm/gtc/type_ptr.hpp>
 #include<GLM/gtc/matrix_transform.hpp>
 
 const double pi = acos(-1.0);

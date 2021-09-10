@@ -74,4 +74,5 @@ public:
 public:
     friend class Event;
     friend class VulkanManager;
+    friend class GLManager;
 };

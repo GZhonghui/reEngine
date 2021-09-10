@@ -90,21 +90,41 @@ namespace EngineCore
         glManager.Destroy();
     }
 
+    uint32_t RenderEditorScene(uint32_t viewWidth, uint32_t viewHeight)
+    {
+        glManager.BeginRenderEditor(viewWidth, viewHeight);
+
+        glManager.RenderSkybox(viewWidth, viewHeight, Event::getCameraLocation(), Event::getCameraDir());
+
+        glManager.EndRenderEditor();
+
+        return glManager.getSceneTextureID();
+    }
+
+    void RenderGame()
+    {
+        int nowWidth, nowHeight;
+        glfwGetFramebufferSize(mainWindow, &nowWidth, &nowHeight);
+
+        glManager.BeginRenderGame(nowWidth, nowHeight);
+
+        glManager.RenderSkybox(nowWidth, nowHeight, Event::getCameraLocation(), Event::getCameraDir());
+
+        glManager.EndRenderGame();
+    }
+
     void Render()
     {
         glClearColor(colorGray.x(), colorGray.y(), colorGray.z(), 1.0);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        int nowWidth, nowHeight;
-        glfwGetFramebufferSize(mainWindow, &nowWidth, &nowHeight);
-
         if (G_BUILD_GAME_MODE)
         {
-            glManager.RenderGame(nowWidth, nowHeight);
+            RenderGame();
         }
         else
         {
-            RenderEditorUI();
+            RenderEditor();
         }
     }
 
@@ -126,6 +146,7 @@ namespace EngineCore
 
     void Update()
     {
+        static bool firstUpdate = true;
         static double lastUpdateTime = glfwGetTime();
         
         double thisUpdateTime = glfwGetTime();
@@ -133,6 +154,12 @@ namespace EngineCore
         float Delta = static_cast<float>(thisUpdateTime - lastUpdateTime);
 
         lastUpdateTime = thisUpdateTime;
+
+        if (firstUpdate)
+        {
+            firstUpdate = false;
+            return;
+        }
 
         for (auto aIndex = actorsInScene.begin(); aIndex != actorsInScene.end(); ++aIndex)
         {
@@ -185,6 +212,8 @@ int engineMain(void (*initScene)(std::vector<std::shared_ptr<Actor>>* actorsInSc
     EngineCore::initGLFW();
     EngineCore::initImGuiForGL();
     EngineCore::initOpenGL();
+
+    Event::initEventState();
 
     while (!glfwWindowShouldClose(EngineCore::mainWindow))
     {

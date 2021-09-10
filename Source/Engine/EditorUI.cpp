@@ -15,12 +15,13 @@ namespace EngineCore
     extern std::unordered_set<std::string> actorNameSet;
     // FROM EngineCore.cpp
 
-    void RenderEditorUI()
+    void RenderEditor()
     {
         // CONST
         const float leftWindowWidth = 256;
         const float rightWindowWidth = 256;
         const float toolBoxHeight = 96;
+        const float detailHeight = 360;
         // CONST
 
         // STATIC
@@ -60,8 +61,6 @@ namespace EngineCore
             actorItemsChar.push_back(actorIndex->m_Name.c_str());
         }
 
-        ImGui::ShowDemoWindow();
-
         int listBoxHeightCount = ((displayH - 64) / ImGui::GetTextLineHeightWithSpacing());
         ImGui::SetNextWindowSize(ImVec2(leftWindowWidth, displayH), ImGuiCond_Always);
         ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always);
@@ -91,7 +90,7 @@ namespace EngineCore
             ImGui::End();
         }
 
-        ImGui::SetNextWindowSize(ImVec2(rightWindowWidth, displayH), ImGuiCond_Always);
+        ImGui::SetNextWindowSize(ImVec2(rightWindowWidth, detailHeight), ImGuiCond_Always);
         ImGui::SetNextWindowPos(ImVec2(displayW - rightWindowWidth, 0), ImGuiCond_Always);
         if (ImGui::Begin("Details", nullptr, mainWinFlag))
         {
@@ -114,6 +113,22 @@ namespace EngineCore
                     ImGui::Text("Class Name: %s", classItemsChar[classCurrent]);
                 }
             }
+
+            ImGui::End();
+        }
+
+        ImGui::SetNextWindowSize(ImVec2(rightWindowWidth, displayH - detailHeight), ImGuiCond_Always);
+        ImGui::SetNextWindowPos(ImVec2(displayW - rightWindowWidth, detailHeight), ImGuiCond_Always);
+        if (ImGui::Begin("Info", nullptr, mainWinFlag))
+        {
+            ImGui::Text("Camera");
+            auto cameraLocation = Event::getCameraLocation();
+            auto cameraDir = Event::getCameraDir();
+
+            ImGui::Text("Location (%.2lf,%.2lf,%.2lf)",
+                cameraLocation.x(), cameraLocation.y(), cameraLocation.z());
+            ImGui::Text("Forward (%.2lf,%.2lf,%.2lf)",
+                cameraDir.x(), cameraDir.y(), cameraDir.z());
 
             ImGui::End();
         }
@@ -295,8 +310,8 @@ namespace EngineCore
             sceneWindowSize.x -= 16;
             sceneWindowSize.y -= 36;
 
-            auto sceneTextureID = glManager.RenderScene(sceneWindowSize.x, sceneWindowSize.y);
-            ImGui::Image((void*)sceneTextureID, sceneWindowSize);
+            auto sceneTextureID = RenderEditorScene(sceneWindowSize.x, sceneWindowSize.y);
+            ImGui::Image((void*)sceneTextureID, sceneWindowSize, ImVec2(0, 1), ImVec2(1, 0));
 
             ImGui::End();
         }

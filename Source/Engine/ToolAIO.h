@@ -102,14 +102,19 @@ inline bool checkClassOrActorName(const char* inputName)
 {
     auto checkIndex = inputName;
 
-    auto isAlpha = [](char x)
+    auto isAlpha = [](char x)->bool
     {
         return ('a' <= x && x <= 'z') || ('A' <= x && x < 'Z');
     };
 
+    auto isNumber = [](char x)->bool
+    {
+        return '0' <= x && x <= '9';
+    };
+
     while (*checkIndex)
     {
-        if (!isAlpha(*checkIndex) && (*checkIndex != '_'))
+        if (!isAlpha(*checkIndex) && !isNumber(*checkIndex) && (*checkIndex != '_'))
         {
             return false;
         }

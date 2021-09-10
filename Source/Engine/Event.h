@@ -23,7 +23,7 @@ protected:
 protected:
     static void resetCamera()
     {
-        mainCamera.setPosition(Point(0, 0, 10));
+        mainCamera.setPosition(Point(3, 1, 3));
         mainCamera.lookAt(Point(0, 0, 0));
     }
 
@@ -38,7 +38,18 @@ public:
 
         cameraMoveSpeed = 3.0f;
 
-        Out::Log(pType::MESSAGE, "Init Event");
+        Out::Log(pType::MESSAGE, "Inited Event");
+    }
+
+public:
+    static Point getCameraLocation()
+    {
+        return mainCamera.m_Position;
+    }
+
+    static Direction getCameraDir()
+    {
+        return mainCamera.m_Forward;
     }
 
 public:
@@ -156,4 +167,5 @@ public:
 
 public:
     friend class VulkanManager;
+    friend class GLManager;
 };

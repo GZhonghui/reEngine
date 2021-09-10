@@ -1,6 +1,6 @@
 #pragma once
 
-// #define BUILD_GAME_MODE
+#define BUILD_GAME_MODE
 
 //Switch to Build Mode
 #ifdef BUILD_GAME_MODE

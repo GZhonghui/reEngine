@@ -6,6 +6,8 @@
 #include"VulkanManager.h"
 #include"GLManager.h"
 
+#include"GLRenderable.h"
+
 #include"Actor.h"
 
 #include"CodeTemplate.h"
@@ -25,7 +27,11 @@ namespace EngineCore
     void destroyOpenGL();
 
     //EditorUI.cpp
-    void RenderEditorUI();
+    void RenderEditor();
+    uint32_t RenderEditorScene(uint32_t viewWidth, uint32_t viewHeight);
+    
+    void RenderGame();
+    
     void Render();
 
     void initActors();
