@@ -10,7 +10,9 @@
 ## Tutorial
 Please Watch this [Youtube Video](https://www.youtube.com/channel/UCa0G_UHT3j2vzTHHy_2CN2w)
 
+### 🚩Editor
 ![Editor](readMe/Editor.jpg)
+### 🚩Game
 ![Game](readMe/Game.jpg)
 
 ## Features
