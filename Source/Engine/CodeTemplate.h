@@ -158,6 +158,8 @@ inline void updateInitHeader
         }
 
         fprintf(initHeader, "}\n");
+
+        fclose(initHeader);
     }
 }
 

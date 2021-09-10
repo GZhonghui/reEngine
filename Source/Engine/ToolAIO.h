@@ -100,6 +100,8 @@ public:
 
 inline bool checkClassOrActorName(const char* inputName)
 {
+    if (!(*inputName)) return false;
+
     auto checkIndex = inputName;
 
     auto isAlpha = [](char x)->bool

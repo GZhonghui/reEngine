@@ -58,6 +58,8 @@ namespace EngineCore
             actorItemsChar.push_back(actorIndex->m_Name.c_str());
         }
 
+        ImGui::ShowDemoWindow();
+
         int listBoxHeightCount = ((displayH - 64) / ImGui::GetTextLineHeightWithSpacing());
         ImGui::SetNextWindowSize(ImVec2(leftWindowWidth, displayH), ImGuiCond_Always);
         ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always);
@@ -140,6 +142,7 @@ namespace EngineCore
         static bool showAddNewClassWindow = false;
         static bool showAddNewActorWindow = false;
         static bool showAboutWindow = false;
+        static bool renderNewClass = false;
         static char newClassName[16];
         static char newActorName[32];
         static int selectClassInNewActor = 0;
@@ -230,6 +233,9 @@ namespace EngineCore
                 ImGui::Separator();
                 ImGui::Text("Input the Class Name");
                 ImGui::InputText("", newClassName, IM_ARRAYSIZE(newClassName));
+                ImGui::Checkbox("Render", &renderNewClass);
+
+                ImGui::Separator();
 
                 if (ImGui::Button("Add & Save"))
                 {
@@ -245,6 +251,9 @@ namespace EngineCore
 
                         showAddNewClassWindow = false;
                         havePopWindow = false;
+
+                        *newClassName = 0;
+                        renderNewClass = false;
                     }
                 }
 
@@ -253,6 +262,9 @@ namespace EngineCore
                 {
                     showAddNewClassWindow = false;
                     havePopWindow = false;
+
+                    *newClassName = 0;
+                    renderNewClass = false;
                 }
                 ImGui::End();
             }
@@ -268,6 +280,7 @@ namespace EngineCore
                 if (classItemsChar.empty())
                 {
                     ImGui::Text("Please Add a Class First");
+                    ImGui::Separator();
                 }
                 else
                 {
@@ -275,16 +288,18 @@ namespace EngineCore
                     ImGui::InputText("", newActorName, IM_ARRAYSIZE(newActorName));
                     ImGui::Text("Selete the Class");
                     ImGui::Combo("", &selectClassInNewActor, classItemsChar.data(), classItemsChar.size());
+                    ImGui::Separator();
 
                     if (ImGui::Button("Add"))
                     {
-                        if (checkClassOrActorName(newActorName) && selectClassInNewActor < classItemsChar.size())
+                        if (checkClassOrActorName(newActorName) &&
+                            selectClassInNewActor >= 0 &&
+                            selectClassInNewActor < classItemsChar.size())
                         {
                             ActorItem newActor;
                             newActor.m_Name = std::string(newActorName);
                             newActor.m_ClassName = classItems[selectClassInNewActor].m_Name;
-                            newActor.m_Tags.insert("Default Tag 01");
-                            newActor.m_Tags.insert("Default Tag 02");
+                            newActor.m_Tags.insert(std::string("Actor of ") + newActor.m_ClassName);
 
                             actorItems.push_back(newActor);
 

@@ -3,4 +3,14 @@
   <Class>
     <ClassItem Name="Car"/>
   </Class>
+  <Actor>
+    <ActorItem Name="Car_01">
+      <ClassName>Car</ClassName>
+      <Tag>Actor of Car</Tag>
+    </ActorItem>
+    <ActorItem Name="Car_02">
+      <ClassName>Car</ClassName>
+      <Tag>Actor of Car</Tag>
+    </ActorItem>
+  </Actor>
 </Project>
