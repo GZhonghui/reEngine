@@ -4,8 +4,8 @@
 Camera Event::mainCamera;
 
 bool Event::shouldQuit;
-bool Event::moveState;
 bool Event::windowResized;
+bool Event::mouseAsCursor;
 
 float Event::cameraMoveSpeed;
 
@@ -46,6 +46,11 @@ namespace EngineCore
             G_MIN_WINDOW_WIDTH, G_MIN_WINDOW_HEIGHT,
             GLFW_DONT_CARE, GLFW_DONT_CARE
         );
+
+        glfwSetKeyCallback(mainWindow, Event::glfwKeyCallback);
+        glfwSetCursorPosCallback(mainWindow, Event::glfwCursorPositionCallback);
+        glfwSetMouseButtonCallback(mainWindow, Event::glfwMouseButtonCallback);
+        glfwSetWindowSizeCallback(mainWindow, Event::glfwWindowResizeCallback);
 
         glfwMakeContextCurrent(mainWindow);
         glfwSwapInterval(1);
@@ -211,6 +216,7 @@ int engineMain(void (*initScene)(std::vector<std::shared_ptr<Actor>>* actorsInSc
     while (!glfwWindowShouldClose(EngineCore::mainWindow))
     {
         glfwPollEvents();
+        Event::Loop(EngineCore::mainWindow);
 
         EngineCore::Render();
 

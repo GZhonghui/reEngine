@@ -15,16 +15,16 @@ protected:
     static Camera mainCamera;
 
     static bool shouldQuit;
-    static bool moveState;
     static bool windowResized;
+    static bool mouseAsCursor;
 
     static float cameraMoveSpeed;
 
 protected:
     static void resetCamera()
     {
-        mainCamera.setPosition(Point(3, 1, 3));
-        mainCamera.lookAt(Point(0, 0, 0));
+        mainCamera.setPosition(Point(0, 0, 0));
+        mainCamera.lookAt(Point(0, 0, 1));
     }
 
 public:
@@ -33,8 +33,8 @@ public:
         resetCamera();
 
         shouldQuit = false;
-        moveState = false;
         windowResized = false;
+        mouseAsCursor = true;
 
         cameraMoveSpeed = 3.0f;
 
@@ -58,9 +58,23 @@ public:
         GLFWwindow* window, int key, int scancode, int action, int mods
     )
     {
+        // Push Some Key
+        // shouldQuit = true;
+
         if (key == GLFW_KEY_Q && action == GLFW_PRESS)
         {
-            shouldQuit = true;
+            mouseAsCursor = !mouseAsCursor;
+
+            if (mouseAsCursor)
+            {
+                glfwSetWindowTitle(window, "reEngine [Cursor Mode]");
+                glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+            }
+            else
+            {
+                glfwSetWindowTitle(window, "reEngine [Move Mode]");
+                glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+            }
         }
     }
 
@@ -83,7 +97,7 @@ public:
         lastX = x;
         lastY = y;
 
-        if (!moveState) return;
+        if (mouseAsCursor) return;
 
         offsetX *= rotateSpeed;
         offsetY *= rotateSpeed;
@@ -104,22 +118,7 @@ public:
     static void glfwMouseButtonCallback
     (
         GLFWwindow* window, int button, int action, int mods
-    )
-    {
-        if (button == GLFW_MOUSE_BUTTON_RIGHT)
-        {
-            if (action == GLFW_PRESS)
-            {
-                moveState = true;
-                glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-            }
-            else if (action == GLFW_RELEASE)
-            {
-                moveState = false;
-                glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-            }
-        }
-    }
+    ) {}
 
     static void glfwWindowResizeCallback
     (
@@ -143,7 +142,7 @@ public:
 
         lastTime = nowTime;
 
-        if (!moveState) return;
+        if (mouseAsCursor) return;
 
         Direction cameraRight = mainCamera.m_Forward.cross(cameraUP);
 
