@@ -24,6 +24,7 @@ public:
 public:
     std::string m_Name;
     std::string m_ClassName;
+    std::unordered_set<std::string> m_Tags;
 };
 
 inline void addClassToProject(const char* className)
@@ -127,7 +128,7 @@ inline void updateInitHeader
         //For Each
         auto addInclude = [initHeader](const char* className)
         {
-            fprintf(initHeader, "#include\"impl%s.h\"\n", className);
+            fprintf(initHeader, "#include\"impl%s.h\"\n\n", className);
         };
 
         for (auto classIndex = classItems.begin(); classIndex != classItems.end(); ++classIndex)
@@ -135,19 +136,25 @@ inline void updateInitHeader
             addInclude(classIndex->m_Name.c_str());
         }
 
-        fprintf(initHeader, "\n");
         fprintf(initHeader, "inline void initScene(std::vector<std::shared_ptr<Actor>>* actorsInScene)\n");
         fprintf(initHeader, "{\n");
 
         //For Each
-        auto addActor = [initHeader](const char* actorName, const char* className)
+        auto addActor = [initHeader](const char* actorName, const char* className, const std::unordered_set<std::string>& Tags)
         {
-            fprintf(initHeader, "    actorsInScene->push_back(std::make_shared<%s>(\"%s\"));\n", className, actorName);
+            fprintf(initHeader, "    {\n");
+            fprintf(initHeader, "        auto newActor = std::make_shared<%s>(\"%s\");\n", className, actorName);
+            for (auto nowTag = Tags.begin(); nowTag != Tags.end(); ++nowTag)
+            {
+                fprintf(initHeader, "        newActor->insertTag(\"%s\");\n", nowTag->c_str());
+            }
+            fprintf(initHeader, "        actorsInScene->push_back(newActor);\n");
+            fprintf(initHeader, "    }\n");
         };
 
         for (auto actorIndex = actorItems.begin(); actorIndex != actorItems.end(); ++actorIndex)
         {
-            addActor(actorIndex->m_Name.c_str(), actorIndex->m_ClassName.c_str());
+            addActor(actorIndex->m_Name.c_str(), actorIndex->m_ClassName.c_str(), actorIndex->m_Tags);
         }
 
         fprintf(initHeader, "}\n");
@@ -168,18 +175,19 @@ Project
         ActorItem
             Name=""
             ClassName=""
+            Tag=""
+            Tag=""
         ActorItem
             Name=""
             ClassName=""
+            Tag=""
 */
 // Project File Struction
 
 inline void readProject
 (
     std::vector<ClassItem>& classItems,
-    std::vector<ActorItem>& actorItems,
-    std::unordered_set<std::string>& classNameSet,
-    std::unordered_set<std::string>& actorNameSet
+    std::vector<ActorItem>& actorItems
 )
 {
     using namespace boost::property_tree;
@@ -193,8 +201,8 @@ inline void readProject
     classItems.clear();
     actorItems.clear();
 
-    classNameSet.clear();
-    actorNameSet.clear();
+    std::unordered_set<std::string> classNameSet;
+    std::unordered_set<std::string> actorNameSet;
 
     ptree ptProject;
     read_xml(projectFilePath, ptProject, xml_parser::trim_whitespace);
@@ -238,6 +246,15 @@ inline void readProject
                     thisActor.m_Name = thisActorName;
                     thisActor.m_ClassName = thisActorClassName;
 
+                    BOOST_FOREACH(const ptree::value_type & tagItem, actorItem.second.get_child(""))
+                    {
+                        if (tagItem.first == "Tag")
+                        {
+                            std::string nowTag = tagItem.second.get<std::string>("");
+                            thisActor.m_Tags.insert(nowTag);
+                        }
+                    }
+
                     actorItems.push_back(thisActor);
                 }
             }
@@ -270,6 +287,11 @@ inline void saveProject
         ptree& actorItem = ptProject.add("Project.Actor.ActorItem", "");
         actorItem.put("<xmlattr>.Name", actorIndex->m_Name.c_str());
         actorItem.put("ClassName", actorIndex->m_ClassName.c_str());
+
+        for (auto nowTag = actorIndex->m_Tags.begin(); nowTag != actorIndex->m_Tags.end(); ++nowTag)
+        {
+            actorItem.add("Tag", nowTag->c_str());
+        }
     }
 
     const boost::property_tree::xml_writer_settings<ptree::key_type> writeSettings(' ', 2);

@@ -71,15 +71,6 @@
     <ClCompile Include="EditorUI.cpp">
       <Filter>Engine Source</Filter>
     </ClCompile>
-    <ClCompile Include="implApple.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="implCar.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="implLove.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Loader.cpp">
       <Filter>Engine Source</Filter>
     </ClCompile>
@@ -126,15 +117,6 @@
     </ClInclude>
     <ClInclude Include="CodeTemplate.h">
       <Filter>Engine Header</Filter>
-    </ClInclude>
-    <ClInclude Include="implApple.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="implCar.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="implLove.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="GLRenderable.h">
       <Filter>Engine Header</Filter>

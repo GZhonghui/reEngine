@@ -1,16 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project>
   <Class>
-    <ClassItem Name="Apple"/>
     <ClassItem Name="Car"/>
-    <ClassItem Name="Love"/>
   </Class>
-  <Actor>
-    <ActorItem Name="myCar">
-      <ClassName>Car</ClassName>
-    </ActorItem>
-    <ActorItem Name="myApple">
-      <ClassName>Apple</ClassName>
-    </ActorItem>
-  </Actor>
 </Project>

@@ -10,26 +10,23 @@ namespace EngineCore
 
     extern std::vector<ClassItem> classItems;
     extern std::vector<ActorItem> actorItems;
-
-    extern std::unordered_set<std::string> classNameSet;
-    extern std::unordered_set<std::string> actorNameSet;
     // FROM EngineCore.cpp
 
     void RenderEditor()
     {
+        int displayW, displayH;
+        glfwGetFramebufferSize(mainWindow, &displayW, &displayH);
+
         // CONST
         const float leftWindowWidth = 256;
         const float rightWindowWidth = 256;
         const float toolBoxHeight = 96;
-        const float detailHeight = 360;
+        const float detailHeight = displayH >> 1;
         // CONST
 
         // STATIC
         static bool havePopWindow = false;
         // STATIC
-
-        int displayW, displayH;
-        glfwGetFramebufferSize(mainWindow, &displayW, &displayH);
 
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
@@ -92,23 +89,29 @@ namespace EngineCore
 
         ImGui::SetNextWindowSize(ImVec2(rightWindowWidth, detailHeight), ImGuiCond_Always);
         ImGui::SetNextWindowPos(ImVec2(displayW - rightWindowWidth, 0), ImGuiCond_Always);
-        if (ImGui::Begin("Details", nullptr, mainWinFlag))
+        if (ImGui::Begin("Details", nullptr, mainWinFlag | ImGuiWindowFlags_AlwaysVerticalScrollbar))
         {
             if (leftEnableTab == 0)
             {
                 ImGui::Text("Actor Details");
                 ImGui::Separator();
-                if (actorCurrent < actorItemsChar.size())
+                if (actorCurrent >= 0 && actorCurrent < actorItemsChar.size())
                 {
                     ImGui::Text("Actor Name: %s", actorItemsChar[actorCurrent]);
                     ImGui::Text("Actor Type: %s", actorItems[actorCurrent].m_ClassName.c_str());
+                    ImGui::Spacing();
+                    ImGui::Text("Actor Tags (%d):", actorItems[actorCurrent].m_Tags.size());
+                    for (auto i = actorItems[actorCurrent].m_Tags.begin(); i != actorItems[actorCurrent].m_Tags.end(); ++i)
+                    {
+                        ImGui::Text("%s", i->c_str());
+                    }
                 }
             }
             else if (leftEnableTab == 1)
             {
                 ImGui::Text("Class Details");
                 ImGui::Separator();
-                if (classCurrent < classItemsChar.size())
+                if (classCurrent >= 0 &&classCurrent < classItemsChar.size())
                 {
                     ImGui::Text("Class Name: %s", classItemsChar[classCurrent]);
                 }
@@ -119,7 +122,7 @@ namespace EngineCore
 
         ImGui::SetNextWindowSize(ImVec2(rightWindowWidth, displayH - detailHeight), ImGuiCond_Always);
         ImGui::SetNextWindowPos(ImVec2(displayW - rightWindowWidth, detailHeight), ImGuiCond_Always);
-        if (ImGui::Begin("Info", nullptr, mainWinFlag))
+        if (ImGui::Begin("Infos", nullptr, mainWinFlag | ImGuiWindowFlags_AlwaysVerticalScrollbar))
         {
             ImGui::Text("Camera");
             auto cameraLocation = Event::getCameraLocation();
@@ -153,7 +156,7 @@ namespace EngineCore
                 {
                     if (ImGui::Button("Reload Project"))
                     {
-                        readProject(classItems, actorItems, classNameSet, actorNameSet);
+                        readProject(classItems, actorItems);
                     }
                     ImGui::SameLine();
                     if (ImGui::Button("Write Project"))
@@ -191,7 +194,16 @@ namespace EngineCore
                     ImGui::SameLine();
                     if (ImGui::Button("Delete Selected Actor"))
                     {
+                        if (leftEnableTab == 0 && actorCurrent >= 0 && actorCurrent < actorItemsChar.size())
+                        {
+                            Out::Log(pType::MESSAGE, "Delete Actor : %s", actorItemsChar[actorCurrent]);
 
+                            actorItems.erase(actorItems.begin() + actorCurrent);
+                        }
+                        else
+                        {
+                            Out::Log(pType::ERROR, "No Selected Actor");
+                        }
                     }
                     ImGui::EndTabItem();
                 }
@@ -271,6 +283,8 @@ namespace EngineCore
                             ActorItem newActor;
                             newActor.m_Name = std::string(newActorName);
                             newActor.m_ClassName = classItems[selectClassInNewActor].m_Name;
+                            newActor.m_Tags.insert("Default Tag 01");
+                            newActor.m_Tags.insert("Default Tag 02");
 
                             actorItems.push_back(newActor);
 
