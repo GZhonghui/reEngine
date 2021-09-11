@@ -13,5 +13,5 @@ const bool G_BUILD_GAME_MODE = false;
 const bool G_ENABLE_OUTPUT = true;
 
 //Min Window Size
-const unsigned int G_MIN_WINDOW_WIDTH = 1200;
+const unsigned int G_MIN_WINDOW_WIDTH = 1400;
 const unsigned int G_MIN_WINDOW_HEIGHT = 768;

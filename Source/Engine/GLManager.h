@@ -3,8 +3,7 @@
 #include"ToolAIO.h"
 #include"MathAIO.h"
 
-#include"Loader.h"
-#include"Shader.h"
+#include"GLRenderable.h"
 
 class GLManager
 {
@@ -15,6 +14,21 @@ public:
 protected:
     unsigned int m_SceneFBO;
     unsigned int m_SceneTextureID;
+
+// Light
+protected:
+    Direction m_LightDir;
+    Color m_LightColor;
+    double m_LightPower;
+
+protected:
+    void InitLight();
+
+public:
+    Direction getLightDir() const noexcept { return m_LightDir; }
+    Color getLightColor() const noexcept { return m_LightColor; }
+    double getLightPower() const noexcept { return m_LightPower; }
+// Light
 
 // Skybox
 protected:
@@ -35,6 +49,9 @@ public:
 public:
     bool Init();
     bool Destroy();
+
+public:
+    void Render(std::shared_ptr<GLRenderable> renderObj);
 
 public:
     unsigned int getSceneTextureID() const { return m_SceneTextureID; }

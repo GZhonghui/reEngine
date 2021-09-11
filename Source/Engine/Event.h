@@ -105,7 +105,7 @@ public:
         yaw += offsetX;
         pitch += offsetY;
 
-        pitch = std::min(std::max(-89.0, pitch), 89.0);
+        pitch = std::min(std::max(-75.0, pitch), 75.0);
 
         Direction forward;
         forward.x() = std::cos(glm::radians(yaw) * std::cos(glm::radians(pitch)));

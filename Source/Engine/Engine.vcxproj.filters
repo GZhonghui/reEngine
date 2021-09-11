@@ -74,6 +74,12 @@
     <ClCompile Include="Loader.cpp">
       <Filter>Engine Source</Filter>
     </ClCompile>
+    <ClCompile Include="implCar.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GLRenderable.cpp">
+      <Filter>Engine Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h">
@@ -120,6 +126,9 @@
     </ClInclude>
     <ClInclude Include="GLRenderable.h">
       <Filter>Engine Header</Filter>
+    </ClInclude>
+    <ClInclude Include="implCar.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

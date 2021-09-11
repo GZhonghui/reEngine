@@ -3,20 +3,71 @@
 #include"MathAIO.h"
 #include"ToolAIO.h"
 
+enum class sType
+{
+    VERT, FRAG
+};
+
 class Shader
 {
 protected:
     std::vector<char> m_ShaderCode;
+    std::string m_ShaderType;
+    sType m_ShaderStage;
 
 public:
-    Shader(const char* filePath)
+    Shader(const char* ShaderType, sType Stage)
     {
-        loadFrom(filePath);
+        Init(ShaderType, Stage);
     }
 
     ~Shader()
     {
         Destroy();
+    }
+
+public:
+    void Init(const char* ShaderType, sType Stage)
+    {
+        m_ShaderType = std::string(ShaderType);
+
+        if (m_ShaderType == "GLDefault")
+        {
+            if (Stage == sType::VERT)
+            {
+                loadFrom("./Shader/GLDefault.vert");
+            }
+            else if (Stage == sType::FRAG)
+            {
+                loadFrom("./Shader/GLDefault.frag");
+            }
+        }
+        else if (m_ShaderType == "GLSkybox")
+        {
+            if (Stage == sType::VERT)
+            {
+                loadFrom("./Shader/GLSkybox.vert");
+            }
+            else if (Stage == sType::FRAG)
+            {
+                loadFrom("./Shader/GLSkybox.frag");
+            }
+        }
+        else if (m_ShaderType == "VKDefault")
+        {
+            if (Stage == sType::VERT)
+            {
+                loadFrom("./Shader/VKDefault.vert");
+            }
+            else if (Stage == sType::FRAG)
+            {
+                loadFrom("./Shader/VKDefault.frag");
+            }
+        }
+        else
+        {
+            Out::Log(pType::ERROR, "Wrong Shader Type : %s", ShaderType);
+        }
     }
 
 protected:
@@ -53,4 +104,5 @@ protected:
 public:
     friend class VulkanManager;
     friend class GLManager;
+    friend class GLRenderable;
 };

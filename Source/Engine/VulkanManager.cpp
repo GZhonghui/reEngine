@@ -312,8 +312,8 @@ bool VulkanManager::createShader()
 {
     VkResult result;
 
-    Shader fragmentShader("./Shader/SimpleWithCameraFrag.spv");
-    Shader vertexShader("./Shader/SimpleWithCameraVert.spv");
+    Shader fragmentShader("VKDefault", sType::FRAG);
+    Shader vertexShader("VKDefault", sType::VERT);
 
     VkShaderModuleCreateInfo shaderCreateInfo = {};
     shaderCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;

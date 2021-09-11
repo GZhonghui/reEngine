@@ -1,5 +1,12 @@
 #include"GLManager.h"
 
+void GLManager::InitLight()
+{
+    m_LightDir = Direction(1, -1, 1);
+    m_LightColor = Color(1, 1, 1);
+    m_LightPower = 2;
+}
+
 void GLManager::InitSkybox()
 {
     glGenTextures(1, &m_SkyboxTextureID);
@@ -40,8 +47,8 @@ void GLManager::InitSkybox()
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
-    Shader skyboxVertShader("./Shader/GLSkybox.vert");
-    Shader skyboxFragShader("./Shader/GLSkybox.frag");
+    Shader skyboxVertShader("GLSkybox", sType::VERT);
+    Shader skyboxFragShader("GLSkybox", sType::FRAG);
 
     const char* skyboxVertShaderSource = skyboxVertShader.m_ShaderCode.data();
     const char* skyboxFragShaderSource = skyboxFragShader.m_ShaderCode.data();
@@ -196,6 +203,7 @@ bool GLManager::Init()
         return false;
     }
 
+    InitLight();
     InitSkybox();
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -246,6 +254,11 @@ void GLManager::BeginRenderGame(uint32_t viewWidth, uint32_t viewHeight)
 }
 
 void GLManager::EndRenderGame()
+{
+
+}
+
+void GLManager::Render(std::shared_ptr<GLRenderable> renderObj)
 {
 
 }

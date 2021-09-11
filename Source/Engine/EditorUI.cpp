@@ -95,17 +95,17 @@ namespace EngineCore
         {
             if (leftEnableTab == 0)
             {
-                ImGui::Text("Actor Details");
+                ImGui::Text("=== Actor Details ===");
                 ImGui::Separator();
                 if (actorCurrent >= 0 && actorCurrent < actorItemsChar.size())
                 {
                     ImGui::Text("Actor Name: %s", actorItemsChar[actorCurrent]);
                     ImGui::Text("Actor Type: %s", actorItems[actorCurrent].m_ClassName.c_str());
-                    ImGui::Spacing();
+                    ImGui::Text("");
                     ImGui::Text("Actor Tags (%d):", actorItems[actorCurrent].m_Tags.size());
                     for (auto i = actorItems[actorCurrent].m_Tags.begin(); i != actorItems[actorCurrent].m_Tags.end(); ++i)
                     {
-                        ImGui::Text("%s", i->c_str());
+                        ImGui::Text("> [%s]", i->c_str());
                     }
                 }
             }
@@ -126,14 +126,25 @@ namespace EngineCore
         ImGui::SetNextWindowPos(ImVec2(displayW - rightWindowWidth, detailHeight), ImGuiCond_Always);
         if (ImGui::Begin("Infos", nullptr, mainWinFlag | ImGuiWindowFlags_AlwaysVerticalScrollbar))
         {
-            ImGui::Text("Camera");
+            ImGui::Text("=== Camera ===");
+            ImGui::Separator();
             auto cameraLocation = Event::getCameraLocation();
             auto cameraDir = Event::getCameraDir();
 
             ImGui::Text("Location (%.2lf,%.2lf,%.2lf)",
                 cameraLocation.x(), cameraLocation.y(), cameraLocation.z());
-            ImGui::Text("Forward (%.2lf,%.2lf,%.2lf)",
+            ImGui::Text("Forward  (%.2lf,%.2lf,%.2lf)",
                 cameraDir.x(), cameraDir.y(), cameraDir.z());
+            ImGui::Text("");
+
+            ImGui::Text("=== Light ===");
+            ImGui::Separator();
+            auto lightDir = glManager.getLightDir();
+            auto lightColor = glManager.getLightColor();
+            auto lightPower = glManager.getLightPower();
+            ImGui::Text("Direction (%.2lf,%.2lf,%.2lf)", lightDir.x(), lightDir.y(), lightDir.z());
+            ImGui::Text("Color     (%.2lf,%.2lf,%.2lf)", lightColor.x(), lightColor.y(), lightColor.z());
+            ImGui::Text("Power      %.4lf", lightPower);
 
             ImGui::End();
         }
