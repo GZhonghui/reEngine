@@ -11,6 +11,20 @@
 
 ## Tutorial
 Please Watch this [Youtube Video](https://www.youtube.com/channel/UCa0G_UHT3j2vzTHHy_2CN2w)
+```
+1. Clone this Repository
+2. Compile with Visual Studio 2019
+3. Run (as Editor)
+4. Create Classes and Import Assets
+5. Create Actors
+6. Design the Scene
+7. Save Project then Close the Editor
+8. Reload Visual Studio Project
+9. Code
+10. Edit the Config.h, Switch to Build Game Mode
+11. Compile
+12. Run (as Game)
+```
 
 ### 🚩Editor
 ![Editor](readMe/Editor.jpg)
