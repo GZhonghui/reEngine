@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project>
   <World>
-    <LightDir x="1.0000000000" y="0.0000000000" z="2.0000000000"/>
-    <LightColor x="0.2722350359" y="0.0392877795" z="0.5343137383"/>
-    <LightPower>5.6382080000</LightPower>
+    <LightDir x="2.0000000000" y="0.0000000000" z="2.2000000477"/>
+    <LightColor x="0.2901960909" y="0.9019607902" z="0.1529411823"/>
+    <LightPower>9.0174530000</LightPower>
   </World>
   <Class>
     <ClassItem Name="noRender" Render="False"/>
@@ -19,12 +19,8 @@
     </ClassItem>
   </Class>
   <Actor>
-    <ActorItem Name="no_01" ClassName="noRender">
-      <Tag>no_01_Tag_hhhh</Tag>
-      <Tag>weqweqqq</Tag>
-      <Tag>02x</Tag>
-      <Tag>sdasd</Tag>
-      <Tag>sdas</Tag>
+    <ActorItem Name="firstRenderObj" ClassName="hasRender">
+      <Tag>hasRender</Tag>
       <Location x="0.0000000000" y="0.0000000000" z="0.0000000000"/>
       <Rotation x="0.0000000000" y="0.0000000000" z="0.0000000000"/>
       <Scale x="1.0000000000" y="1.0000000000" z="1.0000000000"/>

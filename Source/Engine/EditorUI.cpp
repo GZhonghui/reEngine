@@ -135,6 +135,12 @@ namespace EngineCore
         static int tagCurrent = -1;
         static std::string tagCurrentStr;
 
+        static float actorLocationf3[3];
+        static float actorRotationf3[3];
+        static float actorScalef3[3];
+
+        static ImVec4 classDiffuseColor;
+
         static float  lightDirf3[3];
         static float  lightColorf3[3];
         static double lightPower = 0;
@@ -188,7 +194,7 @@ namespace EngineCore
             }
         }
         // === Update ===
-        
+
         // === Part 1 ===
         {
             int listBoxHeightCount = ((actorListHeight - 68) / ImGui::GetTextLineHeightWithSpacing());
@@ -202,14 +208,16 @@ namespace EngineCore
                     {
                         leftEnableTab = 0;
                         ImGui::PushItemWidth(-FLT_MIN);
-                        ImGui::ListBox("", &actorCurrent, actorItemsChar.data(), actorItemsChar.size(), listBoxHeightCount);
+                        ImGui::ListBox("", &actorCurrent,
+                            actorItemsChar.data(), actorItemsChar.size(), listBoxHeightCount);
                         ImGui::EndTabItem();
                     }
                     if (ImGui::BeginTabItem("Class List"))
                     {
                         leftEnableTab = 1;
                         ImGui::PushItemWidth(-FLT_MIN);
-                        ImGui::ListBox("", &classCurrent, classItemsChar.data(), classItemsChar.size(), listBoxHeightCount);
+                        ImGui::ListBox("", &classCurrent,
+                            classItemsChar.data(), classItemsChar.size(), listBoxHeightCount);
                         ImGui::EndTabItem();
                     }
                     ImGui::EndTabBar();
@@ -282,7 +290,12 @@ namespace EngineCore
 
                         try
                         {
-                            std::filesystem::copy_file(filePathName, std::string(G_IMPORT_PATH) + fileName);
+                            std::filesystem::path targetPath = std::string(G_IMPORT_PATH) + fileName;
+                            if (std::filesystem::exists(targetPath))
+                            {
+                                std::filesystem::remove(targetPath);
+                            }
+                            std::filesystem::copy_file(filePathName, targetPath);
                         }
                         catch (...)
                         {
@@ -312,7 +325,8 @@ namespace EngineCore
                         if (ImGui::TreeNode("   Tags:"))
                         {
                             int tagIndex = 0;
-                            for (auto i = actorItems[actorCurrent].m_Tags.begin(); i != actorItems[actorCurrent].m_Tags.end(); ++i)
+                            for (auto i = actorItems[actorCurrent].m_Tags.begin();
+                                i != actorItems[actorCurrent].m_Tags.end(); ++i)
                             {
                                 std::string Tag = "> [" + *i + "]";
                                 if (ImGui::Selectable(Tag.c_str(), tagIndex == tagCurrent))
@@ -335,11 +349,21 @@ namespace EngineCore
                     ImGui::Separator();
                     if (actorCurrent >= 0 && actorCurrent < actorItemsChar.size())
                     {
-                        
+                        ImGui::Text("Location");
+                        ImGui::PushItemWidth(-FLT_MIN);
+                        ImGui::InputFloat3("##Location", actorLocationf3);
+
+                        ImGui::Text("Rotation");
+                        ImGui::PushItemWidth(-FLT_MIN);
+                        ImGui::InputFloat3("##Rotation", actorRotationf3);
+
+                        ImGui::Text("Scale");
+                        ImGui::PushItemWidth(-FLT_MIN);
+                        ImGui::InputFloat3("##Scale", actorScalef3);
                     }
                     else
                     {
-                        ImGui::Text("No Actor Selected");
+                        ImGui::Text("N/A");
                     }
                 }
                 else if (leftEnableTab == 1)
@@ -353,6 +377,30 @@ namespace EngineCore
                     else
                     {
                         ImGui::Text("No Class Selected");
+                    }
+                    ImGui::Text("");
+
+                    ImGui::TextColored(textColor, "=== Class Visibility===");
+                    ImGui::Separator();
+                    if (classItems[classCurrent].Render)
+                    {
+                        classDiffuseColor.x = classItems[classCurrent].m_DiffuseColor.x();
+                        classDiffuseColor.y = classItems[classCurrent].m_DiffuseColor.y();
+                        classDiffuseColor.z = classItems[classCurrent].m_DiffuseColor.z();
+                        classDiffuseColor.w = 1;
+
+                        ImGui::Text("+ Model");
+                        ImGui::Text("  %s", classItems[classCurrent].m_ModelFile);
+                        ImGui::Text("+ Diffuse Texture");
+                        ImGui::Text("  %s", classItems[classCurrent].m_DiffuseTextureFile);
+                        ImGui::Text("+ Diffuse Color");
+                        ImGui::Text(" ");
+                        ImGui::SameLine();
+                        ImGui::ColorButton("", *(ImVec4*)&classDiffuseColor, 0, ImVec2(128, 48));
+                    }
+                    else
+                    {
+                        ImGui::Text("N/A");
                     }
                 }
                 ImGui::End();
@@ -399,15 +447,15 @@ namespace EngineCore
 
                 ImGui::Text("Direction");
                 ImGui::PushItemWidth(-FLT_MIN);
-                ImGui::InputFloat3("", lightDirf3);
+                ImGui::InputFloat3("##LightDirection", lightDirf3);
 
                 ImGui::Text("Color");
                 ImGui::PushItemWidth(-FLT_MIN);
-                ImGui::ColorEdit3("", lightColorf3);
+                ImGui::ColorEdit3("##LightColor", lightColorf3);
 
                 ImGui::Text("Power");
                 ImGui::PushItemWidth(-FLT_MIN);
-                ImGui::SliderScalar("", ImGuiDataType_Double, &lightPower, &lightPowerMin, &lightPowerMax);
+                ImGui::SliderScalar("##LightPower", ImGuiDataType_Double, &lightPower, &lightPowerMin, &lightPowerMax);
 
                 glManager.setLightDir(Direction(lightDirf3[0], lightDirf3[1], lightDirf3[2]));
                 glManager.setLightColor(Color(lightColorf3[0], lightColorf3[1], lightColorf3[2]));
@@ -417,7 +465,7 @@ namespace EngineCore
                 ImGui::TextColored(textColor, "=== Skybox ===");
                 ImGui::Separator();
                 ImGui::PushItemWidth(-FLT_MIN);
-                ImGui::Combo(" ", &skyboxCurrent, skyboxChoices, skyboxChoicesCount);
+                ImGui::Combo("##Skybox", &skyboxCurrent, skyboxChoices, skyboxChoicesCount);
 
                 ImGui::End();
             }
@@ -484,15 +532,15 @@ namespace EngineCore
                             if (renderNewClass)
                             {
                                 ImGui::Text("Select Model");
-                                ImGui::Combo("[M]", &renderNewClassModelCurrent,
+                                ImGui::Combo("##Model", &renderNewClassModelCurrent,
                                     renderNewClassModel.data(), renderNewClassModel.size());
 
                                 ImGui::Text("Select Diffuse Texture");
-                                ImGui::Combo("[T]", &renderNewClassTextureCurrent,
+                                ImGui::Combo("##DiffuseTexture", &renderNewClassTextureCurrent,
                                     renderNewClassTexture.data(), renderNewClassTexture.size());
 
                                 ImGui::Text("Select Diffuse Color");
-                                ImGui::ColorEdit3("", renderNewClassDiffuseColorf3);
+                                ImGui::ColorEdit3("##DiffuseColor", renderNewClassDiffuseColorf3);
                             }
 
                             ImGui::Separator();
@@ -766,7 +814,8 @@ namespace EngineCore
                 }
                 if (ImGui::BeginPopupModal("All Logs", nullptr, popWinFlag))
                 {
-                    ImGui::InputTextMultiline("", allLogsBuffer, sizeof(allLogsBuffer), ImVec2(480, 200), ImGuiInputTextFlags_ReadOnly);
+                    ImGui::InputTextMultiline("", allLogsBuffer, sizeof(allLogsBuffer), ImVec2(480, 200),
+                        ImGuiInputTextFlags_ReadOnly);
                     ImGui::Separator();
                     if (ImGui::Button("Close"))
                     {
