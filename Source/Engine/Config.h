@@ -15,3 +15,6 @@ const bool G_ENABLE_OUTPUT = true;
 //Min Window Size
 const unsigned int G_MIN_WINDOW_WIDTH = 1400;
 const unsigned int G_MIN_WINDOW_HEIGHT = 768;
+
+// Import Asset Path
+const char G_IMPORT_PATH[] = "../Asset/Import/";

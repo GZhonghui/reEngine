@@ -39,6 +39,9 @@ namespace EngineCore
 
     void Update();
 
+    void applyWorldSettings();
+    void collectWorldSettings();
+
     std::shared_ptr<Actor> getActorByID(unsigned int actorID);
     std::shared_ptr<Actor> getActorByName(const std::string& actorName);
     std::vector<std::shared_ptr<Actor>> getActorsByTag(const std::string& tagName);

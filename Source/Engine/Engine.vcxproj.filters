@@ -74,11 +74,14 @@
     <ClCompile Include="Loader.cpp">
       <Filter>Engine Source</Filter>
     </ClCompile>
-    <ClCompile Include="implCar.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="GLRenderable.cpp">
       <Filter>Engine Source</Filter>
+    </ClCompile>
+    <ClCompile Include="ToolAIO.cpp">
+      <Filter>Engine Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Support\Include\ImGUI\ImGuiFileDialog.cpp">
+      <Filter>ImGUI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -126,9 +129,6 @@
     </ClInclude>
     <ClInclude Include="GLRenderable.h">
       <Filter>Engine Header</Filter>
-    </ClInclude>
-    <ClInclude Include="implCar.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

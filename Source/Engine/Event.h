@@ -14,6 +14,7 @@ public:
 protected:
     static Camera mainCamera;
 
+public:
     static bool shouldQuit;
     static bool windowResized;
     static bool mouseAsCursor;
@@ -59,22 +60,9 @@ public:
     )
     {
         // Push Some Key
-        // shouldQuit = true;
-
         if (key == GLFW_KEY_Q && action == GLFW_PRESS)
         {
-            mouseAsCursor = !mouseAsCursor;
-
-            if (mouseAsCursor)
-            {
-                glfwSetWindowTitle(window, "reEngine [Cursor Mode]");
-                glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-            }
-            else
-            {
-                glfwSetWindowTitle(window, "reEngine [Move Mode]");
-                glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-            }
+            // shouldQuit = true;
         }
     }
 
@@ -118,7 +106,29 @@ public:
     static void glfwMouseButtonCallback
     (
         GLFWwindow* window, int button, int action, int mods
-    ) {}
+    )
+    {
+        if (button == GLFW_MOUSE_BUTTON_RIGHT)
+        {
+            if (action == GLFW_PRESS)
+            {
+                mouseAsCursor = false;
+            }
+            else if (action == GLFW_RELEASE)
+            {
+                mouseAsCursor = true;
+            }
+
+            if (mouseAsCursor)
+            {
+                glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+            }
+            else
+            {
+                glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+            }
+        }
+    }
 
     static void glfwWindowResizeCallback
     (

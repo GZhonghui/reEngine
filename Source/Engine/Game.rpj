@@ -1,16 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project>
+  <World>
+    <LightDir x="1.0000000000" y="0.0000000000" z="2.0000000000"/>
+    <LightColor x="0.2722350359" y="0.0392877795" z="0.5343137383"/>
+    <LightPower>5.6382080000</LightPower>
+  </World>
   <Class>
-    <ClassItem Name="Car"/>
+    <ClassItem Name="noRender" Render="False"/>
+    <ClassItem Name="hasRender" Render="True">
+      <Model>Box.obj</Model>
+      <DiffuseTexture>PureBall.png</DiffuseTexture>
+      <DiffuseColor x="0.6127451062" y="0.1650241166" z="0.0690840110"/>
+    </ClassItem>
+    <ClassItem Name="thirdClass" Render="True">
+      <Model>Box.obj</Model>
+      <DiffuseTexture>PureBall.png</DiffuseTexture>
+      <DiffuseColor x="0.0627162680" y="0.8529411554" z="0.2254096121"/>
+    </ClassItem>
   </Class>
   <Actor>
-    <ActorItem Name="Car_01">
-      <ClassName>Car</ClassName>
-      <Tag>Actor of Car</Tag>
-    </ActorItem>
-    <ActorItem Name="Car_02">
-      <ClassName>Car</ClassName>
-      <Tag>Actor of Car</Tag>
+    <ActorItem Name="no_01" ClassName="noRender">
+      <Tag>no_01_Tag_hhhh</Tag>
+      <Tag>weqweqqq</Tag>
+      <Tag>02x</Tag>
+      <Tag>sdasd</Tag>
+      <Tag>sdas</Tag>
+      <Location x="0.0000000000" y="0.0000000000" z="0.0000000000"/>
+      <Rotation x="0.0000000000" y="0.0000000000" z="0.0000000000"/>
+      <Scale x="1.0000000000" y="1.0000000000" z="1.0000000000"/>
     </ActorItem>
   </Actor>
 </Project>

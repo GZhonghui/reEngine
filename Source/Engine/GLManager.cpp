@@ -2,9 +2,12 @@
 
 void GLManager::InitLight()
 {
+    // See World Setting
+    /*
     m_LightDir = Direction(1, -1, 1);
     m_LightColor = Color(1, 1, 1);
     m_LightPower = 2;
+    */
 }
 
 void GLManager::InitSkybox()

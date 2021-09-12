@@ -18,16 +18,21 @@ protected:
 // Light
 protected:
     Direction m_LightDir;
-    Color m_LightColor;
-    double m_LightPower;
+    Color     m_LightColor;
+    double    m_LightPower;
 
 protected:
     void InitLight();
 
 public:
     Direction getLightDir() const noexcept { return m_LightDir; }
-    Color getLightColor() const noexcept { return m_LightColor; }
-    double getLightPower() const noexcept { return m_LightPower; }
+    void      setLightDir(const Direction& newDir) { m_LightDir = newDir; }
+
+    Color     getLightColor() const noexcept { return m_LightColor; }
+    void      setLightColor(const Color& newColor) { m_LightColor = newColor; }
+    
+    double    getLightPower() const noexcept { return m_LightPower; }
+    void      setLightPower(double newPower) { m_LightPower = newPower; }
 // Light
 
 // Skybox

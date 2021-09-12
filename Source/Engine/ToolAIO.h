@@ -2,6 +2,9 @@
 
 #include"Config.h"
 
+// sscanf
+#pragma warning(disable:6031)
+
 //Construction Function
 #pragma warning(disable:26495)
 
@@ -23,11 +26,14 @@
 #include<boost/property_tree/xml_parser.hpp>
 #include<boost/foreach.hpp>
 #include<boost/lexical_cast.hpp>
+#include<boost/algorithm/string.hpp>
 
 #include<imgui.h>
 #include<imgui_impl_glfw.h>
 #include<imgui_impl_vulkan.h>
 #include<imgui_impl_opengl3.h>
+
+#include<ImGuiFileDialog.h>
 
 #include<glad/glad.h>
 
@@ -57,48 +63,13 @@ public:
     ~Out() = default;
 
 private:
-    static void printTime()
-    {
-        time_t nowTime = time(nullptr);
-        tm* ltm = localtime(&nowTime);
-
-        printf("[%02d:%02d:%02d]", ltm->tm_hour, ltm->tm_min, ltm->tm_sec);
-    }
+    static void printTime();
 
 public:
-    static void Log(pType Type, const char* Format, ...)
-    {
-#ifndef DEBUG_MESSAGE
-        return;
-#endif
-
-        if (!G_ENABLE_OUTPUT) return;
-
-        switch (Type)
-        {
-        case pType::MESSAGE:
-            printf("[MESSAGE]");
-            break;
-        case pType::WARNING:
-            printf("[WARNING]");
-            break;
-        case pType::ERROR:
-            printf("[ ERROR ]");
-            break;
-        }
-        printf(" "); printTime(); printf(" >>");
-
-        va_list args;
-
-        va_start(args, Format);
-        vprintf(Format, args);
-        va_end(args);
-
-        puts("");
-    }
+    static void Log(pType Type, const char* Format, ...);
 };
 
-inline bool checkClassOrActorName(const char* inputName)
+inline bool checkSimpleStr(const char* inputName)
 {
     if (!(*inputName)) return false;
 
@@ -124,4 +95,30 @@ inline bool checkClassOrActorName(const char* inputName)
     }
 
     return true;
+}
+
+inline bool endsWith(std::string const& value, std::string const& ending)
+{
+    if (ending.size() > value.size()) return false;
+    return std::equal(ending.rbegin(), ending.rend(), value.rbegin());
+}
+
+inline double StrToFloat(const std::string& inStr)
+{
+    double Res = -1;
+    try
+    {
+        sscanf(inStr.c_str(), "%lf", &Res);
+    }
+    catch (...) {}
+
+    return Res;
+}
+
+inline std::string FloatToStr(double inFloat)
+{
+    char printBuffer[64];
+    snprintf(printBuffer, sizeof(printBuffer), "%.10lf", inFloat);
+
+    return std::string(printBuffer);
 }

@@ -16,6 +16,7 @@ namespace EngineCore
 
     std::vector<std::shared_ptr<Actor>> actorsInScene;
 
+    WorldSetting worldSettings;
     std::vector<ClassItem> classItems;
     std::vector<ActorItem> actorItems;
 
@@ -192,13 +193,24 @@ namespace EngineCore
 
         return findResult;
     }
+
+    void applyWorldSettings()
+    {
+        glManager.setLightDir(worldSettings.m_LightDir);
+        glManager.setLightColor(worldSettings.m_LightColor);
+        glManager.setLightPower(worldSettings.m_LightPower);
+    }
+
+    void collectWorldSettings()
+    {
+        worldSettings.m_LightDir = glManager.getLightDir();
+        worldSettings.m_LightColor = glManager.getLightColor();
+        worldSettings.m_LightPower = glManager.getLightPower();
+    }
 };
 
 int engineMain(void (*initScene)(std::vector<std::shared_ptr<Actor>>* actorsInScene))
 {
-
-    readProject(EngineCore::classItems, EngineCore::actorItems);
-
     if (G_BUILD_GAME_MODE)
     {
         EngineCore::actorsInScene.clear();
@@ -212,6 +224,9 @@ int engineMain(void (*initScene)(std::vector<std::shared_ptr<Actor>>* actorsInSc
     EngineCore::initOpenGL();
 
     Event::initEventState();
+
+    readProject(EngineCore::worldSettings, EngineCore::classItems, EngineCore::actorItems);
+    EngineCore::applyWorldSettings();
 
     while (!glfwWindowShouldClose(EngineCore::mainWindow))
     {
