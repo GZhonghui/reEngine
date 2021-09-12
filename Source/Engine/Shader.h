@@ -16,12 +16,13 @@ protected:
     sType m_ShaderStage;
 
 public:
+    Shader() = default;
     Shader(const char* ShaderType, sType Stage)
     {
         Init(ShaderType, Stage);
     }
 
-    ~Shader()
+    virtual ~Shader()
     {
         Destroy();
     }

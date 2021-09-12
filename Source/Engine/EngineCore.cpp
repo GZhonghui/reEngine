@@ -95,9 +95,10 @@ namespace EngineCore
 
     uint32_t RenderEditorScene(uint32_t viewWidth, uint32_t viewHeight)
     {
-        glManager.BeginRenderEditor(viewWidth, viewHeight);
+        glManager.BeginRenderEditor(viewWidth, viewHeight, Event::getCameraLocation(), Event::getCameraDir());
 
-        glManager.RenderSkybox(viewWidth, viewHeight, Event::getCameraLocation(), Event::getCameraDir());
+        glManager.RenderSkybox();
+        glManager.RenderDefaultScene();
 
         glManager.EndRenderEditor();
 
@@ -109,9 +110,9 @@ namespace EngineCore
         int nowWidth, nowHeight;
         glfwGetFramebufferSize(mainWindow, &nowWidth, &nowHeight);
 
-        glManager.BeginRenderGame(nowWidth, nowHeight);
+        glManager.BeginRenderGame(nowWidth, nowHeight, Event::getCameraLocation(), Event::getCameraDir());
 
-        glManager.RenderSkybox(nowWidth, nowHeight, Event::getCameraLocation(), Event::getCameraDir());
+        glManager.RenderSkybox();
 
         glManager.EndRenderGame();
     }
@@ -211,12 +212,19 @@ namespace EngineCore
 
 int engineMain(void (*initScene)(std::vector<std::shared_ptr<Actor>>* actorsInScene))
 {
+    // Important
+    stbi_set_flip_vertically_on_load(true);
+
     if (G_BUILD_GAME_MODE)
     {
         EngineCore::actorsInScene.clear();
         initScene(&EngineCore::actorsInScene);
 
         EngineCore::initActors();
+    }
+    else
+    {
+        // Code Here
     }
 
     EngineCore::initGLFW();

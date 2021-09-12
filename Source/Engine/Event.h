@@ -24,8 +24,8 @@ public:
 protected:
     static void resetCamera()
     {
-        mainCamera.setPosition(Point(0, 0, 0));
-        mainCamera.lookAt(Point(0, 0, 1));
+        mainCamera.setPosition(Point(0, 8, 12));
+        mainCamera.lookAt(Point(0, 0, 0));
     }
 
 public:
@@ -59,10 +59,17 @@ public:
         GLFWwindow* window, int key, int scancode, int action, int mods
     )
     {
-        // Push Some Key
-        if (key == GLFW_KEY_Q && action == GLFW_PRESS)
+        if (G_BUILD_GAME_MODE)
         {
-            // shouldQuit = true;
+
+        }
+        else
+        {
+            // Push Some Key
+            if (key == GLFW_KEY_Q && action == GLFW_PRESS)
+            {
+                // shouldQuit = true;
+            }
         }
     }
 
@@ -71,36 +78,44 @@ public:
         GLFWwindow* window, double x, double y
     )
     {
-        const double rotateSpeed = 0.1f;
+        if (G_BUILD_GAME_MODE)
+        {
 
-        static double yaw = 90.0;
-        static double pitch = 0.0;
+        }
+        else
+        {
+            const double rotateSpeed = 0.1f;
 
-        static double lastX = x;
-        static double lastY = y;
+            static double yaw = 90.0;
+            static double pitch = 0.0;
 
-        double offsetX = x - lastX;
-        double offsetY = y - lastY;
+            static double lastX = x;
+            static double lastY = y;
 
-        lastX = x;
-        lastY = y;
+            double offsetX = x - lastX;
+            double offsetY = y - lastY;
 
-        if (mouseAsCursor) return;
+            lastX = x;
+            lastY = y;
 
-        offsetX *= rotateSpeed;
-        offsetY *= rotateSpeed;
+            if (mouseAsCursor) return;
 
-        yaw += offsetX;
-        pitch += offsetY;
+            offsetX *= rotateSpeed;
+            offsetY *= rotateSpeed;
 
-        pitch = std::min(std::max(-75.0, pitch), 75.0);
+            yaw += offsetX;
+            pitch += offsetY;
 
-        Direction forward;
-        forward.x() = std::cos(glm::radians(yaw) * std::cos(glm::radians(pitch)));
-        forward.y() = std::sin(glm::radians(-pitch));
-        forward.z() = std::sin(glm::radians(yaw)) * std::cos(glm::radians(pitch));
+            pitch = std::min(std::max(-75.0, pitch), 75.0);
 
-        mainCamera.m_Forward = forward.normalized();
+            Direction forward;
+            forward.x() = std::cos(glm::radians(yaw) * std::cos(glm::radians(pitch)));
+            forward.y() = std::sin(glm::radians(-pitch));
+            forward.z() = std::sin(glm::radians(yaw)) * std::cos(glm::radians(pitch));
+
+            mainCamera.m_Forward = forward.normalized();
+        }
+        
     }
 
     static void glfwMouseButtonCallback
@@ -108,24 +123,31 @@ public:
         GLFWwindow* window, int button, int action, int mods
     )
     {
-        if (button == GLFW_MOUSE_BUTTON_RIGHT)
+        if (G_BUILD_GAME_MODE)
         {
-            if (action == GLFW_PRESS)
-            {
-                mouseAsCursor = false;
-            }
-            else if (action == GLFW_RELEASE)
-            {
-                mouseAsCursor = true;
-            }
 
-            if (mouseAsCursor)
+        }
+        else
+        {
+            if (button == GLFW_MOUSE_BUTTON_RIGHT)
             {
-                glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-            }
-            else
-            {
-                glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+                if (action == GLFW_PRESS)
+                {
+                    mouseAsCursor = false;
+                }
+                else if (action == GLFW_RELEASE)
+                {
+                    mouseAsCursor = true;
+                }
+
+                if (mouseAsCursor)
+                {
+                    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+                }
+                else
+                {
+                    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+                }
             }
         }
     }
@@ -135,42 +157,56 @@ public:
         GLFWwindow* window, int newWidth, int newHeight
     )
     {
-        windowResized = true;
+        if (G_BUILD_GAME_MODE)
+        {
+
+        }
+        else
+        {
+            windowResized = true;
+        }
     }
 
 public:
     static void Loop(GLFWwindow* window)
     {
-        const float moveSpeed = cameraMoveSpeed;
-
-        using namespace std::chrono;
-
-        static auto lastTime = high_resolution_clock::now();
-
-        auto nowTime = high_resolution_clock::now();
-        auto deltaTime = duration<float, seconds::period>(nowTime - lastTime).count();
-
-        lastTime = nowTime;
-
-        if (mouseAsCursor) return;
-
-        Direction cameraRight = mainCamera.m_Forward.cross(cameraUP);
-
-        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+        if (G_BUILD_GAME_MODE)
         {
-            mainCamera.Move(mainCamera.m_Forward * -1 * deltaTime * moveSpeed);
+            
         }
-        else if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+        else
         {
-            mainCamera.Move(mainCamera.m_Forward * deltaTime * moveSpeed);
-        }
-        else if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        {
-            mainCamera.Move(cameraRight * -1 * deltaTime * moveSpeed);
-        }
-        else if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        {
-            mainCamera.Move(cameraRight * deltaTime * moveSpeed);
+            const float moveSpeed = cameraMoveSpeed;
+
+            using namespace std::chrono;
+
+            static auto lastTime = high_resolution_clock::now();
+
+            auto nowTime = high_resolution_clock::now();
+            auto deltaTime = duration<float, seconds::period>(nowTime - lastTime).count();
+
+            lastTime = nowTime;
+
+            if (mouseAsCursor) return;
+
+            Direction cameraRight = mainCamera.m_Forward.cross(cameraUP);
+
+            if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+            {
+                mainCamera.Move(mainCamera.m_Forward * -1 * deltaTime * moveSpeed);
+            }
+            else if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+            {
+                mainCamera.Move(mainCamera.m_Forward * deltaTime * moveSpeed);
+            }
+            else if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+            {
+                mainCamera.Move(cameraRight * -1 * deltaTime * moveSpeed);
+            }
+            else if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+            {
+                mainCamera.Move(cameraRight * deltaTime * moveSpeed);
+            }
         }
     }
 

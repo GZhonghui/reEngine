@@ -23,6 +23,8 @@
     <ClInclude Include="implhasRender.h"/>
     <ClCompile Include="implthirdClass.cpp"/>
     <ClInclude Include="implthirdClass.h"/>
+    <ClCompile Include="implBlueBoy.cpp"/>
+    <ClInclude Include="implBlueBoy.h"/>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

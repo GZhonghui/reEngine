@@ -15,6 +15,12 @@ protected:
     unsigned int m_SceneFBO;
     unsigned int m_SceneTextureID;
 
+    uint32_t m_ViewWidth;
+    uint32_t m_ViewHeight;
+    
+    Point m_CameraLocation;
+    Direction m_CameraDir;
+
 // Light
 protected:
     Direction m_LightDir;
@@ -47,24 +53,40 @@ protected:
     void DestroySkybox();
 
 public:
-    void RenderSkybox(uint32_t viewWidth, uint32_t viewHeight,
-        const Point& mainCameraLocation, const Direction& mainCameraDir);
+    void RenderSkybox();
 // Skybox
+
+// Default Scene
+protected:
+    uint32_t m_DefaultSceneTextureID;
+    uint32_t m_DefaultSceneShaderProgramID;
+    uint32_t m_DefaultSceneVAOID;
+    uint32_t m_DefaultSceneVBOID;
+
+protected:
+    void InitDefaultScene();
+    void DestroyDefaultScene();
+
+public:
+    void RenderDefaultScene();
+// Default Scene
 
 public:
     bool Init();
     bool Destroy();
 
 public:
-    void Render(std::shared_ptr<GLRenderable> renderObj);
+    void Render(std::shared_ptr<GLRenderable> renderObj, const glm::mat4& matModel);
 
 public:
     unsigned int getSceneTextureID() const { return m_SceneTextureID; }
 
 public:
-    void BeginRenderEditor(uint32_t viewWidth, uint32_t viewHeight);
+    void BeginRenderEditor(uint32_t viewWidth, uint32_t viewHeight,
+        const Point& mainCameraLocation, const Direction& mainCameraDir);
     void EndRenderEditor();
 
-    void BeginRenderGame(uint32_t viewWidth, uint32_t viewHeight);
+    void BeginRenderGame(uint32_t viewWidth, uint32_t viewHeight,
+        const Point& mainCameraLocation, const Direction& mainCameraDir);
     void EndRenderGame();
 };

@@ -23,9 +23,9 @@ protected:
     uint32_t m_EBOID;
 
 public:
-    void Init();
+    void Init(std::string Model, std::string DiffuseTexture, Color DiffuseColor);
     void Clear();
 
 public:
-    void Draw();
+    void Draw(glm::mat4* MVP);
 };

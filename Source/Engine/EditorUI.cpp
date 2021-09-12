@@ -79,8 +79,8 @@ namespace EngineCore
         const double lightPowerMin = 0.1;
         const double lightPowerMax = 20.0;
 
-        const char* skyboxChoices = "Creek\0Water\0";
-        const int   skyboxChoicesCount = 2;
+        const char* skyboxChoices = "Creek\0";
+        const int   skyboxChoicesCount = 1;
 
         // Part3 Const
         const ImVec2 toolboxButtonSize = ImVec2(72, 32);
@@ -351,15 +351,33 @@ namespace EngineCore
                     {
                         ImGui::Text("Location");
                         ImGui::PushItemWidth(-FLT_MIN);
+                        actorLocationf3[0] = actorItems[actorCurrent].m_Location.x();
+                        actorLocationf3[1] = actorItems[actorCurrent].m_Location.y();
+                        actorLocationf3[2] = actorItems[actorCurrent].m_Location.z();
                         ImGui::InputFloat3("##Location", actorLocationf3);
+                        actorItems[actorCurrent].m_Location.x() = actorLocationf3[0];
+                        actorItems[actorCurrent].m_Location.y() = actorLocationf3[1];
+                        actorItems[actorCurrent].m_Location.z() = actorLocationf3[2];
 
                         ImGui::Text("Rotation");
                         ImGui::PushItemWidth(-FLT_MIN);
+                        actorRotationf3[0] = actorItems[actorCurrent].m_Rotation.x();
+                        actorRotationf3[1] = actorItems[actorCurrent].m_Rotation.y();
+                        actorRotationf3[2] = actorItems[actorCurrent].m_Rotation.z();
                         ImGui::InputFloat3("##Rotation", actorRotationf3);
+                        actorItems[actorCurrent].m_Rotation.x() = actorRotationf3[0];
+                        actorItems[actorCurrent].m_Rotation.y() = actorRotationf3[1];
+                        actorItems[actorCurrent].m_Rotation.z() = actorRotationf3[2];
 
                         ImGui::Text("Scale");
                         ImGui::PushItemWidth(-FLT_MIN);
+                        actorScalef3[0] = actorItems[actorCurrent].m_Scale.x();
+                        actorScalef3[1] = actorItems[actorCurrent].m_Scale.y();
+                        actorScalef3[2] = actorItems[actorCurrent].m_Scale.z();
                         ImGui::InputFloat3("##Scale", actorScalef3);
+                        actorItems[actorCurrent].m_Scale.x() = actorScalef3[0];
+                        actorItems[actorCurrent].m_Scale.y() = actorScalef3[1];
+                        actorItems[actorCurrent].m_Scale.z() = actorScalef3[2];
                     }
                     else
                     {
