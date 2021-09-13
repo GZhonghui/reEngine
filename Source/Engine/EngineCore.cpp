@@ -20,6 +20,9 @@ namespace EngineCore
     std::vector<ClassItem> classItems;
     std::vector<ActorItem> actorItems;
 
+    std::shared_ptr<GLRenderable> renderOBJ;
+    std::shared_ptr<GLRenderable> renderBOX;
+
     void initGLFW()
     {
         glfwInit();
@@ -98,7 +101,10 @@ namespace EngineCore
         glManager.BeginRenderEditor(viewWidth, viewHeight, Event::getCameraLocation(), Event::getCameraDir());
 
         glManager.RenderSkybox();
-        glManager.RenderDefaultScene();
+        // glManager.RenderDefaultScene();
+
+        //glManager.Render(renderBOX, glm::translate(glm::mat4(1), glm::vec3(0, 2, 0)));
+        glManager.Render(renderOBJ, glm::translate(glm::mat4(1), glm::vec3(0, 0, 0)));
 
         glManager.EndRenderEditor();
 
@@ -231,6 +237,11 @@ int engineMain(void (*initScene)(std::vector<std::shared_ptr<Actor>>* actorsInSc
     EngineCore::initImGuiForGL();
     EngineCore::initOpenGL();
 
+    EngineCore::renderOBJ = std::make_shared<GLRenderable>();
+    EngineCore::renderOBJ->Init("Bee.obj", "BeeTexture.png", Color(1, 1, 1));
+    EngineCore::renderBOX = std::make_shared<GLRenderable>();
+    EngineCore::renderBOX->Init("Box.obj", "BoxDiffuse.png", Color(1, 1, 1));
+
     Event::initEventState();
 
     readProject(EngineCore::worldSettings, EngineCore::classItems, EngineCore::actorItems);
@@ -259,6 +270,9 @@ int engineMain(void (*initScene)(std::vector<std::shared_ptr<Actor>>* actorsInSc
     {
         EngineCore::destroyActors();
     }
+
+    EngineCore::renderOBJ->Clear();
+    EngineCore::renderBOX->Clear();
 
     return 0;
 }

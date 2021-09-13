@@ -14,6 +14,7 @@ public:
 protected:
     unsigned int m_SceneFBO;
     unsigned int m_SceneTextureID;
+    unsigned int m_DepthTextureID;
 
     uint32_t m_ViewWidth;
     uint32_t m_ViewHeight;

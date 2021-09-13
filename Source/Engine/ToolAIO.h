@@ -40,7 +40,9 @@
 #define GLFW_INCLUDE_VULKAN
 #include<GLFW/glfw3.h>
 
+#include<assimp/Importer.hpp>
 #include<assimp/scene.h>
+#include<assimp/postprocess.h>
 
 #include<STB/stb_image.h>
 #include<STB/stb_image_write.h>

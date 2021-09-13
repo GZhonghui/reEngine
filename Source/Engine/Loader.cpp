@@ -2,7 +2,8 @@
 
 #include"Loader.h"
 
-unsigned char* ImageLoader::LoadImage(const char* Path, int& Width, int& Height)
+// Useless
+unsigned char* Loader::ImageLoader::LoadImage(const char* Path, int& Width, int& Height)
 {
     int Channels;
     auto loadRes = stbi_load(Path, &Width, &Height, &Channels, 3);

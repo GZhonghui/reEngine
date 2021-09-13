@@ -17,6 +17,10 @@ typedef Eigen::Vector3d Direction;
 typedef Eigen::Vector3d Point;
 typedef Eigen::Vector3d Color;
 
+typedef Eigen::Vector2d TextureCoords;
+
+typedef Eigen::Vector3i TriangleFace;
+
 const Color colorGray(105 / 255.999, 105 / 255.999, 105 / 255.999);
 const Color colorGreen(32 / 255.999, 127 / 255.999, 76 / 255.999);
 

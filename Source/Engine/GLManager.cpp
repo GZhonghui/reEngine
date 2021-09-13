@@ -318,6 +318,16 @@ bool GLManager::Init()
 
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_SceneTextureID, 0);
 
+    glGenTextures(1, &m_DepthTextureID);
+
+    glBindTexture(GL_TEXTURE_2D, m_DepthTextureID);
+    glTexImage2D(
+        GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8, 800, 600, 0,
+        GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, NULL
+    );
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, m_DepthTextureID, 0);
+
+
     if (GL_FRAMEBUFFER_COMPLETE != glCheckFramebufferStatus(GL_FRAMEBUFFER))
     {
         Out::Log(pType::ERROR, "Init FBO Failed");
@@ -325,11 +335,12 @@ bool GLManager::Init()
         return false;
     }
 
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
     // InitLight();
+
     InitSkybox();
     InitDefaultScene();
-
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     Out::Log(pType::MESSAGE, "Inited OpenGL");
 
@@ -358,6 +369,8 @@ void GLManager::BeginRenderEditor(uint32_t viewWidth, uint32_t viewHeight,
 
     glBindFramebuffer(GL_FRAMEBUFFER, m_SceneFBO);
 
+    glEnable(GL_DEPTH_TEST);
+
     glBindTexture(GL_TEXTURE_2D, m_SceneTextureID);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, viewWidth, viewHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
     glBindTexture(GL_TEXTURE_2D, 0);
@@ -365,7 +378,7 @@ void GLManager::BeginRenderEditor(uint32_t viewWidth, uint32_t viewHeight,
     glViewport(0, 0, viewWidth, viewHeight);
 
     glClearColor(colorGray.x(), colorGray.y(), colorGray.z(), 1.0);
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 void GLManager::EndRenderEditor()
@@ -387,6 +400,7 @@ void GLManager::BeginRenderGame(uint32_t viewWidth, uint32_t viewHeight,
 
     glClearColor(colorGreen.x(), colorGreen.y(), colorGreen.z(), 1.0);
     glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_DEPTH_BUFFER_BIT);
 }
 
 void GLManager::EndRenderGame()
@@ -400,7 +414,7 @@ void GLManager::Render(std::shared_ptr<GLRenderable> renderObj, const glm::mat4&
 
     MVP[0] = matModel;
     MVP[1] = glm::lookAt(Convert(m_CameraLocation), Convert(m_CameraLocation + m_CameraDir), glm::vec3(0, 1, 0));
-    MVP[2] = glm::perspective(glm::radians(60.0f), (float)m_ViewWidth / m_ViewHeight, 0.1f, 100.0f);
+    MVP[2] = glm::perspective(glm::radians(60.0f), (float)m_ViewWidth / m_ViewHeight, 0.01f, 100.0f);
 
     renderObj->Draw(MVP);
 }
