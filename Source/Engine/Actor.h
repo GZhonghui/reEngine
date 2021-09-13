@@ -4,6 +4,7 @@
 #include"MathAIO.h"
 
 #include"GLRenderable.h"
+// No VulkanRenderable.h for now
 
 class Actor
 {

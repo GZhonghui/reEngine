@@ -35,7 +35,10 @@ namespace Loader
         {
             Loader = std::make_unique<Assimp::Importer>();
         }
-        ~ModelLoader() = default;
+        virtual ~ModelLoader()
+        {
+            Clear();
+        }
 
     public:
         std::unique_ptr<Assimp::Importer> Loader;
@@ -44,7 +47,7 @@ namespace Loader
     public:
         bool Load(const char* filePath)
         {
-            const aiScene* scene = Loader->ReadFile(filePath, aiProcess_Triangulate);
+            const aiScene* scene = Loader->ReadFile(filePath, aiProcess_Triangulate | aiProcess_GenNormals);
 
             //Error
             if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
@@ -123,15 +126,5 @@ namespace Loader
             m_Meshs.clear();
         }
 
-    };
-
-    class ImageLoader
-    {
-    public:
-        ImageLoader() = default;
-        virtual ~ImageLoader() = default;
-
-    public:
-        static unsigned char* LoadImage(const char* Path, int& Width, int& Height);
     };
 };

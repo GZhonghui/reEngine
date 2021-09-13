@@ -1,8 +1,7 @@
 #pragma once
 
+// Vulkan Renderable for now
 #include"VulkanMisc.h"
-#include"Shader.h"
-#include"Loader.h"
 #include"Event.h"
 
 class VulkanManager
@@ -26,12 +25,12 @@ protected:
 
 protected:
     //Vertex
-    std::vector<Vertex> m_Vertices;
+    std::vector<VulkanMisc::Vertex> m_Vertices;
     bool m_VerticesNeedUpdate;
 
 protected:
     //Infos
-    VulkanInfo m_VulkanInfo;
+    VulkanMisc::VulkanInfo m_VulkanInfo;
 
 protected:
     //Init GLFW
@@ -164,7 +163,6 @@ protected:
     bool Render();
     // Use THIS Function
     bool RenderWithUI();
-    // In VulkanManagerUI.cpp
     bool RenderUI();
 
 protected:

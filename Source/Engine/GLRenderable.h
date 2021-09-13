@@ -3,8 +3,7 @@
 #include"ToolAIO.h"
 #include"MathAIO.h"
 
-#include"Loader.h"
-#include"Shader.h"
+#include"GLMisc.h"
 
 class GLRenderable
 {

@@ -55,8 +55,10 @@ public:
     }
 
 public:
+    // Do Not Use
     bool updateMVP(float r, UniformMVP& mvp)
     {
+        // Danger
         auto model = glm::mat4(1.0f);
 
         auto eye = Convert(m_Position);
@@ -64,10 +66,20 @@ public:
 
         auto view = glm::lookAt(eye, target, Convert(cameraUP));
 
+        // Danger
         auto project = glm::perspective(glm::radians(45.0f), r, 0.1f, 100.0f);
 
         mvp = UniformMVP(model, view, project);
 
+        return true;
+    }
+
+    bool updateView(glm::mat4& View)
+    {
+        auto eye = Convert(m_Position);
+        auto target = Convert(m_Position + m_Forward);
+
+        View = glm::lookAt(eye, target, Convert(cameraUP));
         return true;
     }
 

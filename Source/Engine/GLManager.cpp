@@ -400,7 +400,6 @@ void GLManager::BeginRenderGame(uint32_t viewWidth, uint32_t viewHeight,
 
     glClearColor(colorGreen.x(), colorGreen.y(), colorGreen.z(), 1.0);
     glClear(GL_COLOR_BUFFER_BIT);
-    glClear(GL_DEPTH_BUFFER_BIT);
 }
 
 void GLManager::EndRenderGame()
@@ -414,7 +413,7 @@ void GLManager::Render(std::shared_ptr<GLRenderable> renderObj, const glm::mat4&
 
     MVP[0] = matModel;
     MVP[1] = glm::lookAt(Convert(m_CameraLocation), Convert(m_CameraLocation + m_CameraDir), glm::vec3(0, 1, 0));
-    MVP[2] = glm::perspective(glm::radians(60.0f), (float)m_ViewWidth / m_ViewHeight, 0.01f, 100.0f);
+    MVP[2] = glm::perspective(glm::radians(60.0f), (float)m_ViewWidth / m_ViewHeight, 0.1f, 100.0f);
 
     renderObj->Draw(MVP);
 }

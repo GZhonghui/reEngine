@@ -3,14 +3,12 @@
 #include"MathAIO.h"
 #include"ToolAIO.h"
 
+#include"ProjectParser.h"
+
 #include"VulkanManager.h"
 #include"GLManager.h"
 
-#include"GLRenderable.h"
-
 #include"Actor.h"
-
-#include"CodeTemplate.h"
 
 #define RUN_ENGINE engineMain(initScene)
 
@@ -26,7 +24,7 @@ namespace EngineCore
     void destroyImGuiForGL();
     void destroyOpenGL();
 
-    //EditorUI.cpp
+    // EngineCoreEditorUI.cpp
     void RenderEditor();
     uint32_t RenderEditorScene(uint32_t viewWidth, uint32_t viewHeight);
     

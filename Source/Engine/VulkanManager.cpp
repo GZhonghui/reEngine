@@ -86,7 +86,7 @@ bool VulkanManager::createPhysicalDevice()
 
     for (auto device = devices.begin(); device != devices.end(); ++device)
     {
-        if (VulkanMisc::checkDevice(*device, m_Surface, m_NeedExtensionsChar))
+        if (VulkanMisc::Tools::checkDevice(*device, m_Surface, m_NeedExtensionsChar))
         {
             m_PhysicalDevice = *device;
             break;
@@ -104,21 +104,21 @@ bool VulkanManager::createPhysicalDevice()
     Out::Log(pType::MESSAGE, "Pick device: %s", physicalDeviceProperties.deviceName);
 
     //Get Vulkan Info
-    VulkanMisc::checkQueueFamilies(m_PhysicalDevice, m_Surface, m_VulkanInfo.queueFamiliesIndex);
-    VulkanMisc::checkSwapchainSupport(m_PhysicalDevice, m_Surface, m_VulkanInfo.swapChainDetails);
+    VulkanMisc::Tools::checkQueueFamilies(m_PhysicalDevice, m_Surface, m_VulkanInfo.queueFamiliesIndex);
+    VulkanMisc::Tools::checkSwapchainSupport(m_PhysicalDevice, m_Surface, m_VulkanInfo.swapChainDetails);
 
-    VulkanMisc::chooseSwapSurfaceFormat
+    VulkanMisc::Tools::chooseSwapSurfaceFormat
     (
         m_VulkanInfo.swapChainDetails.m_Formats,
         m_VulkanInfo.swapSurfaceFormat
     );
-    VulkanMisc::chooseSwapPresentMode
+    VulkanMisc::Tools::chooseSwapPresentMode
     (
         m_VulkanInfo.swapChainDetails.m_PresentModes,
         m_VulkanInfo.swapPresentMode
     );
 
-    VulkanMisc::chooseSwapExtent
+    VulkanMisc::Tools::chooseSwapExtent
     (
         m_wWidth, m_wHeight,
         m_VulkanInfo.swapChainDetails.m_Capabilities,
@@ -133,7 +133,7 @@ bool VulkanManager::createLogicalDevice()
     std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
     std::unordered_set<int> queueIndices;
 
-    QueueFamiliesIndices queueFamiliesIndex = m_VulkanInfo.queueFamiliesIndex;
+    VulkanMisc::QueueFamiliesIndices queueFamiliesIndex = m_VulkanInfo.queueFamiliesIndex;
 
     queueIndices.insert(queueFamiliesIndex.m_GraphicsIndex);
     queueIndices.insert(queueFamiliesIndex.m_PresentIndex);
@@ -177,7 +177,7 @@ bool VulkanManager::createLogicalDevice()
 
 bool VulkanManager::createQueue()
 {
-    QueueFamiliesIndices QFI = m_VulkanInfo.queueFamiliesIndex;
+    VulkanMisc::QueueFamiliesIndices QFI = m_VulkanInfo.queueFamiliesIndex;
 
     vkGetDeviceQueue(m_Device, QFI.m_GraphicsIndex, 0, &m_GraphicsQueue);
     vkGetDeviceQueue(m_Device, QFI.m_PresentIndex, 0, &m_PresentQueue);
@@ -189,8 +189,8 @@ bool VulkanManager::createSwapChain()
 {
     VkResult result;
 
-    QueueFamiliesIndices queueFamiliesIndex = m_VulkanInfo.queueFamiliesIndex;
-    SwapChainDetails swapChainDetails = m_VulkanInfo.swapChainDetails;
+    VulkanMisc::QueueFamiliesIndices queueFamiliesIndex = m_VulkanInfo.queueFamiliesIndex;
+    VulkanMisc::SwapChainDetails swapChainDetails = m_VulkanInfo.swapChainDetails;
 
     uint32_t swapChainImagesCount;
     swapChainImagesCount = swapChainDetails.m_Capabilities.minImageCount + 1;
@@ -268,7 +268,7 @@ bool VulkanManager::createImageViews()
 {
     VkResult result;
 
-    SwapChainDetails swapChainDetails = m_VulkanInfo.swapChainDetails;
+    VulkanMisc::SwapChainDetails swapChainDetails = m_VulkanInfo.swapChainDetails;
     VkSurfaceFormatKHR swapSurfaceFormat = m_VulkanInfo.swapSurfaceFormat;
 
     uint32_t swapChainImagesCount;
@@ -435,8 +435,8 @@ bool VulkanManager::createGraphicsPipeline()
     VkPipelineVertexInputStateCreateInfo vertexInputStateCreateInfo = {};
     vertexInputStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
 
-    auto bindingDescription = Vertex::getBindingDescription();
-    auto attributeDescription = Vertex::getAttributeDescription();
+    auto bindingDescription = VulkanMisc::Vertex::getBindingDescription();
+    auto attributeDescription = VulkanMisc::Vertex::getAttributeDescription();
 
     vertexInputStateCreateInfo.vertexBindingDescriptionCount = 1;
     vertexInputStateCreateInfo.pVertexBindingDescriptions = &bindingDescription;
@@ -604,7 +604,7 @@ bool VulkanManager::createVertexBuffer()
 
     VkBufferCreateInfo vertexBufferCreateInfo = {};
     vertexBufferCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-    vertexBufferCreateInfo.size = sizeof(Vertex) * m_Vertices.size();
+    vertexBufferCreateInfo.size = sizeof(VulkanMisc::Vertex) * m_Vertices.size();
     vertexBufferCreateInfo.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
     vertexBufferCreateInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
@@ -623,7 +623,7 @@ bool VulkanManager::createVertexBuffer()
     allocMemoryInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
     allocMemoryInfo.allocationSize = memoryRequitments.size;
 
-    VulkanMisc::findMemoryType
+    VulkanMisc::Tools::findMemoryType
     (
         allocMemoryInfo.memoryTypeIndex, memoryRequitments.memoryTypeBits,
         VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
@@ -675,7 +675,7 @@ bool VulkanManager::createUniformBuffers()
         memoryAllocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
         memoryAllocInfo.allocationSize = memRequirements.size;
 
-        VulkanMisc::findMemoryType
+        VulkanMisc::Tools::findMemoryType
         (
             memoryAllocInfo.memoryTypeIndex, memRequirements.memoryTypeBits,
             memProperties, m_PhysicalDevice
@@ -978,7 +978,8 @@ bool VulkanManager::RenderWithUI()
     
     VkSemaphore imageAcquiredSemaphore  = pMWD->FrameSemaphores[pMWD->SemaphoreIndex].ImageAcquiredSemaphore;
     VkSemaphore renderCompleteSemaphore = pMWD->FrameSemaphores[pMWD->SemaphoreIndex].RenderCompleteSemaphore;
-    auto Result = vkAcquireNextImageKHR(m_Device, pMWD->Swapchain, UINT64_MAX, imageAcquiredSemaphore, VK_NULL_HANDLE, &pMWD->FrameIndex);
+    auto Result = vkAcquireNextImageKHR(m_Device, pMWD->Swapchain, UINT64_MAX,
+        imageAcquiredSemaphore, VK_NULL_HANDLE, &pMWD->FrameIndex);
 
     if (Result == VK_ERROR_OUT_OF_DATE_KHR ||
         Result == VK_SUBOPTIMAL_KHR ||
@@ -1066,18 +1067,150 @@ bool VulkanManager::RenderWithUI()
     return true;
 }
 
-// VulkanManager::RenderUI() in VulkanManagerUI.cpp
+bool VulkanManager::RenderUI()
+{
+    //Static
+    static VulkanMisc::VulkanUIState uiState;
+
+    //Layout
+    const uint32_t ToolBoxWidth = 256;
+    const uint32_t MenuBarHeight = 84;
+    const uint32_t MainMenuHeight = 20;
+
+    //Get States
+    ImGuiIO IO = ImGui::GetIO();
+    float displayWidth = (float)IO.DisplaySize.x;
+    float displayHeight = (float)IO.DisplaySize.y;
+
+    // Main Menu Bar
+    {// Main Menu Bar Start
+        if (ImGui::BeginMainMenuBar())
+        {
+            if (ImGui::BeginMenu("Help"))
+            {
+                if (ImGui::MenuItem("About"))
+                {
+                    uiState.showAbout = true;
+                }
+                ImGui::EndMenu();
+            }
+            ImGui::EndMainMenuBar();
+        }
+
+        if (uiState.showAbout)
+        {
+            if (ImGui::Begin("About reEngine", &uiState.showAbout, ImGuiWindowFlags_NoResize))
+            {
+                ImGui::Text("reEngine");
+                ImGui::Separator();
+                ImGui::Text("reEngine is a OpenSource Game Engine");
+                ImGui::Text("Coded by GZhonghui mail@gzher.com");
+
+                ImGui::End();
+            }
+        }
+    }// Main Menu Bar End
+
+    // Menu Bar
+    {// Menu Bar Start
+        ImGui::SetNextWindowPos(ImVec2(ToolBoxWidth, MainMenuHeight), ImGuiCond_Always);
+        ImGui::SetNextWindowSize(ImVec2(displayWidth - ToolBoxWidth, MenuBarHeight), ImGuiCond_Always);
+
+        if (ImGui::Begin("reEngine MenuBar", nullptr, ImGuiWindowFlags_NoResize))
+        {
+            if (ImGui::BeginTabBar("Tool Tab"))
+            {
+                if (ImGui::BeginTabItem("Actors"))
+                {
+                    if (ImGui::Button("Add Actor"))
+                    {
+
+                    }
+
+                    ImGui::SameLine();
+                    if (ImGui::Button("Delete Seleted"))
+                    {
+
+                    }
+
+                    ImGui::SameLine();
+                    if (ImGui::Button("Load Model"))
+                    {
+
+                    }
+
+                    ImGui::EndTabItem();
+                }
+
+                if (ImGui::BeginTabItem("Build"))
+                {
+                    if (ImGui::Button("Generate"))
+                    {
+
+                    }
+
+                    ImGui::EndTabItem();
+                }
+
+                ImGui::EndTabBar();
+            }
+
+            ImGui::End();
+        }
+    }// Menu Bar End
+
+    // Tool Box
+    {// Tool Box Start
+        ImGui::SetNextWindowPos(ImVec2(0, MainMenuHeight), ImGuiCond_Always);
+        ImGui::SetNextWindowSize(ImVec2(ToolBoxWidth, displayHeight - MainMenuHeight), ImGuiCond_Always);
+
+        if (ImGui::Begin("reEngine ToolBox", nullptr, ImGuiWindowFlags_NoResize))
+        {
+            ImGui::Text("Now FPS: %d", m_FPS);
+            ImGui::Separator();
+
+            if (ImGui::CollapsingHeader("Scene Actors"))
+            {
+
+            }
+
+            if (ImGui::CollapsingHeader("Actor Properities"))
+            {
+
+            }
+
+            if (ImGui::CollapsingHeader("Game Info"))
+            {
+                ImGui::Text("Camera Move Speed");
+                ImGui::SliderFloat("", &Event::cameraMoveSpeed, 1.0f, 10.0f, "Speed = %.3f");
+                ImGui::Separator();
+
+                ImGui::Text("Camera Position");
+                ImGui::Text("X = %.3f", Event::mainCamera.m_Position.x());
+                ImGui::Text("Y = %.3f", Event::mainCamera.m_Position.y());
+                ImGui::Text("Z = %.3f", Event::mainCamera.m_Position.z());
+                ImGui::Separator();
+
+                ImGui::Text("reEngine");
+            }
+
+            ImGui::End();
+        }
+    }// Tool Box End
+
+    return true;
+}
 
 bool VulkanManager::loadScene()
 {
     //Load Default Scene
-    m_Vertices.push_back(Vertex(Convert(Point(-5, 0, 5))));
-    m_Vertices.push_back(Vertex(Convert(Point( 5, 0, 5))));
-    m_Vertices.push_back(Vertex(Convert(Point( 5, 0,-5))));
+    m_Vertices.push_back(VulkanMisc::Vertex(Convert(Point(-5, 0, 5))));
+    m_Vertices.push_back(VulkanMisc::Vertex(Convert(Point( 5, 0, 5))));
+    m_Vertices.push_back(VulkanMisc::Vertex(Convert(Point( 5, 0,-5))));
 
-    m_Vertices.push_back(Vertex(Convert(Point(-5, 0, 5))));
-    m_Vertices.push_back(Vertex(Convert(Point( 5, 0,-5))));
-    m_Vertices.push_back(Vertex(Convert(Point(-5, 0,-5))));
+    m_Vertices.push_back(VulkanMisc::Vertex(Convert(Point(-5, 0, 5))));
+    m_Vertices.push_back(VulkanMisc::Vertex(Convert(Point( 5, 0,-5))));
+    m_Vertices.push_back(VulkanMisc::Vertex(Convert(Point(-5, 0,-5))));
 
     return true;
 }
@@ -1189,13 +1322,13 @@ bool VulkanManager::initVulkanAfterResize()
     int newWidth, newHeight;
     glfwGetFramebufferSize(m_Window, &newWidth, &newHeight);
 
-    VulkanMisc::checkSwapchainSupport
+    VulkanMisc::Tools::checkSwapchainSupport
     (
         m_PhysicalDevice, m_Surface,
         m_VulkanInfo.swapChainDetails
     );
 
-    VulkanMisc::chooseSwapExtent
+    VulkanMisc::Tools::chooseSwapExtent
     (
         newWidth, newHeight,
         m_VulkanInfo.swapChainDetails.m_Capabilities,
@@ -1486,7 +1619,7 @@ void VulkanManager::Loop()
 
         if (m_VerticesNeedUpdate)
         {
-            uint32_t bufferSize = sizeof(Vertex) * m_Vertices.size();
+            uint32_t bufferSize = sizeof(VulkanMisc::Vertex) * m_Vertices.size();
 
             void* vertexData;
             vkMapMemory(m_Device, m_VertexBufferMemory, 0, bufferSize, 0, &vertexData);

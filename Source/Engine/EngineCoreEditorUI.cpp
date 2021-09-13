@@ -1,8 +1,8 @@
 #include"EngineCore.h"
 
-// FROM ToolAIO.cpp
+// FROM ToolAIO
 extern std::vector<std::string> allLogs;
-// FROM ToolAIO.cpp
+// FROM ToolAIO
 
 namespace EngineCore
 {

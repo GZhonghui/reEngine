@@ -101,7 +101,7 @@ namespace EngineCore
         glManager.BeginRenderEditor(viewWidth, viewHeight, Event::getCameraLocation(), Event::getCameraDir());
 
         glManager.RenderSkybox();
-        // glManager.RenderDefaultScene();
+        glManager.RenderDefaultScene();
 
         //glManager.Render(renderBOX, glm::translate(glm::mat4(1), glm::vec3(0, 2, 0)));
         glManager.Render(renderOBJ, glm::translate(glm::mat4(1), glm::vec3(0, 0, 0)));

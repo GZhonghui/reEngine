@@ -53,9 +53,6 @@
     <ClCompile Include="VulkanManager.cpp">
       <Filter>Engine Source</Filter>
     </ClCompile>
-    <ClCompile Include="VulkanManagerUI.cpp">
-      <Filter>Engine Source</Filter>
-    </ClCompile>
     <ClCompile Include="..\Support\Include\ImGUI\backends\imgui_impl_opengl3.cpp">
       <Filter>ImGUI</Filter>
     </ClCompile>
@@ -68,20 +65,26 @@
     <ClCompile Include="EngineCore.cpp">
       <Filter>Engine Source</Filter>
     </ClCompile>
-    <ClCompile Include="EditorUI.cpp">
-      <Filter>Engine Source</Filter>
-    </ClCompile>
-    <ClCompile Include="Loader.cpp">
+    <ClCompile Include="EngineCoreEditorUI.cpp">
       <Filter>Engine Source</Filter>
     </ClCompile>
     <ClCompile Include="GLRenderable.cpp">
       <Filter>Engine Source</Filter>
     </ClCompile>
-    <ClCompile Include="ToolAIO.cpp">
-      <Filter>Engine Source</Filter>
-    </ClCompile>
     <ClCompile Include="..\Support\Include\ImGUI\ImGuiFileDialog.cpp">
       <Filter>ImGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="implnoRender.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="implhasRender.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="implthirdClass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="implBlueBoy.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -121,14 +124,35 @@
     <ClInclude Include="Init.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="Config.h">
-      <Filter>Engine Header</Filter>
-    </ClInclude>
     <ClInclude Include="CodeTemplate.h">
       <Filter>Engine Header</Filter>
     </ClInclude>
     <ClInclude Include="GLRenderable.h">
       <Filter>Engine Header</Filter>
+    </ClInclude>
+    <ClInclude Include="implnoRender.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="implhasRender.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="implthirdClass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="implBlueBoy.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AssetManager.h">
+      <Filter>Engine Header</Filter>
+    </ClInclude>
+    <ClInclude Include="GLMisc.h">
+      <Filter>Engine Header</Filter>
+    </ClInclude>
+    <ClInclude Include="ProjectParser.h">
+      <Filter>Engine Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Config.h">
+      <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
