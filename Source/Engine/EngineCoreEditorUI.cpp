@@ -1,16 +1,12 @@
 #include"EngineCore.h"
 
-// FROM ToolAIO
-extern std::vector<std::string> allLogs;
-// FROM ToolAIO
-
 namespace EngineCore
 {
     // FROM EngineCore.cpp
     extern GLFWwindow* mainWindow;
     extern GLManager glManager;
 
-    extern std::vector<std::shared_ptr<Actor>> actorsInScene;
+    extern std::vector<std::shared_ptr<Actor>> actorsInSceneOfGame;
 
     extern WorldSetting worldSettings;
     extern std::vector<ClassItem> classItems;
@@ -91,39 +87,6 @@ namespace EngineCore
         // Global Static
         static std::vector<std::string> assetList;
         static std::vector<std::string> assetTypeList;
-        
-        auto localUpdateAssetList = []
-        (
-            std::vector<std::string>& assetList,
-            std::vector<std::string>& assetTypeList
-        )
-        {
-            assetList.clear();
-            assetTypeList.clear();
-
-            for (const auto& singleFile : std::filesystem::directory_iterator(G_IMPORT_PATH))
-            {
-                std::string fileName = singleFile.path().filename().u8string();
-                std::string upperName = boost::to_upper_copy<std::string>(fileName);
-
-                bool rightType = true;
-                if (endsWith(upperName, "OBJ"))
-                {
-                    assetTypeList.push_back("OBJ");
-                }
-                else if (endsWith(upperName, "PNG"))
-                {
-                    assetTypeList.push_back("PNG");
-                }
-                else rightType = false;
-
-                if (rightType)
-                {
-                    assetList.push_back(fileName);
-                }
-            }
-        };
-#define REENGINE_UPDATE_ASSET_LIST localUpdateAssetList(assetList,assetTypeList)
 
         // Part 1 Static
         static uint8_t leftEnableTab = 0;// Actor List or Class List
@@ -231,7 +194,7 @@ namespace EngineCore
             {
                 if (ImGui::Button("View Assets", ImVec2(leftWindowWidth - 16, 64)))
                 {
-                    REENGINE_UPDATE_ASSET_LIST;
+                    AssetManager::getAssetList(assetList, assetTypeList);
 
                     ImGui::OpenPopup("View Assets");
                 }
@@ -283,24 +246,9 @@ namespace EngineCore
                     if (ImGuiFileDialog::Instance()->IsOk())
                     {
                         std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
-                        std::string filePath = ImGuiFileDialog::Instance()->GetCurrentPath();
                         std::string fileName = ImGuiFileDialog::Instance()->GetCurrentFileName();
 
-                        Out::Log(pType::MESSAGE, "Loading %s", filePathName.c_str());
-
-                        try
-                        {
-                            std::filesystem::path targetPath = std::string(G_IMPORT_PATH) + fileName;
-                            if (std::filesystem::exists(targetPath))
-                            {
-                                std::filesystem::remove(targetPath);
-                            }
-                            std::filesystem::copy_file(filePathName, targetPath);
-                        }
-                        catch (...)
-                        {
-                            Out::Log(pType::ERROR, "Import Failed");
-                        }
+                        AssetManager::addAsset(filePathName, fileName);
                     }
                     ImGuiFileDialog::Instance()->Close();
                 }
@@ -517,7 +465,7 @@ namespace EngineCore
                     {
                         if (ImGui::Button("New Class", toolboxButtonSize))
                         {
-                            REENGINE_UPDATE_ASSET_LIST;
+                            AssetManager::getAssetList(assetList, assetTypeList);
 
                             renderNewClassModel.clear();
                             renderNewClassTexture.clear();
@@ -851,10 +799,9 @@ namespace EngineCore
             }
         }
         
-        ImGui::Render();
-
         glViewport(0, 0, displayW, displayH);
 
+        ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     }
 };

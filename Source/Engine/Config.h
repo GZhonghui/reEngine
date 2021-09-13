@@ -10,7 +10,8 @@ const bool G_BUILD_GAME_MODE = false;
 #endif
 
 //Enable Output
-const bool G_ENABLE_OUTPUT = true;
+const bool G_ENABLE_CON_OUTPUT = false;
+const bool G_ENABLE_WIN_OUTPUT = true;
 
 //Min Window Size
 const unsigned int G_MIN_WINDOW_WIDTH = 1400;

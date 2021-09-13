@@ -4,6 +4,7 @@
 #include"MathAIO.h"
 
 #include"GLRenderable.h"
+#include"Event.h"
 
 class GLManager
 {
@@ -11,15 +12,21 @@ public:
     GLManager() = default;
     ~GLManager() = default;
 
+private:
+    const float NearZ  = 0.1f;
+    const float FarZ   = 300.0f;
+    const float Aspect = 60.0f;
+
 protected:
     unsigned int m_SceneFBO;
     unsigned int m_SceneTextureID;
     unsigned int m_DepthTextureID;
 
+    // Update Every Frame
     uint32_t m_ViewWidth;
     uint32_t m_ViewHeight;
     
-    Point m_CameraLocation;
+    Point     m_CameraLocation;
     Direction m_CameraDir;
 
 // Light
@@ -27,9 +34,6 @@ protected:
     Direction m_LightDir;
     Color     m_LightColor;
     double    m_LightPower;
-
-protected:
-    void InitLight();
 
 public:
     Direction getLightDir() const noexcept { return m_LightDir; }
@@ -77,7 +81,7 @@ public:
     bool Destroy();
 
 public:
-    void Render(std::shared_ptr<GLRenderable> renderObj, const glm::mat4& matModel);
+    void Render(std::shared_ptr<GLRenderable> renderObj, const Transform& ObjTransform);
 
 public:
     unsigned int getSceneTextureID() const { return m_SceneTextureID; }

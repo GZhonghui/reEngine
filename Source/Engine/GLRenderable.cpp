@@ -1,21 +1,9 @@
 #include"GLRenderable.h"
 
-void GLRenderable::Init(std::string Model, std::string DiffuseTexture, Color DiffuseColor)
+void GLRenderable::Init(const std::string& Model, const std::string& DiffuseTexture, Color DiffuseColor)
 {
-    m_ShaderVert.Init("GLDefault", sType::VERT);
-    m_ShaderFrag.Init("GLDefault", sType::FRAG);
-
-    const char* vertShaderSource = m_ShaderVert.m_ShaderCode.data();
-    const char* fragShaderSource = m_ShaderFrag.m_ShaderCode.data();
-
-    uint32_t vertShaderID = glCreateShader(GL_VERTEX_SHADER);
-    uint32_t fragShaderID = glCreateShader(GL_FRAGMENT_SHADER);
-
-    glShaderSource(vertShaderID, 1, &vertShaderSource, nullptr);
-    glCompileShader(vertShaderID);
-
-    glShaderSource(fragShaderID, 1, &fragShaderSource, nullptr);
-    glCompileShader(fragShaderID);
+    uint32_t vertShaderID = GLMisc::CompileShader(Shader("GLDefault", sType::VERT).m_ShaderCode.data(), sType::VERT);
+    uint32_t fragShaderID = GLMisc::CompileShader(Shader("GLDefault", sType::FRAG).m_ShaderCode.data(), sType::FRAG);
 
     m_ShaderProgramID = glCreateProgram();
     glAttachShader(m_ShaderProgramID, vertShaderID);
@@ -25,30 +13,7 @@ void GLRenderable::Init(std::string Model, std::string DiffuseTexture, Color Dif
     glDeleteShader(vertShaderID);
     glDeleteShader(fragShaderID);
 
-    m_ShaderVert.Destroy();
-    m_ShaderFrag.Destroy();
-
-    glGenTextures(1, &m_DiffuseTextureID);
-    glBindTexture(GL_TEXTURE_2D, m_DiffuseTextureID);
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-    std::string texturePath = std::string(G_IMPORT_PATH) + DiffuseTexture;
-    int textureWidth, textureHeight, textureChannels;
-    unsigned char* diffuseTextureData = stbi_load(texturePath.c_str(), &textureWidth, &textureHeight, &textureChannels, 3);
-
-    if (!diffuseTextureData)
-    {
-        Out::Log(pType::ERROR, "Load Texture Failed");
-    }
-
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, textureWidth, textureHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, diffuseTextureData);
-    glGenerateMipmap(GL_TEXTURE_2D);
-
-    stbi_image_free(diffuseTextureData);
+    m_DiffuseTextureID = GLMisc::GenDefaultTextureWithImageFile((G_IMPORT_PATH + DiffuseTexture).c_str());
 
     m_DiffuseColor = DiffuseColor;
     
@@ -113,14 +78,18 @@ void GLRenderable::Clear()
 
     glDeleteBuffers(1, &m_VBOID);
     glDeleteBuffers(1, &m_EBOID);
+
+    glDeleteTextures(1, &m_DiffuseTextureID);
 }
 
 void GLRenderable::Draw(glm::mat4* MVP)
 {
     glUseProgram(m_ShaderProgramID);
-    glUniformMatrix4fv(glGetUniformLocation(m_ShaderProgramID, "model"),      1, GL_FALSE, glm::value_ptr(MVP[0]));
-    glUniformMatrix4fv(glGetUniformLocation(m_ShaderProgramID, "view"),       1, GL_FALSE, glm::value_ptr(MVP[1]));
-    glUniformMatrix4fv(glGetUniformLocation(m_ShaderProgramID, "projection"), 1, GL_FALSE, glm::value_ptr(MVP[2]));
+    glUniformMatrix4fv(glGetUniformLocation(m_ShaderProgramID, "M"), 1, GL_FALSE, glm::value_ptr(MVP[0]));
+    glUniformMatrix4fv(glGetUniformLocation(m_ShaderProgramID, "V"), 1, GL_FALSE, glm::value_ptr(MVP[1]));
+    glUniformMatrix4fv(glGetUniformLocation(m_ShaderProgramID, "P"), 1, GL_FALSE, glm::value_ptr(MVP[2]));
+
+    glUniform1i(glGetUniformLocation(m_ShaderProgramID, "diffuseTexture"), 0);
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, m_DiffuseTextureID);

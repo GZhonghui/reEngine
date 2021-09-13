@@ -12,8 +12,6 @@ class Shader
 {
 protected:
     std::vector<char> m_ShaderCode;
-    std::string m_ShaderType;
-    sType m_ShaderStage;
 
 public:
     Shader() = default;
@@ -30,9 +28,8 @@ public:
 public:
     void Init(const char* ShaderType, sType Stage)
     {
-        m_ShaderType = std::string(ShaderType);
-
-        if (m_ShaderType == "GLDefault")
+        std::string thisShaderType(ShaderType);
+        if (thisShaderType == "GLDefault")
         {
             if (Stage == sType::VERT)
             {
@@ -43,7 +40,7 @@ public:
                 loadFrom("./Shader/GLDefault.frag");
             }
         }
-        else if (m_ShaderType == "GLSkybox")
+        else if (thisShaderType == "GLSkybox")
         {
             if (Stage == sType::VERT)
             {
@@ -54,7 +51,7 @@ public:
                 loadFrom("./Shader/GLSkybox.frag");
             }
         }
-        else if (m_ShaderType == "VKDefault")
+        else if (thisShaderType == "VKDefault")
         {
             if (Stage == sType::VERT)
             {
@@ -104,6 +101,7 @@ protected:
 
 public:
     friend class VulkanManager;
+
     friend class GLManager;
     friend class GLRenderable;
 };

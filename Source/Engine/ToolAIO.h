@@ -71,22 +71,26 @@ public:
     static void Log(pType Type, const char* Format, ...);
 };
 
-
 #ifdef TOOL_ALL_IN_ONE_OUT_IMPLEMENTATION
 std::vector<std::string> allLogs;
 std::string thisLog;
 
-char printBuffer[128];
+char printBuffer[512];
 
 void Out::printTime()
 {
     time_t nowTime = time(nullptr);
     tm* ltm = localtime(&nowTime);
 
-    // printf("[%02d:%02d:%02d]", ltm->tm_hour, ltm->tm_min, ltm->tm_sec);
-
-    snprintf(printBuffer, sizeof(printBuffer), "[%02d:%02d:%02d]", ltm->tm_hour, ltm->tm_min, ltm->tm_sec);
-    thisLog += printBuffer;
+    if (G_ENABLE_CON_OUTPUT)
+    {
+        printf("[%02d:%02d:%02d]", ltm->tm_hour, ltm->tm_min, ltm->tm_sec);
+    }
+    if (G_ENABLE_WIN_OUTPUT)
+    {
+        snprintf(printBuffer, sizeof(printBuffer), "[%02d:%02d:%02d]", ltm->tm_hour, ltm->tm_min, ltm->tm_sec);
+        thisLog += printBuffer;
+    }
 }
 
 void Out::Log(pType Type, const char* Format, ...)
@@ -95,51 +99,62 @@ void Out::Log(pType Type, const char* Format, ...)
     return;
 #endif
 
-    if (!G_ENABLE_OUTPUT) return;
-
     thisLog.clear();
 
     switch (Type)
     {
     case pType::MESSAGE:
-        // printf("[MESSAGE]");
-        thisLog += "[MESSAGE]";
+        if (G_ENABLE_CON_OUTPUT) printf("[MESSAGE]");
+        if (G_ENABLE_WIN_OUTPUT) thisLog += "[MESSAGE]";
         break;
     case pType::WARNING:
-        // printf("[WARNING]");
-        thisLog += "[WARNING]";
+        if (G_ENABLE_CON_OUTPUT) printf("[WARNING]");
+        if (G_ENABLE_WIN_OUTPUT) thisLog += "[WARNING]";
         break;
     case pType::ERROR:
-        // printf("[ ERROR ]");
-        thisLog += "[ ERROR ]";
+        if (G_ENABLE_CON_OUTPUT) printf("[ ERROR ]");
+        if (G_ENABLE_WIN_OUTPUT) thisLog += "[ ERROR ]";
         break;
     }
-    // printf(" ");
-    thisLog += " ";
+    if (G_ENABLE_CON_OUTPUT) printf(" ");
+    if (G_ENABLE_WIN_OUTPUT) thisLog += " ";
 
     printTime();
 
-    // printf(" >>");
-    thisLog += " >>";
+    if (G_ENABLE_CON_OUTPUT) printf(" >>");
+    if (G_ENABLE_WIN_OUTPUT) thisLog += " >>";
 
     va_list args;
 
     va_start(args, Format);
-    // vprintf(Format, args);
-    vsprintf(printBuffer, Format, args);
-    thisLog += printBuffer;
+    if (G_ENABLE_CON_OUTPUT)
+    {
+        vprintf(Format, args);
+    }
+    if (G_ENABLE_WIN_OUTPUT)
+    {
+        vsnprintf(printBuffer, sizeof(printBuffer), Format, args);
+        thisLog += printBuffer;
+    }
     va_end(args);
 
-    // puts("");
+    if (G_ENABLE_CON_OUTPUT) puts("");
 
-    // Max Size = 32
-    if (allLogs.size() >= 32)
+    if (G_ENABLE_WIN_OUTPUT)
     {
-        allLogs.erase(allLogs.begin());
-    }
+        // Max Size = 32
+        if (allLogs.size() >= 32)
+        {
+            allLogs.erase(allLogs.begin());
+        }
 
-    allLogs.push_back(thisLog);
+        allLogs.push_back(thisLog);
+    }
 }
+#else
+// FROM ToolAIO
+extern std::vector<std::string> allLogs;
+// FROM ToolAIO
 #endif// TOOL_ALL_IN_ONE_OUT_IMPLEMENTATION
 
 inline bool checkSimpleStr(const char* inputName)

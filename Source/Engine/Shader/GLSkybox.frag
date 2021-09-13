@@ -8,9 +8,10 @@ uniform samplerCube skyboxTexture;
 
 void main()
 {   
-    textureCoords.x =  textureCoords.x;
-    textureCoords.y = -textureCoords.y;
-    textureCoords.z = -textureCoords.z;
+    vec3 fixedTextureCoords;
+    fixedTextureCoords.x =  textureCoords.x;
+    fixedTextureCoords.y = -textureCoords.y;
+    fixedTextureCoords.z = -textureCoords.z;
 
-    FragColor = texture(skyboxTexture, textureCoords);
+    FragColor = texture(skyboxTexture, fixedTextureCoords);
 }

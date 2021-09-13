@@ -10,4 +10,4 @@
 // Only On Windows
 #include<Windows.h>
 
-int main() { ShowWindow(GetConsoleWindow(), SW_HIDE); return RUN_ENGINE; }
+int main() { ShowWindow(GetConsoleWindow(), G_ENABLE_CON_OUTPUT ? SW_SHOW : SW_HIDE); return RUN_ENGINE; }

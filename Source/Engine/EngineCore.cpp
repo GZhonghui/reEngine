@@ -14,14 +14,11 @@ namespace EngineCore
     GLFWwindow* mainWindow;
     GLManager glManager;
 
-    std::vector<std::shared_ptr<Actor>> actorsInScene;
+    std::vector<std::shared_ptr<Actor>> actorsInSceneOfGame;
 
     WorldSetting worldSettings;
     std::vector<ClassItem> classItems;
     std::vector<ActorItem> actorItems;
-
-    std::shared_ptr<GLRenderable> renderOBJ;
-    std::shared_ptr<GLRenderable> renderBOX;
 
     void initGLFW()
     {
@@ -103,9 +100,6 @@ namespace EngineCore
         glManager.RenderSkybox();
         glManager.RenderDefaultScene();
 
-        //glManager.Render(renderBOX, glm::translate(glm::mat4(1), glm::vec3(0, 2, 0)));
-        glManager.Render(renderOBJ, glm::translate(glm::mat4(1), glm::vec3(0, 0, 0)));
-
         glManager.EndRenderEditor();
 
         return glManager.getSceneTextureID();
@@ -119,6 +113,7 @@ namespace EngineCore
         glManager.BeginRenderGame(nowWidth, nowHeight, Event::getCameraLocation(), Event::getCameraDir());
 
         glManager.RenderSkybox();
+        glManager.RenderDefaultScene();
 
         glManager.EndRenderGame();
     }
@@ -140,7 +135,7 @@ namespace EngineCore
 
     void initActors()
     {
-        for (auto thisAcotr = actorsInScene.begin(); thisAcotr != actorsInScene.end(); ++thisAcotr)
+        for (auto thisAcotr = actorsInSceneOfGame.begin(); thisAcotr != actorsInSceneOfGame.end(); ++thisAcotr)
         {
             thisAcotr->get()->Init();
         }
@@ -148,7 +143,7 @@ namespace EngineCore
 
     void destroyActors()
     {
-        for (auto thisAcotr = actorsInScene.begin(); thisAcotr != actorsInScene.end(); ++thisAcotr)
+        for (auto thisAcotr = actorsInSceneOfGame.begin(); thisAcotr != actorsInSceneOfGame.end(); ++thisAcotr)
         {
             thisAcotr->get()->Destroy();
         }
@@ -171,7 +166,7 @@ namespace EngineCore
             return;
         }
 
-        for (auto aIndex = actorsInScene.begin(); aIndex != actorsInScene.end(); ++aIndex)
+        for (auto aIndex = actorsInSceneOfGame.begin(); aIndex != actorsInSceneOfGame.end(); ++aIndex)
         {
             aIndex->get()->Update(Delta);
         }
@@ -223,8 +218,8 @@ int engineMain(void (*initScene)(std::vector<std::shared_ptr<Actor>>* actorsInSc
 
     if (G_BUILD_GAME_MODE)
     {
-        EngineCore::actorsInScene.clear();
-        initScene(&EngineCore::actorsInScene);
+        EngineCore::actorsInSceneOfGame.clear();
+        initScene(&EngineCore::actorsInSceneOfGame);
 
         EngineCore::initActors();
     }
@@ -236,11 +231,6 @@ int engineMain(void (*initScene)(std::vector<std::shared_ptr<Actor>>* actorsInSc
     EngineCore::initGLFW();
     EngineCore::initImGuiForGL();
     EngineCore::initOpenGL();
-
-    EngineCore::renderOBJ = std::make_shared<GLRenderable>();
-    EngineCore::renderOBJ->Init("Bee.obj", "BeeTexture.png", Color(1, 1, 1));
-    EngineCore::renderBOX = std::make_shared<GLRenderable>();
-    EngineCore::renderBOX->Init("Box.obj", "BoxDiffuse.png", Color(1, 1, 1));
 
     Event::initEventState();
 
@@ -270,9 +260,6 @@ int engineMain(void (*initScene)(std::vector<std::shared_ptr<Actor>>* actorsInSc
     {
         EngineCore::destroyActors();
     }
-
-    EngineCore::renderOBJ->Clear();
-    EngineCore::renderBOX->Clear();
 
     return 0;
 }

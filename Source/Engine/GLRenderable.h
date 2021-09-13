@@ -12,10 +12,6 @@ public:
     virtual ~GLRenderable() = default;
 
 protected:
-    Shader m_ShaderVert;
-    Shader m_ShaderFrag;
-
-protected:
     uint32_t m_ShaderProgramID;
     uint32_t m_DiffuseTextureID;
     uint32_t m_VAOID;
@@ -27,7 +23,7 @@ protected:
     unsigned int m_ElementCount;
 
 public:
-    void Init(std::string Model, std::string DiffuseTexture, Color DiffuseColor);
+    void Init(const std::string& Model, const std::string& DiffuseTexture, Color DiffuseColor);
     void Clear();
 
 public:
