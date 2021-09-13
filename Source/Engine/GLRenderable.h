@@ -8,8 +8,15 @@
 class GLRenderable
 {
 public:
-    GLRenderable() = default;
-    virtual ~GLRenderable() = default;
+    bool m_NeedClear;
+    GLRenderable()
+    {
+        m_NeedClear = false;
+    }
+    virtual ~GLRenderable()
+    {
+        Clear();
+    }
 
 protected:
     uint32_t m_ShaderProgramID;

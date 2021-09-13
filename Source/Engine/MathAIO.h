@@ -30,6 +30,12 @@ class Transform
 {
 public:
     Transform() = default;
+    Transform(const Eigen::Vector3d& inLocation, const Eigen::Vector3d& inRotation, const Eigen::Vector3d& inScale)
+    {
+        Location = inLocation;
+        Rotation = inRotation;
+        Scale    = inScale;
+    }
     ~Transform() = default;
 
 public:

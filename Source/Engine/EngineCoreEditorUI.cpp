@@ -6,7 +6,11 @@ namespace EngineCore
     extern GLFWwindow* mainWindow;
     extern GLManager glManager;
 
+    // Game Mode
     extern std::vector<std::shared_ptr<Actor>> actorsInSceneOfGame;
+
+    // Editor Mode
+    extern std::unordered_map<std::string, std::shared_ptr<GLRenderable>> classesInSceneOfEditor;
 
     extern WorldSetting worldSettings;
     extern std::vector<ClassItem> classItems;
@@ -146,6 +150,20 @@ namespace EngineCore
             {
                 classNameSet.insert(std::string(classIndex->m_Name.c_str()));
                 classItemsChar.push_back(classIndex->m_Name.c_str());
+            }
+
+            if (!classesInSceneOfEditor.count(classIndex->m_Name))
+            {
+                if (classIndex->Render)
+                {
+                    classesInSceneOfEditor[classIndex->m_Name] = std::make_shared<GLRenderable>();
+                    classesInSceneOfEditor[classIndex->m_Name]->Init(classIndex->m_ModelFile,
+                        classIndex->m_DiffuseTextureFile, classIndex->m_DiffuseColor);
+                }
+                else
+                {
+                    classesInSceneOfEditor[classIndex->m_Name] = nullptr;
+                }
             }
         }
         for (auto actorIndex = actorItems.begin(); actorIndex != actorItems.end(); ++actorIndex)

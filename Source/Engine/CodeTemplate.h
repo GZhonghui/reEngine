@@ -158,6 +158,7 @@ inline void updateInitHeader
         fprintf(initHeader, "{\n");
         fprintf(initHeader, "}\n");
         fprintf(initHeader, "*/\n");
+        fprintf(initHeader, "\n");
         // Default Code
 
         fprintf(initHeader, "#pragma once\n");

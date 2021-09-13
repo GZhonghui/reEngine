@@ -27,7 +27,7 @@ Please Watch this [Youtube Video](https://www.youtube.com/channel/UCa0G_UHT3j2vz
 ```
 
 ### 🚩Editor
-![Editor](readMe/Editor.jpg)
+![Editor](readMe/Editor.png)
 ### 🚩Game
 ![Game](readMe/Game.jpg)
 

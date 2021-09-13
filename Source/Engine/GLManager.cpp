@@ -328,7 +328,7 @@ void GLManager::Render(std::shared_ptr<GLRenderable> renderObj, const Transform&
 
     // Transform
     MVP[0] = glm::mat4(1);
-    MVP[1] = glm::translate(MVP[0], Convert(ObjTransform.Location));
+    MVP[0] = glm::translate(MVP[0], Convert(ObjTransform.Location));
 
     Event::mainCamera.updateView(MVP[1]);
 

@@ -22,14 +22,23 @@
       <DiffuseTexture>PureBall.png</DiffuseTexture>
       <DiffuseColor x="0.0629085228" y="0.2386822402" z="0.9166666865"/>
     </ClassItem>
+    <ClassItem Name="Bee" Render="True">
+      <Model>Bee.obj</Model>
+      <DiffuseTexture>BeeTexture.png</DiffuseTexture>
+      <DiffuseColor x="0.0000000000" y="0.0000000000" z="0.0000000000"/>
+    </ClassItem>
+    <ClassItem Name="Box" Render="True">
+      <Model>Box.obj</Model>
+      <DiffuseTexture>BoxDiffuse.png</DiffuseTexture>
+      <DiffuseColor x="0.0000000000" y="0.0000000000" z="0.0000000000"/>
+    </ClassItem>
   </Class>
   <Actor>
-    <ActorItem Name="firstRenderObj" ClassName="hasRender">
-      <Tag>CanYouSee</Tag>
-      <Tag>hasRender</Tag>
-      <Location x="0.0000000000" y="10.0000000000" z="0.0000000000"/>
-      <Rotation x="90.0000000000" y="0.0000000000" z="0.0000000000"/>
-      <Scale x="1.0000000000" y="1.0000000000" z="3.1400001049"/>
+    <ActorItem Name="Bee_01" ClassName="Bee">
+      <Tag>Bee</Tag>
+      <Location x="0.0000000000" y="0.0000000000" z="0.0000000000"/>
+      <Rotation x="0.0000000000" y="0.0000000000" z="0.0000000000"/>
+      <Scale x="1.0000000000" y="1.0000000000" z="1.0000000000"/>
     </ActorItem>
   </Actor>
 </Project>

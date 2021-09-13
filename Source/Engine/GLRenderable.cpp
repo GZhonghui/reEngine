@@ -68,18 +68,25 @@ void GLRenderable::Init(const std::string& Model, const std::string& DiffuseText
 
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
+
+    m_NeedClear = true;
 }
 
 void GLRenderable::Clear()
 {
-    glDeleteProgram(m_ShaderProgramID);
+    if (m_NeedClear)
+    {
+        glDeleteProgram(m_ShaderProgramID);
 
-    glDeleteVertexArrays(1, &m_VAOID);
+        glDeleteVertexArrays(1, &m_VAOID);
 
-    glDeleteBuffers(1, &m_VBOID);
-    glDeleteBuffers(1, &m_EBOID);
+        glDeleteBuffers(1, &m_VBOID);
+        glDeleteBuffers(1, &m_EBOID);
 
-    glDeleteTextures(1, &m_DiffuseTextureID);
+        glDeleteTextures(1, &m_DiffuseTextureID);
+
+        m_NeedClear = false;
+    }
 }
 
 void GLRenderable::Draw(glm::mat4* MVP)

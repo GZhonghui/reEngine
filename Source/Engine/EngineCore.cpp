@@ -14,7 +14,11 @@ namespace EngineCore
     GLFWwindow* mainWindow;
     GLManager glManager;
 
+    // Game Mode
     std::vector<std::shared_ptr<Actor>> actorsInSceneOfGame;
+
+    // Editor Mode
+    std::unordered_map<std::string, std::shared_ptr<GLRenderable>> classesInSceneOfEditor;
 
     WorldSetting worldSettings;
     std::vector<ClassItem> classItems;
@@ -99,6 +103,15 @@ namespace EngineCore
 
         glManager.RenderSkybox();
         glManager.RenderDefaultScene();
+
+        for (auto i = actorItems.begin(); i != actorItems.end(); ++i)
+        {
+            if (classesInSceneOfEditor.count(i->m_ClassName) && classesInSceneOfEditor[i->m_ClassName])
+            {
+                glManager.Render(classesInSceneOfEditor[i->m_ClassName],
+                    Transform(i->m_Location, i->m_Rotation, i->m_Scale));
+            }
+        }
 
         glManager.EndRenderEditor();
 
@@ -216,6 +229,15 @@ int engineMain(void (*initScene)(std::vector<std::shared_ptr<Actor>>* actorsInSc
     // Important
     stbi_set_flip_vertically_on_load(true);
 
+    EngineCore::initGLFW();
+    EngineCore::initImGuiForGL();
+    EngineCore::initOpenGL();
+
+    Event::initEventState();
+
+    readProject(EngineCore::worldSettings, EngineCore::classItems, EngineCore::actorItems);
+    EngineCore::applyWorldSettings();
+
     if (G_BUILD_GAME_MODE)
     {
         EngineCore::actorsInSceneOfGame.clear();
@@ -225,17 +247,21 @@ int engineMain(void (*initScene)(std::vector<std::shared_ptr<Actor>>* actorsInSc
     }
     else
     {
-        // Code Here
+        // No Need to Clear
+        EngineCore::classesInSceneOfEditor.clear();
+        for (auto i = EngineCore::classItems.begin(); i != EngineCore::classItems.end(); ++i)
+        {
+            if (i->Render)
+            {
+                EngineCore::classesInSceneOfEditor[i->m_Name] = std::make_shared<GLRenderable>();
+                EngineCore::classesInSceneOfEditor[i->m_Name]->Init(i->m_ModelFile, i->m_DiffuseTextureFile, i->m_DiffuseColor);
+            }
+            else
+            {
+                EngineCore::classesInSceneOfEditor[i->m_Name] = nullptr;
+            }
+        }
     }
-
-    EngineCore::initGLFW();
-    EngineCore::initImGuiForGL();
-    EngineCore::initOpenGL();
-
-    Event::initEventState();
-
-    readProject(EngineCore::worldSettings, EngineCore::classItems, EngineCore::actorItems);
-    EngineCore::applyWorldSettings();
 
     while (!glfwWindowShouldClose(EngineCore::mainWindow))
     {
