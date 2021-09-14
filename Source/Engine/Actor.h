@@ -1,9 +1,8 @@
 #pragma once
 
-#include"ToolAIO.h"
-#include"MathAIO.h"
+#include"Object.h"
 
-class Actor
+class Actor : Object
 {
 public:
     Actor(const std::string& Name) :m_Name(Name) {}

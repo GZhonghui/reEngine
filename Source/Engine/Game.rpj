@@ -2,15 +2,14 @@
 <Project>
   <World>
     <LightDir x="-1.0000000000" y="-1.0000000000" z="-1.0000000000"/>
-    <LightColor x="0.8871003389" y="0.9362745285" z="0.3855247796"/>
-    <LightPower>3.5731130000</LightPower>
+    <LightColor x="0.9999899864" y="0.9999930263" z="1.0000000000"/>
+    <LightPower>1.8834910000</LightPower>
   </World>
   <Actor>
     <ActorItem Name="Bee_01" ClassName="Bee">
-      <Tag>Bee</Tag>
       <Location x="0.0000000000" y="0.0000000000" z="0.0000000000"/>
       <Rotation x="0.0000000000" y="0.0000000000" z="0.0000000000"/>
-      <Scale x="1.0000000000" y="1.0000000000" z="1.0000000000"/>
+      <Scale x="2.0000000000" y="2.0000000000" z="2.0000000000"/>
     </ActorItem>
   </Actor>
   <Class>
