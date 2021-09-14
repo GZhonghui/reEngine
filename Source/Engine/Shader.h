@@ -28,6 +28,13 @@ public:
 public:
     void Init(const char* ShaderType, sType Stage)
     {
+        std::string ShaderFileName = "./Shader/" +
+            std::string(ShaderType) + "." +
+            (Stage == sType::VERT ? "vert" : (Stage == sType::FRAG ? "frag" : "NONE"));
+
+        loadFrom(ShaderFileName.c_str());
+        
+        /*
         std::string thisShaderType(ShaderType);
         if (thisShaderType == "GLDefault")
         {
@@ -51,6 +58,17 @@ public:
                 loadFrom("./Shader/GLSkybox.frag");
             }
         }
+        else if (thisShaderType == "GLAxis")
+        {
+            if (Stage == sType::VERT)
+            {
+                loadFrom("./Shader/GLAxis.vert");
+            }
+            else if (Stage == sType::FRAG)
+            {
+                loadFrom("./Shader/GLAxis.frag");
+            }
+        }
         else if (thisShaderType == "VKDefault")
         {
             if (Stage == sType::VERT)
@@ -66,6 +84,7 @@ public:
         {
             Out::Log(pType::ERROR, "Wrong Shader Type : %s", ShaderType);
         }
+        */
     }
 
 protected:

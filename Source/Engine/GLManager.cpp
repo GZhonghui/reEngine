@@ -218,6 +218,160 @@ void GLManager::RenderDefaultScene()
     glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
+void GLManager::InitAxis()
+{
+    uint32_t axisEndVertShaderID = GLMisc::CompileShader(Shader("GLAxisEnd", sType::VERT).m_ShaderCode.data(), sType::VERT);
+    uint32_t axisEndFragShaderID = GLMisc::CompileShader(Shader("GLAxisEnd", sType::FRAG).m_ShaderCode.data(), sType::FRAG);
+
+    m_AxisEndShaderProgramID = glCreateProgram();
+    glAttachShader(m_AxisEndShaderProgramID, axisEndVertShaderID);
+    glAttachShader(m_AxisEndShaderProgramID, axisEndFragShaderID);
+    glLinkProgram(m_AxisEndShaderProgramID);
+
+    glDeleteShader(axisEndVertShaderID);
+    glDeleteShader(axisEndFragShaderID);
+
+    uint32_t axisLineVertShaderID = GLMisc::CompileShader(Shader("GLAxisLine", sType::VERT).m_ShaderCode.data(), sType::VERT);
+    uint32_t axisLineFragShaderID = GLMisc::CompileShader(Shader("GLAxisLine", sType::FRAG).m_ShaderCode.data(), sType::FRAG);
+
+    m_AxisLineShaderProgramID = glCreateProgram();
+    glAttachShader(m_AxisLineShaderProgramID, axisLineVertShaderID);
+    glAttachShader(m_AxisLineShaderProgramID, axisLineFragShaderID);
+    glLinkProgram(m_AxisLineShaderProgramID);
+
+    glDeleteShader(axisLineVertShaderID);
+    glDeleteShader(axisLineFragShaderID);
+
+    float boxVertices[] =
+    {
+        -1.0f,  1.0f, -1.0f,
+        -1.0f, -1.0f, -1.0f,
+         1.0f, -1.0f, -1.0f,
+         1.0f, -1.0f, -1.0f,
+         1.0f,  1.0f, -1.0f,
+        -1.0f,  1.0f, -1.0f,
+
+        -1.0f, -1.0f,  1.0f,
+        -1.0f, -1.0f, -1.0f,
+        -1.0f,  1.0f, -1.0f,
+        -1.0f,  1.0f, -1.0f,
+        -1.0f,  1.0f,  1.0f,
+        -1.0f, -1.0f,  1.0f,
+
+         1.0f, -1.0f, -1.0f,
+         1.0f, -1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f, -1.0f,
+         1.0f, -1.0f, -1.0f,
+
+        -1.0f, -1.0f,  1.0f,
+        -1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f, -1.0f,  1.0f,
+        -1.0f, -1.0f,  1.0f,
+
+        -1.0f,  1.0f, -1.0f,
+         1.0f,  1.0f, -1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+        -1.0f,  1.0f,  1.0f,
+        -1.0f,  1.0f, -1.0f,
+
+        -1.0f, -1.0f, -1.0f,
+        -1.0f, -1.0f,  1.0f,
+         1.0f, -1.0f, -1.0f,
+         1.0f, -1.0f, -1.0f,
+        -1.0f, -1.0f,  1.0f,
+         1.0f, -1.0f,  1.0f
+    };
+
+    glGenVertexArrays(1, &m_AxisEndVAOID);
+    glGenBuffers(1, &m_AxisEndVBOID);
+
+    glBindVertexArray(m_AxisEndVAOID);
+    glBindBuffer(GL_ARRAY_BUFFER, m_AxisEndVBOID);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(boxVertices), boxVertices, GL_STATIC_DRAW);
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+
+    float lineVertices[] =
+    {
+        0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+        1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+
+        0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+        0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+        
+        0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
+        0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
+    };
+
+    glGenVertexArrays(1, &m_AxisLineVAOID);
+    glGenBuffers(1, &m_AxisLineVBOID);
+
+    glBindVertexArray(m_AxisLineVAOID);
+    glBindBuffer(GL_ARRAY_BUFFER, m_AxisLineVBOID);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(lineVertices), lineVertices, GL_STATIC_DRAW);
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+}
+
+void GLManager::DestroyAxis()
+{
+    glDeleteProgram(m_AxisEndShaderProgramID);
+    glDeleteProgram(m_AxisLineShaderProgramID);
+
+    glDeleteVertexArrays(1, &m_AxisEndVAOID);
+    glDeleteVertexArrays(1, &m_AxisLineVAOID);
+    glDeleteBuffers(1, &m_AxisEndVBOID);
+    glDeleteBuffers(1, &m_AxisLineVBOID);
+}
+
+void GLManager::RenderAxis(double Length, double Size, glm::mat4* MVP)
+{
+    glDisable(GL_DEPTH_TEST);
+
+    glUseProgram(m_AxisEndShaderProgramID);
+
+    auto SomeAxis = [&](glm::vec3 Which)
+    {
+        glm::mat4 S = glm::scale(glm::mat4(1), glm::vec3(Size));
+        glm::mat4 T = glm::translate(glm::mat4(1), Which * (float)Length);
+
+        glUniformMatrix4fv(glGetUniformLocation(m_AxisEndShaderProgramID, "M"), 1, GL_FALSE, glm::value_ptr(MVP[0] * T * S));
+        glUniformMatrix4fv(glGetUniformLocation(m_AxisEndShaderProgramID, "V"), 1, GL_FALSE, glm::value_ptr(MVP[1]));
+        glUniformMatrix4fv(glGetUniformLocation(m_AxisEndShaderProgramID, "P"), 1, GL_FALSE, glm::value_ptr(MVP[2]));
+        glUniform3f(glGetUniformLocation(m_AxisEndShaderProgramID, "axisColor"), Which.x, Which.y, Which.z);
+
+        glBindVertexArray(m_AxisEndVAOID);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+    };
+
+    SomeAxis(glm::vec3(1, 0, 0));
+    SomeAxis(glm::vec3(0, 1, 0));
+    SomeAxis(glm::vec3(0, 0, 1));
+
+    glUseProgram(m_AxisLineShaderProgramID);
+
+    glUniformMatrix4fv(glGetUniformLocation(m_AxisLineShaderProgramID, "M"), 1, GL_FALSE, glm::value_ptr(MVP[0]));
+    glUniformMatrix4fv(glGetUniformLocation(m_AxisLineShaderProgramID, "V"), 1, GL_FALSE, glm::value_ptr(MVP[1]));
+    glUniformMatrix4fv(glGetUniformLocation(m_AxisLineShaderProgramID, "P"), 1, GL_FALSE, glm::value_ptr(MVP[2]));
+    glUniform1f(glGetUniformLocation(m_AxisLineShaderProgramID, "lineLength"), Length);
+
+    glLineWidth(3);
+    glBindVertexArray(m_AxisLineVAOID);
+    glDrawArrays(GL_LINES, 0, 6);
+
+    glEnable(GL_DEPTH_TEST);
+}
+
 bool GLManager::Init()
 {
     glGenFramebuffers(1, &m_SceneFBO);
@@ -247,6 +401,7 @@ bool GLManager::Init()
 
     InitSkybox();
     InitDefaultScene();
+    InitAxis();
 
     Out::Log(pType::MESSAGE, "Inited OpenGL");
 
@@ -262,6 +417,7 @@ bool GLManager::Destroy()
 
     DestroySkybox();
     DestroyDefaultScene();
+    DestroyAxis();
 
     Out::Log(pType::MESSAGE, "Cleaned OpenGL");
 
@@ -322,17 +478,37 @@ void GLManager::EndRenderGame()
     // End Render Game
 }
 
-void GLManager::Render(std::shared_ptr<GLRenderable> renderObj, const Transform& ObjTransform)
+void GLManager::Render(std::shared_ptr<GLRenderable> renderObj,
+    const Transform& ObjTransform, bool Selected, bool LineMode)
 {
     glm::mat4 MVP[3];
+
+    glm::mat4 ModelWithoutScale;
 
     // Transform
     MVP[0] = glm::mat4(1);
     MVP[0] = glm::translate(MVP[0], Convert(ObjTransform.Location));
+    MVP[0] = glm::rotate(MVP[0], glm::radians((float)ObjTransform.Rotation.x()), glm::vec3(1, 0, 0));
+    MVP[0] = glm::rotate(MVP[0], glm::radians((float)ObjTransform.Rotation.y()), glm::vec3(0, 1, 0));
+    MVP[0] = glm::rotate(MVP[0], glm::radians((float)ObjTransform.Rotation.z()), glm::vec3(0, 0, 1));
+
+    ModelWithoutScale = MVP[0];
+
+    MVP[0] = glm::scale(MVP[0], Convert(ObjTransform.Scale));
 
     Event::mainCamera.updateView(MVP[1]);
 
     MVP[2] = glm::perspective(glm::radians(Aspect), (float)m_ViewWidth / m_ViewHeight, NearZ, FarZ);
 
+    if (LineMode) glPolygonMode(GL_FRONT_AND_BACK, GL_LINE), glLineWidth(1);
+
     renderObj->Draw(MVP);
+
+    if (LineMode) glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+    if (Selected)
+    {
+        MVP[0] = ModelWithoutScale;
+        RenderAxis(1, 0.1, MVP);
+    }
 }

@@ -15,6 +15,11 @@ namespace EngineCore
     extern WorldSetting worldSettings;
     extern std::vector<ClassItem> classItems;
     extern std::vector<ActorItem> actorItems;
+    extern std::vector<ComponentItem> componentItems;
+
+    extern int  coreSelectedActorInEditorScene;
+    extern bool coreRenderDefaultSceneInEditorScene;
+    extern int  coreRenderModeFillOrLineInEditorScene;
     // FROM EngineCore.cpp
 
     void RenderEditor()
@@ -82,8 +87,11 @@ namespace EngineCore
         const char* skyboxChoices = "Creek\0";
         const int   skyboxChoicesCount = 1;
 
+        const double cameraMoveSpeedMin = 1.0;
+        const double cameraMoveSpeedMax = 10.0;
+
         // Part3 Const
-        const ImVec2 toolboxButtonSize = ImVec2(72, 32);
+        const ImVec2 toolboxButtonSize = ImVec2(108, 32);
 
         // === CONST ===
 
@@ -97,6 +105,7 @@ namespace EngineCore
 
         static int actorCurrent = 0;
         static int classCurrent = 0;
+        static int componentCurrent = 0;
 
         // Part 2 Static
         static int tagCurrent = -1;
@@ -108,11 +117,17 @@ namespace EngineCore
 
         static ImVec4 classDiffuseColor;
 
+        static double cameraMoveSpeed = 3.0;
+
         static float  lightDirf3[3];
         static float  lightColorf3[3];
         static double lightPower = 0;
 
         static int skyboxCurrent = 0;
+
+        static bool renderDefaultScene = true;
+
+        static int renderMode = 0; // 0 : Fill; 1: Line
 
         // Part 3 Static
         static char newClassName[16];
@@ -134,6 +149,16 @@ namespace EngineCore
 
         // === STATIC ===
 
+        // === Exchange With Engine Core
+        coreSelectedActorInEditorScene = actorCurrent;
+        coreRenderDefaultSceneInEditorScene = renderDefaultScene;
+        coreRenderModeFillOrLineInEditorScene = renderMode;
+        // === Exchange With Engine Core
+
+        // === Exchange Whit Others
+        Event::cameraMoveSpeed = cameraMoveSpeed;
+        // === Exchange Whit Others
+
         // === LOCAL ===
         // Local Variable Update Every Frame
         std::unordered_set<std::string> actorNameSet;
@@ -141,9 +166,20 @@ namespace EngineCore
         
         std::unordered_set<std::string> classNameSet;
         std::vector<const char*> classItemsChar;
+
+        std::unordered_set<std::string> componentNameSet;
+        std::vector<const char*> componentItemsChar;
         // === LOCAL ===
 
         // === Update ===
+        for (auto actorIndex = actorItems.begin(); actorIndex != actorItems.end(); ++actorIndex)
+        {
+            if (!actorNameSet.count(std::string(actorIndex->m_Name.c_str())))
+            {
+                actorNameSet.insert(std::string(actorIndex->m_Name.c_str()));
+                actorItemsChar.push_back(actorIndex->m_Name.c_str());
+            }
+        }
         for (auto classIndex = classItems.begin(); classIndex != classItems.end(); ++classIndex)
         {
             if (!classNameSet.count(std::string(classIndex->m_Name.c_str())))
@@ -166,12 +202,12 @@ namespace EngineCore
                 }
             }
         }
-        for (auto actorIndex = actorItems.begin(); actorIndex != actorItems.end(); ++actorIndex)
+        for (auto componentIndex = componentItems.begin(); componentIndex != componentItems.end(); ++componentIndex)
         {
-            if (!actorNameSet.count(std::string(actorIndex->m_Name.c_str())))
+            if (!componentNameSet.count(componentIndex->m_Name))
             {
-                actorNameSet.insert(std::string(actorIndex->m_Name.c_str()));
-                actorItemsChar.push_back(actorIndex->m_Name.c_str());
+                componentNameSet.insert(componentIndex->m_Name);
+                componentItemsChar.push_back(componentIndex->m_Name.c_str());
             }
         }
         // === Update ===
@@ -183,9 +219,9 @@ namespace EngineCore
             ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always);
             if (ImGui::Begin("Actors", nullptr, mainWinFlag | ImGuiWindowFlags_NoScrollbar))
             {
-                if (ImGui::BeginTabBar("Actors"))
+                if (ImGui::BeginTabBar("Lists"))
                 {
-                    if (ImGui::BeginTabItem("Actor List"))
+                    if (ImGui::BeginTabItem("Actor"))
                     {
                         leftEnableTab = 0;
                         ImGui::PushItemWidth(-FLT_MIN);
@@ -193,12 +229,20 @@ namespace EngineCore
                             actorItemsChar.data(), actorItemsChar.size(), listBoxHeightCount);
                         ImGui::EndTabItem();
                     }
-                    if (ImGui::BeginTabItem("Class List"))
+                    if (ImGui::BeginTabItem("Class"))
                     {
                         leftEnableTab = 1;
                         ImGui::PushItemWidth(-FLT_MIN);
                         ImGui::ListBox("", &classCurrent,
                             classItemsChar.data(), classItemsChar.size(), listBoxHeightCount);
+                        ImGui::EndTabItem();
+                    }
+                    if (ImGui::BeginTabItem("Component"))
+                    {
+                        leftEnableTab = 2;
+                        ImGui::PushItemWidth(-FLT_MIN);
+                        ImGui::ListBox("", &componentCurrent,
+                            componentItemsChar.data(), componentItemsChar.size(), listBoxHeightCount);
                         ImGui::EndTabItem();
                     }
                     ImGui::EndTabBar();
@@ -302,6 +346,51 @@ namespace EngineCore
                                 }
                                 tagIndex += 1;
                             }
+
+                            if (ImGui::Button("New Tag"))
+                            {
+                                if (leftEnableTab == 0 && actorCurrent >= 0 && actorCurrent < actorItemsChar.size())
+                                {
+                                    ImGui::OpenPopup("New Tag");
+                                }
+                            }
+                            if (ImGui::BeginPopupModal("New Tag", nullptr, popWinFlag))
+                            {
+                                ImGui::Text("Guide for Add a Tag for %s", actorItemsChar[actorCurrent]);
+                                ImGui::Separator();
+                                ImGui::Text("Input the Tag Name");
+                                ImGui::InputText("", newTagName, IM_ARRAYSIZE(newTagName));
+                                ImGui::Separator();
+                                if (ImGui::Button("Add"))
+                                {
+                                    if (checkSimpleStr(newTagName))
+                                    {
+                                        actorItems[actorCurrent].m_Tags.insert(newTagName);
+
+                                        *newTagName = 0;
+                                        ImGui::CloseCurrentPopup();
+                                    }
+                                }
+                                ImGui::SameLine();
+                                if (ImGui::Button("Cancel"))
+                                {
+                                    *newTagName = 0;
+                                    ImGui::CloseCurrentPopup();
+                                }
+                                ImGui::EndPopup();
+                            }
+                            ImGui::SameLine();
+                            if (ImGui::Button("Del Tag"))
+                            {
+                                if (leftEnableTab == 0 &&
+                                    actorCurrent >= 0 && actorCurrent < actorItemsChar.size() &&
+                                    tagCurrent >= 0 && tagCurrent < actorItems[actorCurrent].m_Tags.size())
+                                {
+                                    Out::Log(pType::MESSAGE, "Delete Tag [%s] for %s", tagCurrentStr.c_str(),
+                                        actorItemsChar[actorCurrent]);
+                                    actorItems[actorCurrent].m_Tags.erase(tagCurrentStr);
+                                }
+                            }
                             ImGui::TreePop();
                         }
                     }
@@ -349,6 +438,19 @@ namespace EngineCore
                     {
                         ImGui::Text("N/A");
                     }
+                    ImGui::Text("");
+
+                    ImGui::TextColored(textColor, "=== Actor Components ===");
+                    ImGui::Separator();
+                    if (ImGui::Button("Add Component"))
+                    {
+
+                    }
+                    ImGui::SameLine();
+                    if (ImGui::Button("Del Component"))
+                    {
+
+                    }
                 }
                 else if (leftEnableTab == 1)
                 {
@@ -366,7 +468,8 @@ namespace EngineCore
 
                     ImGui::TextColored(textColor, "=== Class Visibility===");
                     ImGui::Separator();
-                    if (classItems[classCurrent].Render)
+                    if (classCurrent >= 0 && classCurrent < classItemsChar.size() &&
+                        classItems[classCurrent].Render)
                     {
                         classDiffuseColor.x = classItems[classCurrent].m_DiffuseColor.x();
                         classDiffuseColor.y = classItems[classCurrent].m_DiffuseColor.y();
@@ -377,6 +480,16 @@ namespace EngineCore
                         ImGui::Text("  %s", classItems[classCurrent].m_ModelFile);
                         ImGui::Text("+ Diffuse Texture");
                         ImGui::Text("  %s", classItems[classCurrent].m_DiffuseTextureFile);
+
+                        const int imageSize = rightWindowWidth - 96;
+                        if (classesInSceneOfEditor.count(classItems[classCurrent].m_Name))
+                        {
+                            ImGui::Text(" ");
+                            ImGui::SameLine();
+                            ImGui::Image((void*)classesInSceneOfEditor[classItems[classCurrent].m_Name]->getDiffuseTextureID(),
+                                ImVec2(imageSize, imageSize));
+                        }
+
                         ImGui::Text("+ Diffuse Color");
                         ImGui::Text(" ");
                         ImGui::SameLine();
@@ -408,8 +521,13 @@ namespace EngineCore
                     ImGui::TextColored(ImVec4(1, 1, 0, 1), "> Move");
                 }
 
-                ImGui::Text("Location (%.2lf,%.2lf,%.2lf)", cameraLocation.x(), cameraLocation.y(), cameraLocation.z());
-                ImGui::Text("Forward  (%.2lf,%.2lf,%.2lf)", cameraDir.x(), cameraDir.y(), cameraDir.z());
+                ImGui::Text("Location (%6.2lf,%6.2lf,%6.2lf)", cameraLocation.x(), cameraLocation.y(), cameraLocation.z());
+                ImGui::Text("Forward  (%6.2lf,%6.2lf,%6.2lf)", cameraDir.x(), cameraDir.y(), cameraDir.z());
+                ImGui::Text("Speed");
+                ImGui::SameLine();
+                ImGui::PushItemWidth(-FLT_MIN);
+                ImGui::SliderScalar("##CameraMoveSpeed", ImGuiDataType_Double,
+                    &cameraMoveSpeed, &cameraMoveSpeedMin, &cameraMoveSpeedMax);
                 ImGui::Text("");
 
                 auto glLightDir = glManager.getLightDir();
@@ -450,6 +568,24 @@ namespace EngineCore
                 ImGui::Separator();
                 ImGui::PushItemWidth(-FLT_MIN);
                 ImGui::Combo("##Skybox", &skyboxCurrent, skyboxChoices, skyboxChoicesCount);
+                ImGui::Text("");
+
+                ImGui::TextColored(textColor, "=== Grid ===");
+                ImGui::Separator();
+                ImGui::Checkbox("Render Grid", &renderDefaultScene);
+                ImGui::Text("");
+
+                ImGui::TextColored(textColor, "=== Mode ===");
+                ImGui::Separator();
+                if (ImGui::RadioButton("Fill", renderMode == 0))
+                {
+                    renderMode = 0;
+                }
+                ImGui::SameLine();
+                if (ImGui::RadioButton("Line", renderMode == 1))
+                {
+                    renderMode = 1;
+                }
 
                 ImGui::End();
             }
@@ -475,6 +611,81 @@ namespace EngineCore
                         {
                             collectWorldSettings();
                             saveProject(worldSettings, classItems, actorItems);
+                        }
+                        ImGui::EndTabItem();
+                    }
+
+                    if (ImGui::BeginTabItem("Actor"))
+                    {
+                        if (ImGui::Button("New Actor", toolboxButtonSize))
+                        {
+                            if (!classItemsChar.empty())
+                            {
+                                ImGui::OpenPopup("New Actor");
+                            }
+                            else
+                            {
+                                Out::Log(pType::ERROR, "Please Add a Class First");
+                            }
+                        }
+                        if (ImGui::BeginPopupModal("New Actor", nullptr, popWinFlag))
+                        {
+                            ImGui::Text("Guide for Create new Actor");
+                            ImGui::Separator();
+
+                            ImGui::Text("Input the Actor Name");
+                            ImGui::InputText("", newActorName, IM_ARRAYSIZE(newActorName));
+                            ImGui::Text("Selete the Class");
+                            ImGui::Combo(" ", &selectClassInNewActor, classItemsChar.data(), classItemsChar.size());
+
+                            ImGui::Separator();
+
+                            if (ImGui::Button("Add"))
+                            {
+                                if (checkSimpleStr(newActorName) &&
+                                    !actorNameSet.count(newActorName) &&
+                                    selectClassInNewActor >= 0 &&
+                                    selectClassInNewActor < classItemsChar.size())
+                                {
+                                    ActorItem newActor;
+                                    newActor.m_Name = std::string(newActorName);
+                                    newActor.m_ClassName = classItems[selectClassInNewActor].m_Name;
+                                    newActor.m_Tags.insert(newActor.m_ClassName);
+
+                                    newActor.m_Location = Eigen::Vector3d(0, 0, 0);
+                                    newActor.m_Rotation = Eigen::Vector3d(0, 0, 0);
+                                    newActor.m_Scale    = Eigen::Vector3d(1, 1, 1);
+
+                                    actorItems.push_back(newActor);
+
+                                    *newActorName = 0;
+                                    ImGui::CloseCurrentPopup();
+                                }
+                                else
+                                {
+                                    Out::Log(pType::ERROR, "Wrong Actor Name");
+                                }
+                            }
+                            ImGui::SameLine();
+                            if (ImGui::Button("Cancel"))
+                            {
+                                *newActorName = 0;
+                                ImGui::CloseCurrentPopup();
+                            }
+                            ImGui::EndPopup();
+                        }
+                        ImGui::SameLine();
+                        if (ImGui::Button("Del Actor", toolboxButtonSize))
+                        {
+                            if (leftEnableTab == 0 && actorCurrent >= 0 && actorCurrent < actorItemsChar.size())
+                            {
+                                Out::Log(pType::MESSAGE, "Delete Actor : %s", actorItemsChar[actorCurrent]);
+                                actorItems.erase(actorItems.begin() + actorCurrent);
+                            }
+                            else
+                            {
+                                Out::Log(pType::ERROR, "No Selected Actor");
+                            }
                         }
                         ImGui::EndTabItem();
                     }
@@ -512,6 +723,8 @@ namespace EngineCore
                             ImGui::Text("Input the Class Name");
                             ImGui::InputText("", newClassName, IM_ARRAYSIZE(newClassName));
                             ImGui::Checkbox("Render", &renderNewClass);
+
+                            // Add a default actor
 
                             if (renderNewClass)
                             {
@@ -592,127 +805,19 @@ namespace EngineCore
                         ImGui::EndTabItem();
                     }
 
-                    if (ImGui::BeginTabItem("Actor"))
+                    if (ImGui::BeginTabItem("Component"))
                     {
-                        if (ImGui::Button("New Actor", toolboxButtonSize))
+                        if (ImGui::Button("New Component", toolboxButtonSize))
                         {
-                            if (!classItemsChar.empty())
-                            {
-                                ImGui::OpenPopup("New Actor");
-                            }
-                            else
-                            {
-                                Out::Log(pType::ERROR, "Please Add a Class First");
-                            }
+                            ImGui::OpenPopup("New Component");
                         }
-                        if (ImGui::BeginPopupModal("New Actor", nullptr, popWinFlag))
+                        if (ImGui::BeginPopupModal("New Component", nullptr, popWinFlag))
                         {
-                            ImGui::Text("Guide for Create new Actor");
-                            ImGui::Separator();
-
-                            ImGui::Text("Input the Actor Name");
-                            ImGui::InputText("", newActorName, IM_ARRAYSIZE(newActorName));
-                            ImGui::Text("Selete the Class");
-                            ImGui::Combo(" ", &selectClassInNewActor, classItemsChar.data(), classItemsChar.size());
-
-                            ImGui::Separator();
-
-                            if (ImGui::Button("Add"))
-                            {
-                                if (checkSimpleStr(newActorName) &&
-                                    !actorNameSet.count(newActorName) &&
-                                    selectClassInNewActor >= 0 &&
-                                    selectClassInNewActor < classItemsChar.size())
-                                {
-                                    ActorItem newActor;
-                                    newActor.m_Name = std::string(newActorName);
-                                    newActor.m_ClassName = classItems[selectClassInNewActor].m_Name;
-                                    newActor.m_Tags.insert(newActor.m_ClassName);
-
-                                    newActor.m_Location = Eigen::Vector3d(0, 0, 0);
-                                    newActor.m_Rotation = Eigen::Vector3d(0, 0, 0);
-                                    newActor.m_Scale    = Eigen::Vector3d(1, 1, 1);
-
-                                    actorItems.push_back(newActor);
-
-                                    *newActorName = 0;
-                                    ImGui::CloseCurrentPopup();
-                                }
-                                else
-                                {
-                                    Out::Log(pType::ERROR, "Wrong Actor Name");
-                                }
-                            }
-                            
-                            ImGui::SameLine();
-                            
                             if (ImGui::Button("Cancel"))
                             {
-                                *newActorName = 0;
-                                ImGui::CloseCurrentPopup();
-                            }
-
-                            ImGui::EndPopup();
-                        }
-                        ImGui::SameLine();
-                        if (ImGui::Button("Del Actor", toolboxButtonSize))
-                        {
-                            if (leftEnableTab == 0 && actorCurrent >= 0 && actorCurrent < actorItemsChar.size())
-                            {
-                                Out::Log(pType::MESSAGE, "Delete Actor : %s", actorItemsChar[actorCurrent]);
-                                actorItems.erase(actorItems.begin() + actorCurrent);
-                            }
-                            else
-                            {
-                                Out::Log(pType::ERROR, "No Selected Actor");
-                            }
-                        }
-                        ImGui::SameLine();
-                        if (ImGui::Button("New Tag", toolboxButtonSize))
-                        {
-                            if (leftEnableTab == 0 && actorCurrent >= 0 && actorCurrent < actorItemsChar.size())
-                            {
-                                ImGui::OpenPopup("New Tag");
-                            }
-                        }
-                        if (ImGui::BeginPopupModal("New Tag", nullptr, popWinFlag))
-                        {
-                            ImGui::Text("Guide for Add a Tag for %s", actorItemsChar[actorCurrent]);
-                            ImGui::Separator();
-                            ImGui::Text("Input the Tag Name");
-                            ImGui::InputText("", newTagName, IM_ARRAYSIZE(newTagName));
-
-                            ImGui::Separator();
-
-                            if (ImGui::Button("Add"))
-                            {
-                                if (checkSimpleStr(newTagName))
-                                {
-                                    actorItems[actorCurrent].m_Tags.insert(newTagName);
-
-                                    *newTagName = 0;
-                                    ImGui::CloseCurrentPopup();
-                                }
-                            }
-                            ImGui::SameLine();
-                            if (ImGui::Button("Cancel"))
-                            {
-                                *newTagName = 0;
                                 ImGui::CloseCurrentPopup();
                             }
                             ImGui::EndPopup();
-                        }
-                        ImGui::SameLine();
-                        if (ImGui::Button("Del Tag", toolboxButtonSize))
-                        {
-                            if (leftEnableTab == 0 &&
-                                actorCurrent >= 0 && actorCurrent < actorItemsChar.size() &&
-                                tagCurrent >= 0 && tagCurrent < actorItems[actorCurrent].m_Tags.size())
-                            {
-                                Out::Log(pType::MESSAGE, "Delete Tag [%s] for %s", tagCurrentStr.c_str(),
-                                    actorItemsChar[actorCurrent]);
-                                actorItems[actorCurrent].m_Tags.erase(tagCurrentStr);
-                            }
                         }
                         ImGui::EndTabItem();
                     }

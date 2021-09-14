@@ -53,6 +53,16 @@ public:
     Eigen::Vector3d m_Scale;
 };
 
+class ComponentItem
+{
+public:
+    ComponentItem() = default;
+    virtual ~ComponentItem() = default;
+
+public:
+    std::string m_Name;
+};
+
 inline void addClassToProject(const char* className)
 {
     std::string sourceFileName(className);

@@ -74,18 +74,6 @@
     <ClCompile Include="..\Support\Include\ImGUI\ImGuiFileDialog.cpp">
       <Filter>ImGUI</Filter>
     </ClCompile>
-    <ClCompile Include="implnoRender.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="implhasRender.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="implthirdClass.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="implBlueBoy.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h">
@@ -129,18 +117,6 @@
     </ClInclude>
     <ClInclude Include="GLRenderable.h">
       <Filter>Engine Header</Filter>
-    </ClInclude>
-    <ClInclude Include="implnoRender.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="implhasRender.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="implthirdClass.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="implBlueBoy.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="AssetManager.h">
       <Filter>Engine Header</Filter>

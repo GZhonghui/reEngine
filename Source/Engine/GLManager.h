@@ -76,12 +76,27 @@ public:
     void RenderDefaultScene();
 // Default Scene
 
+// Axis
+protected:
+    uint32_t m_AxisEndShaderProgramID;
+    uint32_t m_AxisEndVAOID;
+    uint32_t m_AxisEndVBOID;
+
+    uint32_t m_AxisLineShaderProgramID;
+    uint32_t m_AxisLineVAOID;
+    uint32_t m_AxisLineVBOID;
+
+protected:
+    void InitAxis();
+    void DestroyAxis();
+
+public:
+    void RenderAxis(double Length, double Size, glm::mat4* MVP);
+// Axis
+
 public:
     bool Init();
     bool Destroy();
-
-public:
-    void Render(std::shared_ptr<GLRenderable> renderObj, const Transform& ObjTransform);
 
 public:
     unsigned int getSceneTextureID() const { return m_SceneTextureID; }
@@ -94,4 +109,8 @@ public:
     void BeginRenderGame(uint32_t viewWidth, uint32_t viewHeight,
         const Point& mainCameraLocation, const Direction& mainCameraDir);
     void EndRenderGame();
+
+public:
+    void Render(std::shared_ptr<GLRenderable> renderObj,
+        const Transform& ObjTransform, bool Selected, bool LineMode);
 };

@@ -23,6 +23,12 @@ namespace EngineCore
     WorldSetting worldSettings;
     std::vector<ClassItem> classItems;
     std::vector<ActorItem> actorItems;
+    std::vector<ComponentItem> componentItems;
+
+    // Exchange with UI
+    int  coreSelectedActorInEditorScene;
+    bool coreRenderDefaultSceneInEditorScene;
+    int  coreRenderModeFillOrLineInEditorScene;
 
     void initGLFW()
     {
@@ -102,15 +108,23 @@ namespace EngineCore
         glManager.BeginRenderEditor(viewWidth, viewHeight, Event::getCameraLocation(), Event::getCameraDir());
 
         glManager.RenderSkybox();
-        glManager.RenderDefaultScene();
 
+        if (coreRenderDefaultSceneInEditorScene)
+        {
+            glManager.RenderDefaultScene();
+        }
+
+        int actorIndex = 0;
         for (auto i = actorItems.begin(); i != actorItems.end(); ++i)
         {
             if (classesInSceneOfEditor.count(i->m_ClassName) && classesInSceneOfEditor[i->m_ClassName])
             {
                 glManager.Render(classesInSceneOfEditor[i->m_ClassName],
-                    Transform(i->m_Location, i->m_Rotation, i->m_Scale));
+                    Transform(i->m_Location, i->m_Rotation, i->m_Scale),
+                    actorIndex == coreSelectedActorInEditorScene,
+                    coreRenderModeFillOrLineInEditorScene);
             }
+            ++actorIndex;
         }
 
         glManager.EndRenderEditor();
@@ -222,6 +236,11 @@ namespace EngineCore
         worldSettings.m_LightColor = glManager.getLightColor();
         worldSettings.m_LightPower = glManager.getLightPower();
     }
+};
+
+namespace EngineAPI
+{
+    // Code
 };
 
 int engineMain(void (*initScene)(std::vector<std::shared_ptr<Actor>>* actorsInScene))

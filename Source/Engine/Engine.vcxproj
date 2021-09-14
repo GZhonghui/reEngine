@@ -17,21 +17,15 @@
       <Configuration>Release</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
-    <ClCompile Include="implnoRender.cpp"/>
     <ClInclude Include="AssetManager.h"/>
     <ClInclude Include="Config.h"/>
     <ClInclude Include="GLMisc.h"/>
-    <ClInclude Include="implnoRender.h"/>
-    <ClCompile Include="implhasRender.cpp"/>
-    <ClInclude Include="implhasRender.h"/>
-    <ClCompile Include="implthirdClass.cpp"/>
-    <ClInclude Include="implthirdClass.h"/>
-    <ClCompile Include="implBlueBoy.cpp"/>
-    <ClInclude Include="implBlueBoy.h"/>
-    <ClCompile Include="implBee.cpp"/>
-    <ClInclude Include="implBee.h"/>
+    <ClCompile Include="implManager.cpp"/>
+    <ClInclude Include="implManager.h"/>
     <ClCompile Include="implBox.cpp"/>
     <ClInclude Include="implBox.h"/>
+    <ClCompile Include="implBee.cpp"/>
+    <ClInclude Include="implBee.h"/>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

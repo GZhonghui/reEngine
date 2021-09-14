@@ -1,44 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project>
   <World>
-    <LightDir x="2.0000000000" y="0.0000000000" z="2.2000000477"/>
-    <LightColor x="0.2901960909" y="0.9019607902" z="0.1529411823"/>
-    <LightPower>9.0174530000</LightPower>
+    <LightDir x="1.0000000000" y="-1.0000000000" z="2.0000000000"/>
+    <LightColor x="0.7205882072" y="0.2755190134" z="0.2755190134"/>
+    <LightPower>13.1476420000</LightPower>
   </World>
   <Class>
-    <ClassItem Name="noRender" Render="False"/>
-    <ClassItem Name="hasRender" Render="True">
+    <ClassItem Name="Manager" Render="False"/>
+    <ClassItem Name="Box" Render="True">
       <Model>Box.obj</Model>
-      <DiffuseTexture>PureBall.png</DiffuseTexture>
-      <DiffuseColor x="0.6127451062" y="0.1650241166" z="0.0690840110"/>
-    </ClassItem>
-    <ClassItem Name="thirdClass" Render="True">
-      <Model>Box.obj</Model>
-      <DiffuseTexture>PureBall.png</DiffuseTexture>
-      <DiffuseColor x="0.0627162680" y="0.8529411554" z="0.2254096121"/>
-    </ClassItem>
-    <ClassItem Name="BlueBoy" Render="True">
-      <Model>Box.obj</Model>
-      <DiffuseTexture>PureBall.png</DiffuseTexture>
-      <DiffuseColor x="0.0629085228" y="0.2386822402" z="0.9166666865"/>
+      <DiffuseTexture>BoxDiffuse.png</DiffuseTexture>
+      <DiffuseColor x="0.8872548938" y="0.2158014923" z="0.1000336483"/>
     </ClassItem>
     <ClassItem Name="Bee" Render="True">
       <Model>Bee.obj</Model>
       <DiffuseTexture>BeeTexture.png</DiffuseTexture>
-      <DiffuseColor x="0.0000000000" y="0.0000000000" z="0.0000000000"/>
-    </ClassItem>
-    <ClassItem Name="Box" Render="True">
-      <Model>Box.obj</Model>
-      <DiffuseTexture>BoxDiffuse.png</DiffuseTexture>
-      <DiffuseColor x="0.0000000000" y="0.0000000000" z="0.0000000000"/>
+      <DiffuseColor x="0.1000336483" y="0.8872548938" z="0.2621085942"/>
     </ClassItem>
   </Class>
   <Actor>
+    <ActorItem Name="mainManager" ClassName="Manager">
+      <Tag>Manager_01</Tag>
+      <Location x="0.0000000000" y="0.0000000000" z="0.0000000000"/>
+      <Rotation x="0.0000000000" y="0.0000000000" z="0.0000000000"/>
+      <Scale x="1.0000000000" y="1.0000000000" z="1.0000000000"/>
+    </ActorItem>
     <ActorItem Name="Bee_01" ClassName="Bee">
       <Tag>Bee</Tag>
       <Location x="0.0000000000" y="0.0000000000" z="0.0000000000"/>
       <Rotation x="0.0000000000" y="0.0000000000" z="0.0000000000"/>
       <Scale x="1.0000000000" y="1.0000000000" z="1.0000000000"/>
+    </ActorItem>
+    <ActorItem Name="Box_01" ClassName="Box">
+      <Tag>Box</Tag>
+      <Location x="3.0000000000" y="0.0000000000" z="0.0000000000"/>
+      <Rotation x="0.0000000000" y="0.0000000000" z="0.0000000000"/>
+      <Scale x="3.0000000000" y="3.0000000000" z="3.0000000000"/>
     </ActorItem>
   </Actor>
 </Project>

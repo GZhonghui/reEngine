@@ -7,8 +7,9 @@
 
 class GLRenderable
 {
-public:
+private:
     bool m_NeedClear;
+public:
     GLRenderable()
     {
         m_NeedClear = false;
@@ -28,6 +29,9 @@ protected:
     Color m_DiffuseColor;
 
     unsigned int m_ElementCount;
+
+public:
+    unsigned int getDiffuseTextureID() const { return m_DiffuseTextureID; }
 
 public:
     void Init(const std::string& Model, const std::string& DiffuseTexture, Color DiffuseColor);

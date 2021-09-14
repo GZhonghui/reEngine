@@ -1,11 +1,11 @@
 #include "Actor.h"
 #include "EngineCore.h"
 
-class thirdClass : public Actor
+class Manager : public Actor
 {
 public:
-    thirdClass(const std::string& Name) : Actor(Name) { }
-    virtual ~thirdClass() = default;
+    Manager(const std::string& Name) : Actor(Name) { }
+    virtual ~Manager() = default;
 public:
     virtual void Init();
     virtual void Update(float Delta);
@@ -13,6 +13,6 @@ public:
 public:
     virtual const char* getType() const noexcept
     {
-        return "thirdClass";
+        return "Manager";
     }
 };
