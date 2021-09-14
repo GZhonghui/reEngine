@@ -61,20 +61,17 @@ public:
     void RenderSkybox();
 // Skybox
 
-// Default Scene
+// Grid
 protected:
-    uint32_t m_DefaultSceneTextureID;
-    uint32_t m_DefaultSceneShaderProgramID;
-    uint32_t m_DefaultSceneVAOID;
-    uint32_t m_DefaultSceneVBOID;
+    GLRenderable m_Grid;
 
 protected:
-    void InitDefaultScene();
-    void DestroyDefaultScene();
+    void InitGrid();
+    void DestroyGrid();
 
 public:
-    void RenderDefaultScene();
-// Default Scene
+    void RenderGrid();
+// Grid
 
 // Axis
 protected:

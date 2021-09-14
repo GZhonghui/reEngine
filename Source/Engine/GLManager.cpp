@@ -143,7 +143,7 @@ void GLManager::RenderSkybox()
     glDepthMask(GL_TRUE);
 }
 
-void GLManager::InitDefaultScene()
+void GLManager::InitGrid()
 {
     m_DefaultSceneTextureID = GLMisc::GenDefaultTextureWithImageFile("../Asset/Texture/UV_Texture.png");
 
@@ -187,7 +187,7 @@ void GLManager::InitDefaultScene()
     glEnableVertexAttribArray(2);
 }
 
-void GLManager::DestroyDefaultScene()
+void GLManager::DestroyGrid()
 {
     glDeleteTextures(1, &m_DefaultSceneTextureID);
     glDeleteProgram(m_DefaultSceneShaderProgramID);
@@ -196,7 +196,7 @@ void GLManager::DestroyDefaultScene()
     glDeleteBuffers(1, &m_DefaultSceneVBOID);
 }
 
-void GLManager::RenderDefaultScene()
+void GLManager::RenderGrid()
 {
     glUseProgram(m_DefaultSceneShaderProgramID);
 
@@ -406,7 +406,7 @@ bool GLManager::Init()
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     InitSkybox();
-    InitDefaultScene();
+    InitGrid();
     InitAxis();
 
     Out::Log(pType::MESSAGE, "Inited OpenGL");
@@ -422,7 +422,7 @@ bool GLManager::Destroy()
     glDeleteTextures(1, &m_DepthTextureID);
 
     DestroySkybox();
-    DestroyDefaultScene();
+    DestroyGrid();
     DestroyAxis();
 
     Out::Log(pType::MESSAGE, "Cleaned OpenGL");

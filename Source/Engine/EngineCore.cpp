@@ -111,7 +111,7 @@ namespace EngineCore
 
         if (coreRenderDefaultSceneInEditorScene)
         {
-            glManager.RenderDefaultScene();
+            glManager.RenderGrid();
         }
 
         int actorIndex = 0;
