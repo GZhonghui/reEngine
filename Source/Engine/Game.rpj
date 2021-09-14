@@ -1,41 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project>
   <World>
-    <LightDir x="1.0000000000" y="-1.0000000000" z="2.0000000000"/>
-    <LightColor x="0.7205882072" y="0.2755190134" z="0.2755190134"/>
-    <LightPower>13.1476420000</LightPower>
+    <LightDir x="-1.0000000000" y="-1.0000000000" z="-1.0000000000"/>
+    <LightColor x="0.8871003389" y="0.9362745285" z="0.3855247796"/>
+    <LightPower>3.5731130000</LightPower>
   </World>
-  <Class>
-    <ClassItem Name="Manager" Render="False"/>
-    <ClassItem Name="Box" Render="True">
-      <Model>Box.obj</Model>
-      <DiffuseTexture>BoxDiffuse.png</DiffuseTexture>
-      <DiffuseColor x="0.8872548938" y="0.2158014923" z="0.1000336483"/>
-    </ClassItem>
-    <ClassItem Name="Bee" Render="True">
-      <Model>Bee.obj</Model>
-      <DiffuseTexture>BeeTexture.png</DiffuseTexture>
-      <DiffuseColor x="0.1000336483" y="0.8872548938" z="0.2621085942"/>
-    </ClassItem>
-  </Class>
   <Actor>
-    <ActorItem Name="mainManager" ClassName="Manager">
-      <Tag>Manager_01</Tag>
-      <Location x="0.0000000000" y="0.0000000000" z="0.0000000000"/>
-      <Rotation x="0.0000000000" y="0.0000000000" z="0.0000000000"/>
-      <Scale x="1.0000000000" y="1.0000000000" z="1.0000000000"/>
-    </ActorItem>
     <ActorItem Name="Bee_01" ClassName="Bee">
       <Tag>Bee</Tag>
       <Location x="0.0000000000" y="0.0000000000" z="0.0000000000"/>
       <Rotation x="0.0000000000" y="0.0000000000" z="0.0000000000"/>
       <Scale x="1.0000000000" y="1.0000000000" z="1.0000000000"/>
     </ActorItem>
-    <ActorItem Name="Box_01" ClassName="Box">
-      <Tag>Box</Tag>
-      <Location x="3.0000000000" y="0.0000000000" z="0.0000000000"/>
-      <Rotation x="0.0000000000" y="0.0000000000" z="0.0000000000"/>
-      <Scale x="3.0000000000" y="3.0000000000" z="3.0000000000"/>
-    </ActorItem>
   </Actor>
+  <Class>
+    <ClassItem Name="Bee" Render="True">
+      <Model>Bee.obj</Model>
+      <DiffuseTexture>BeeTexture.png</DiffuseTexture>
+      <DiffuseColor x="1.0000000000" y="0.9999899864" z="0.9999899864"/>
+    </ClassItem>
+  </Class>
+  <Component>
+    <ComponentItem Name="Move"/>
+  </Component>
 </Project>

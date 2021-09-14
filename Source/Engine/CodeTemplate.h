@@ -143,10 +143,16 @@ inline void addClassToProject(const char* className)
     write_xml("Engine.vcxproj", ptProject, std::locale(), writeSettings);
 }
 
+inline void addComponentToProject(const char* componentName)
+{
+
+}
+
 inline void updateInitHeader
 (
     const std::vector<ClassItem>& classItems,
-    const std::vector<ActorItem>& actorItems
+    const std::vector<ActorItem>& actorItems,
+    const std::vector<ComponentItem>& componentItems
 )
 {
     FILE* initHeader = fopen("Init.h", "wt");

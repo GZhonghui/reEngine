@@ -31,6 +31,7 @@ protected:
     unsigned int m_ElementCount;
 
 public:
+    unsigned int getShaderID() const { return m_ShaderProgramID; }
     unsigned int getDiffuseTextureID() const { return m_DiffuseTextureID; }
 
 public:
@@ -38,5 +39,5 @@ public:
     void Clear();
 
 public:
-    void Draw(glm::mat4* MVP);
+    void Draw();
 };

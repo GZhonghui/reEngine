@@ -254,7 +254,7 @@ int engineMain(void (*initScene)(std::vector<std::shared_ptr<Actor>>* actorsInSc
 
     Event::initEventState();
 
-    readProject(EngineCore::worldSettings, EngineCore::classItems, EngineCore::actorItems);
+    readProject(EngineCore::worldSettings, EngineCore::classItems, EngineCore::actorItems, EngineCore::componentItems);
     EngineCore::applyWorldSettings();
 
     if (G_BUILD_GAME_MODE)

@@ -111,6 +111,8 @@ namespace EngineCore
         static int tagCurrent = -1;
         static std::string tagCurrentStr;
 
+        static char newTagName[32];
+
         static float actorLocationf3[3];
         static float actorRotationf3[3];
         static float actorScalef3[3];
@@ -130,7 +132,10 @@ namespace EngineCore
         static int renderMode = 0; // 0 : Fill; 1: Line
 
         // Part 3 Static
-        static char newClassName[16];
+        static char newActorName[32];
+        static int  selectClassInNewActor = 0;// Combo
+
+        static char newClassName[32];
         static bool renderNewClass = false; // Check box
         static std::vector<const char*> renderNewClassModel;
         static int renderNewClassModelCurrent = 0;
@@ -138,10 +143,7 @@ namespace EngineCore
         static int renderNewClassTextureCurrent = 0;
         static float renderNewClassDiffuseColorf3[3];
 
-        static char newActorName[32];
-        static int  selectClassInNewActor = 0;// Combo
-
-        static char newTagName[32];
+        static char newComponentName[32];
 
         // Part 5 Static
         static char logBuffer[512];
@@ -476,24 +478,20 @@ namespace EngineCore
                         classDiffuseColor.z = classItems[classCurrent].m_DiffuseColor.z();
                         classDiffuseColor.w = 1;
 
-                        ImGui::Text("+ Model");
-                        ImGui::Text("  %s", classItems[classCurrent].m_ModelFile);
-                        ImGui::Text("+ Diffuse Texture");
-                        ImGui::Text("  %s", classItems[classCurrent].m_DiffuseTextureFile);
+                        ImGui::Text("Model");
+                        ImGui::Text("%s", classItems[classCurrent].m_ModelFile);
+                        ImGui::Text("Diffuse Texture");
+                        ImGui::Text("%s", classItems[classCurrent].m_DiffuseTextureFile);
 
                         const int imageSize = rightWindowWidth - 96;
                         if (classesInSceneOfEditor.count(classItems[classCurrent].m_Name))
                         {
-                            ImGui::Text(" ");
-                            ImGui::SameLine();
                             ImGui::Image((void*)classesInSceneOfEditor[classItems[classCurrent].m_Name]->getDiffuseTextureID(),
                                 ImVec2(imageSize, imageSize));
                         }
 
-                        ImGui::Text("+ Diffuse Color");
-                        ImGui::Text(" ");
-                        ImGui::SameLine();
-                        ImGui::ColorButton("", *(ImVec4*)&classDiffuseColor, 0, ImVec2(128, 48));
+                        ImGui::Text("Diffuse Color");
+                        ImGui::ColorButton("", *(ImVec4*)&classDiffuseColor, 0, ImVec2(imageSize, 48));
                     }
                     else
                     {
@@ -603,14 +601,14 @@ namespace EngineCore
                     {
                         if (ImGui::Button("Read", toolboxButtonSize))
                         {
-                            readProject(worldSettings, classItems, actorItems);
+                            readProject(worldSettings, classItems, actorItems, componentItems);
                             applyWorldSettings();
                         }
                         ImGui::SameLine();
                         if (ImGui::Button("Save", toolboxButtonSize))
                         {
                             collectWorldSettings();
-                            saveProject(worldSettings, classItems, actorItems);
+                            saveProject(worldSettings, classItems, actorItems, componentItems);
                         }
                         ImGui::EndTabItem();
                     }
@@ -779,7 +777,7 @@ namespace EngineCore
                                         classItems.push_back(newClass);
 
                                         collectWorldSettings();
-                                        saveProject(worldSettings, classItems, actorItems);
+                                        saveProject(worldSettings, classItems, actorItems, componentItems);
 
                                         *newClassName = 0;
                                         renderNewClass = false;
@@ -813,8 +811,32 @@ namespace EngineCore
                         }
                         if (ImGui::BeginPopupModal("New Component", nullptr, popWinFlag))
                         {
+                            ImGui::Text("Guide for Create new Component");
+                            ImGui::Separator();
+                            ImGui::Text("Input the Component Name");
+                            ImGui::InputText("", newComponentName, IM_ARRAYSIZE(newComponentName));
+
+                            if (ImGui::Button("Add"))
+                            {
+                                if (checkSimpleStr(newComponentName) &&
+                                    !componentNameSet.count(std::string(newComponentName)))
+                                {
+                                    ComponentItem newComponent;
+                                    newComponent.m_Name = std::string(newComponentName);
+
+                                    componentItems.push_back(newComponent);
+
+                                    *newComponentName = 0;
+                                    ImGui::CloseCurrentPopup();
+
+                                    collectWorldSettings();
+                                    saveProject(worldSettings, classItems, actorItems, componentItems);
+                                }
+                            }
+                            ImGui::SameLine();
                             if (ImGui::Button("Cancel"))
                             {
+                                *newComponentName = 0;
                                 ImGui::CloseCurrentPopup();
                             }
                             ImGui::EndPopup();

@@ -894,8 +894,11 @@ bool VulkanManager::Render()
     auto swapChainExtent = m_VulkanInfo.swapChainExtent;
     float r = (float)swapChainExtent.width / swapChainExtent.height;
 
-    if (Event::mainCamera.updateMVP(r, mvp))
+    if (Event::mainCamera.updateView(mvp.m_View))
     {
+        mvp.m_Model = glm::mat4(1.0f);
+        mvp.m_Project = glm::perspective(glm::radians(45.0f), r, 0.1f, 100.0f);
+
         void* uniformData;
         vkMapMemory
         (
@@ -1038,8 +1041,11 @@ bool VulkanManager::RenderWithUI()
     auto swapChainExtent = m_VulkanInfo.swapChainExtent;
     float r = (float)swapChainExtent.width / swapChainExtent.height;
 
-    if (Event::mainCamera.updateMVP(r, mvp))
+    if (Event::mainCamera.updateView(mvp.m_View))
     {
+        mvp.m_Model = glm::mat4(1.0f);
+        mvp.m_Project = glm::perspective(glm::radians(45.0f), r, 0.1f, 100.0f);
+
         void* uniformData;
         vkMapMemory
         (

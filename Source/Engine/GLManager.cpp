@@ -161,13 +161,13 @@ void GLManager::InitDefaultScene()
     int repeatCount = 1;
     float groundVertices[] =
     {
-         -10.0f, 0.0f, 10.0f, 0.0f, 0.0f,
-         -10.0f, 0.0f,-10.0f, 0.0f, repeatCount,
-          10.0f, 0.0f,-10.0f, repeatCount, repeatCount,
+         -10.0f, 0.0f, 10.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f,
+         -10.0f, 0.0f,-10.0f, 0.0f, 1.0f, 0.0f, 0.0f, repeatCount,
+          10.0f, 0.0f,-10.0f, 0.0f, 1.0f, 0.0f, repeatCount, repeatCount,
 
-         -10.0f, 0.0f, 10.0f, 0.0f, 0.0f,
-          10.0f, 0.0f,-10.0f, repeatCount, repeatCount,
-          10.0f, 0.0f, 10.0f, repeatCount, 0.0f
+         -10.0f, 0.0f, 10.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f,
+          10.0f, 0.0f,-10.0f, 0.0f, 1.0f, 0.0f, repeatCount, repeatCount,
+          10.0f, 0.0f, 10.0f, 0.0f, 1.0f, 0.0f, repeatCount, 0.0f
     };
 
     glGenVertexArrays(1, &m_DefaultSceneVAOID);
@@ -177,11 +177,14 @@ void GLManager::InitDefaultScene()
     glBindBuffer(GL_ARRAY_BUFFER, m_DefaultSceneVBOID);
     glBufferData(GL_ARRAY_BUFFER, sizeof(groundVertices), groundVertices, GL_STATIC_DRAW);
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
+
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+    glEnableVertexAttribArray(2);
 }
 
 void GLManager::DestroyDefaultScene()
@@ -208,6 +211,9 @@ void GLManager::RenderDefaultScene()
     glUniformMatrix4fv(glGetUniformLocation(m_DefaultSceneShaderProgramID, "V"), 1, GL_FALSE, glm::value_ptr(V));
     glUniformMatrix4fv(glGetUniformLocation(m_DefaultSceneShaderProgramID, "P"), 1, GL_FALSE, glm::value_ptr(P));
 
+    glUniform3f(glGetUniformLocation(m_DefaultSceneShaderProgramID, "diffuseColor"), 1, 1, 1);
+
+    glUniform1i(glGetUniformLocation(m_DefaultSceneShaderProgramID, "enableDiffuseTexture"), 1);
     glUniform1i(glGetUniformLocation(m_SkyboxShaderProgramID, "diffuseTexture"), 0);
 
     glActiveTexture(GL_TEXTURE0);
@@ -481,6 +487,8 @@ void GLManager::EndRenderGame()
 void GLManager::Render(std::shared_ptr<GLRenderable> renderObj,
     const Transform& ObjTransform, bool Selected, bool LineMode)
 {
+    if (!renderObj) return;
+
     glm::mat4 MVP[3];
 
     glm::mat4 ModelWithoutScale;
@@ -502,7 +510,21 @@ void GLManager::Render(std::shared_ptr<GLRenderable> renderObj,
 
     if (LineMode) glPolygonMode(GL_FRONT_AND_BACK, GL_LINE), glLineWidth(1);
 
-    renderObj->Draw(MVP);
+    unsigned int ShaderID = renderObj->getShaderID();
+    glUseProgram(ShaderID);
+
+    glUniformMatrix4fv(glGetUniformLocation(ShaderID, "M"), 1, GL_FALSE, glm::value_ptr(MVP[0]));
+    glUniformMatrix4fv(glGetUniformLocation(ShaderID, "V"), 1, GL_FALSE, glm::value_ptr(MVP[1]));
+    glUniformMatrix4fv(glGetUniformLocation(ShaderID, "P"), 1, GL_FALSE, glm::value_ptr(MVP[2]));
+
+    glUniform3f(glGetUniformLocation(ShaderID, "lightDir"),
+        m_LightDir.x(), m_LightDir.y(), m_LightDir.z());
+    glUniform3f(glGetUniformLocation(ShaderID, "lightColor"),
+        m_LightColor.x(), m_LightColor.y(), m_LightColor.z());
+    glUniform1f(glGetUniformLocation(ShaderID, "lightPower"),
+        m_LightPower);
+
+    renderObj->Draw();
 
     if (LineMode) glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 

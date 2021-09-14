@@ -17,7 +17,7 @@ void GLRenderable::Init(const std::string& Model, const std::string& DiffuseText
 
     m_DiffuseColor = DiffuseColor;
     
-    // Location UV : 5 Float per Vertex
+    // Location UV : 8 Float per Vertex
     std::vector<float> VBuffer;
     std::vector<unsigned int> EBuffer;
 
@@ -27,7 +27,7 @@ void GLRenderable::Init(const std::string& Model, const std::string& DiffuseText
     {
         for (auto meshIndex = modelLoader.m_Meshs.begin(); meshIndex != modelLoader.m_Meshs.end(); ++meshIndex)
         {
-            int VertexNumber = VBuffer.size() / 5;
+            int VertexNumber = VBuffer.size() / 8;
             for (auto faceIndex = (*meshIndex)->Faces.begin(); faceIndex != (*meshIndex)->Faces.end(); ++faceIndex)
             {
                 EBuffer.push_back((*faceIndex)->x() + VertexNumber);
@@ -40,6 +40,9 @@ void GLRenderable::Init(const std::string& Model, const std::string& DiffuseText
                 VBuffer.push_back((*vertexIndex)->m_Location.x());
                 VBuffer.push_back((*vertexIndex)->m_Location.y());
                 VBuffer.push_back((*vertexIndex)->m_Location.z());
+                VBuffer.push_back((*vertexIndex)->m_Normal.x());
+                VBuffer.push_back((*vertexIndex)->m_Normal.y());
+                VBuffer.push_back((*vertexIndex)->m_Normal.z());
                 VBuffer.push_back((*vertexIndex)->m_TextureCoords.x());
                 VBuffer.push_back((*vertexIndex)->m_TextureCoords.y());
             }
@@ -63,11 +66,14 @@ void GLRenderable::Init(const std::string& Model, const std::string& DiffuseText
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EBOID);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * EBuffer.size(), EBuffer.data(), GL_STATIC_DRAW);
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
+
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+    glEnableVertexAttribArray(2);
 
     m_NeedClear = true;
 }
@@ -89,14 +95,15 @@ void GLRenderable::Clear()
     }
 }
 
-void GLRenderable::Draw(glm::mat4* MVP)
+void GLRenderable::Draw()
 {
-    glUseProgram(m_ShaderProgramID);
-    glUniformMatrix4fv(glGetUniformLocation(m_ShaderProgramID, "M"), 1, GL_FALSE, glm::value_ptr(MVP[0]));
-    glUniformMatrix4fv(glGetUniformLocation(m_ShaderProgramID, "V"), 1, GL_FALSE, glm::value_ptr(MVP[1]));
-    glUniformMatrix4fv(glGetUniformLocation(m_ShaderProgramID, "P"), 1, GL_FALSE, glm::value_ptr(MVP[2]));
+    glUniform3f(glGetUniformLocation(m_ShaderProgramID, "diffuseColor"),
+        m_DiffuseColor.x(), m_DiffuseColor.y(), m_DiffuseColor.z());
 
+    glUniform1i(glGetUniformLocation(m_ShaderProgramID, "enableDiffuseTexture"), 1);
     glUniform1i(glGetUniformLocation(m_ShaderProgramID, "diffuseTexture"), 0);
+
+    glUniform1i(glGetUniformLocation(m_ShaderProgramID, "enableNormalTexture"), 0);
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, m_DiffuseTextureID);

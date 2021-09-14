@@ -11,13 +11,6 @@ Project
         LightColor x="" y="" z=""
         LightPower
 
-    Class
-        ClassItem Name="" Render="False"
-        ClassItem Name="" Render="True"
-            Model
-            DiffuseTexture
-            DiffuseColor x="" y="" z=""
-
     Actor
         ActorItem Name="" ClassName=""
             Tag=""
@@ -30,6 +23,16 @@ Project
             Location x="" y="" z=""
             Rotation x="" y="" z=""
             Scale    x="" y="" z=""
+
+    Class
+        ClassItem Name="" Render="False"
+        ClassItem Name="" Render="True"
+            Model
+            DiffuseTexture
+            DiffuseColor x="" y="" z=""
+
+    Component
+        ComponentItem Name=""
 */
 // Project File Struction
 
@@ -37,7 +40,8 @@ inline void readProject
 (
     WorldSetting& worldSettings,
     std::vector<ClassItem>& classItems,
-    std::vector<ActorItem>& actorItems
+    std::vector<ActorItem>& actorItems,
+    std::vector<ComponentItem>& componentItems
 )
 {
     using namespace boost::property_tree;
@@ -50,9 +54,11 @@ inline void readProject
 
     classItems.clear();
     actorItems.clear();
+    componentItems.clear();
 
     std::unordered_set<std::string> classNameSet;
     std::unordered_set<std::string> actorNameSet;
+    std::unordered_set<std::string> componentNameSet;
 
     ptree ptProject;
     read_xml(projectFilePath, ptProject, xml_parser::trim_whitespace);
@@ -82,46 +88,6 @@ inline void readProject
     catch (...)
     {
         Out::Log(pType::ERROR, "Read World Setting Failed");
-    }
-
-    try
-    {
-        BOOST_FOREACH(const ptree::value_type & classItem, ptProject.get_child("Project.Class"))
-        {
-            if (classItem.first == "ClassItem")
-            {
-                std::string thisClassName = classItem.second.get<std::string>("<xmlattr>.Name");
-
-                if (!classNameSet.count(thisClassName))
-                {
-                    classNameSet.insert(thisClassName);
-
-                    ClassItem thisClass;
-                    thisClass.m_Name = thisClassName;
-
-                    if (classItem.second.get<std::string>("<xmlattr>.Render") == "True")
-                    {
-                        thisClass.Render = true;
-                        thisClass.m_ModelFile = classItem.second.get<std::string>("Model");
-                        thisClass.m_DiffuseTextureFile = classItem.second.get<std::string>("DiffuseTexture");
-
-                        thisClass.m_DiffuseColor.x() = StrToFloat(classItem.second.get<std::string>("DiffuseColor.<xmlattr>.x"));
-                        thisClass.m_DiffuseColor.y() = StrToFloat(classItem.second.get<std::string>("DiffuseColor.<xmlattr>.y"));
-                        thisClass.m_DiffuseColor.z() = StrToFloat(classItem.second.get<std::string>("DiffuseColor.<xmlattr>.z"));
-                    }
-                    else
-                    {
-                        thisClass.Render = false;
-                    }
-
-                    classItems.push_back(thisClass);
-                }
-            }
-        }
-    }
-    catch (...)
-    {
-        Out::Log(pType::ERROR, "Read Class Failed");
     }
 
     try
@@ -178,8 +144,74 @@ inline void readProject
         Out::Log(pType::ERROR, "Read Actor Failed");
     }
 
+    try
+    {
+        BOOST_FOREACH(const ptree::value_type & classItem, ptProject.get_child("Project.Class"))
+        {
+            if (classItem.first == "ClassItem")
+            {
+                std::string thisClassName = classItem.second.get<std::string>("<xmlattr>.Name");
+
+                if (!classNameSet.count(thisClassName))
+                {
+                    classNameSet.insert(thisClassName);
+
+                    ClassItem thisClass;
+                    thisClass.m_Name = thisClassName;
+
+                    if (classItem.second.get<std::string>("<xmlattr>.Render") == "True")
+                    {
+                        thisClass.Render = true;
+                        thisClass.m_ModelFile = classItem.second.get<std::string>("Model");
+                        thisClass.m_DiffuseTextureFile = classItem.second.get<std::string>("DiffuseTexture");
+
+                        thisClass.m_DiffuseColor.x() = StrToFloat(classItem.second.get<std::string>("DiffuseColor.<xmlattr>.x"));
+                        thisClass.m_DiffuseColor.y() = StrToFloat(classItem.second.get<std::string>("DiffuseColor.<xmlattr>.y"));
+                        thisClass.m_DiffuseColor.z() = StrToFloat(classItem.second.get<std::string>("DiffuseColor.<xmlattr>.z"));
+                    }
+                    else
+                    {
+                        thisClass.Render = false;
+                    }
+
+                    classItems.push_back(thisClass);
+                }
+            }
+        }
+    }
+    catch (...)
+    {
+        Out::Log(pType::ERROR, "Read Class Failed");
+    }
+
+    try
+    {
+        BOOST_FOREACH(const ptree::value_type & componentItem, ptProject.get_child("Project.Component"))
+        {
+            if (componentItem.first == "ComponentItem")
+            {
+                std::string thisComponentName = componentItem.second.get<std::string>("<xmlattr>.Name");
+
+                if (!componentNameSet.count(thisComponentName))
+                {
+                    componentNameSet.insert(thisComponentName);
+
+                    ComponentItem thisComponent;
+                    thisComponent.m_Name = thisComponentName;
+
+                    componentItems.push_back(thisComponent);
+                }
+            }
+        }
+    }
+    catch (...)
+    {
+        Out::Log(pType::ERROR, "Read Component Failed");
+    }
+
     Out::Log(pType::MESSAGE, "Read %d Class", classItems.size());
     Out::Log(pType::MESSAGE, "Read %d Actor", actorItems.size());
+    Out::Log(pType::MESSAGE, "Read %d Component", componentItems.size());
     Out::Log(pType::MESSAGE, "Read Project Done");
 }
 
@@ -187,7 +219,8 @@ inline void saveProject
 (
     WorldSetting& worldSettings,
     const std::vector<ClassItem>& classItems,
-    const std::vector<ActorItem>& actorItems
+    const std::vector<ActorItem>& actorItems,
+    const std::vector<ComponentItem>& componentItems
 )
 {
     using namespace boost::property_tree;
@@ -197,8 +230,9 @@ inline void saveProject
     ptree& rootProject = ptProject.add("Project", "");
 
     ptree& worldNode = rootProject.add("World", "");
-    ptree& classNode = rootProject.add("Class", "");
     ptree& actorNode = rootProject.add("Actor", "");
+    ptree& classNode = rootProject.add("Class", "");
+    ptree& componentNode = rootProject.add("Component", "");
 
     ptree& lightDirNode = worldNode.add("LightDir", "");
     lightDirNode.put("<xmlattr>.x", FloatToStr(worldSettings.m_LightDir.x()).c_str());
@@ -211,29 +245,6 @@ inline void saveProject
     lightColorNode.put("<xmlattr>.z", FloatToStr(worldSettings.m_LightColor.z()).c_str());
 
     ptree& lightPowerNode = worldNode.add("LightPower", FloatToStr(worldSettings.m_LightPower).c_str());
-
-    for (auto classIndex = classItems.begin(); classIndex != classItems.end(); ++classIndex)
-    {
-        ptree& classItem = classNode.add("ClassItem", "");
-
-        classItem.put("<xmlattr>.Name", classIndex->m_Name.c_str());
-        if (classIndex->Render)
-        {
-            classItem.put("<xmlattr>.Render", "True");
-
-            classItem.add("Model", classIndex->m_ModelFile.c_str());
-            classItem.add("DiffuseTexture", classIndex->m_DiffuseTextureFile.c_str());
-
-            ptree& diffuseColorNode = classItem.add("DiffuseColor", "");
-            diffuseColorNode.put("<xmlattr>.x", FloatToStr(classIndex->m_DiffuseColor.x()).c_str());
-            diffuseColorNode.put("<xmlattr>.y", FloatToStr(classIndex->m_DiffuseColor.y()).c_str());
-            diffuseColorNode.put("<xmlattr>.z", FloatToStr(classIndex->m_DiffuseColor.z()).c_str());
-        }
-        else
-        {
-            classItem.put("<xmlattr>.Render", "False");
-        }
-    }
 
     for (auto actorIndex = actorItems.begin(); actorIndex != actorItems.end(); ++actorIndex)
     {
@@ -264,12 +275,41 @@ inline void saveProject
         ScaleNode.put("<xmlattr>.z", FloatToStr(actorIndex->m_Scale.z()).c_str());
     }
 
+    for (auto classIndex = classItems.begin(); classIndex != classItems.end(); ++classIndex)
+    {
+        ptree& classItem = classNode.add("ClassItem", "");
+
+        classItem.put("<xmlattr>.Name", classIndex->m_Name.c_str());
+        if (classIndex->Render)
+        {
+            classItem.put("<xmlattr>.Render", "True");
+
+            classItem.add("Model", classIndex->m_ModelFile.c_str());
+            classItem.add("DiffuseTexture", classIndex->m_DiffuseTextureFile.c_str());
+
+            ptree& diffuseColorNode = classItem.add("DiffuseColor", "");
+            diffuseColorNode.put("<xmlattr>.x", FloatToStr(classIndex->m_DiffuseColor.x()).c_str());
+            diffuseColorNode.put("<xmlattr>.y", FloatToStr(classIndex->m_DiffuseColor.y()).c_str());
+            diffuseColorNode.put("<xmlattr>.z", FloatToStr(classIndex->m_DiffuseColor.z()).c_str());
+        }
+        else
+        {
+            classItem.put("<xmlattr>.Render", "False");
+        }
+    }
+
+    for (auto componentIndex = componentItems.begin(); componentIndex != componentItems.end(); ++componentIndex)
+    {
+        ptree& componentItem = componentNode.add("ComponentItem","");
+        componentItem.put("<xmlattr>.Name", componentIndex->m_Name.c_str());
+    }
+
     const boost::property_tree::xml_writer_settings<ptree::key_type> writeSettings(' ', 2);
     write_xml(projectFilePath, ptProject, std::locale(), writeSettings);
 
     Out::Log(pType::MESSAGE, "Save File Done");
 
-    updateInitHeader(classItems, actorItems);
+    updateInitHeader(classItems, actorItems, componentItems);
 
     Out::Log(pType::MESSAGE, "Generated Init Header");
 }
