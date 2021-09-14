@@ -478,6 +478,17 @@ namespace EngineCore
                         classDiffuseColor.z = classItems[classCurrent].m_DiffuseColor.z();
                         classDiffuseColor.w = 1;
 
+                        // Class的渲染设置应该要可以更改
+                        // 这里的属性要改为Combo
+                        // 还要添加法线贴图
+                        // 每一种贴图都要提供是否启用的选项
+                        // 高光值
+
+                        // 按理来说 渲染应该可以更改Shader Type的
+                        // 但是我们目前就只提供一种Default Phong Shader吧
+
+                        // 每一种不同的Shader Type应该是接受不同的参数的
+
                         ImGui::Text("Model");
                         ImGui::Text("%s", classItems[classCurrent].m_ModelFile);
                         ImGui::Text("Diffuse Texture");

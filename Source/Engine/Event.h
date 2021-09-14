@@ -84,6 +84,9 @@ public:
         }
         else
         {
+            // 摄像机目前还有BUG 待修复
+            // 1.初始就给Yaw Pitch设定一个固定的值是不对的
+            // 2.因为摄像机的UP方向是固定的 所以抬头低头到一定程度的时候会出现BUG
             const double rotateSpeed = 0.1f;
 
             static double yaw = 90.0;

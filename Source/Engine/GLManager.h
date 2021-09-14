@@ -70,6 +70,9 @@ protected:
     void DestroyGrid();
 
 public:
+    // 修改了这里
+    // 如果是使用模型渲染一个默认的地面 就使用Renderable
+    // 如果是绘制线条 就改回自己的Shader和VAO
     void RenderGrid();
 // Grid
 
