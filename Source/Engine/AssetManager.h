@@ -11,7 +11,7 @@ namespace AssetManager
 
         try
         {
-            std::filesystem::path targetPath = std::string(G_IMPORT_PATH) + fileName;
+            std::filesystem::path targetPath = G_IMPORT_PATH + fileName;
             if (std::filesystem::exists(targetPath))
             {
                 std::filesystem::remove(targetPath);
@@ -25,6 +25,32 @@ namespace AssetManager
         }
 
         Out::Log(pType::MESSAGE, "Import Done");
+        return true;
+    }
+
+    inline bool deleteAsset(const std::string& fileName)
+    {
+        Out::Log(pType::MESSAGE, "Deleting %s", fileName.c_str());
+
+        try
+        {
+            std::filesystem::path targetPath = G_IMPORT_PATH + fileName;
+            if (std::filesystem::exists(targetPath))
+            {
+                std::filesystem::remove(targetPath);
+            }
+            else
+            {
+                throw 0;
+            }
+        }
+        catch (...)
+        {
+            Out::Log(pType::ERROR, "Can't Delete %s", fileName.c_str());
+            return false;
+        }
+
+        Out::Log(pType::MESSAGE, "Delete Done");
         return true;
     }
 

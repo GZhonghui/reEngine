@@ -1,12 +1,15 @@
 #pragma once
 
 #include"Object.h"
+#include"Component.h"
 
 class Actor : Object
 {
 public:
     Actor(const std::string& Name) :m_Name(Name) {}
     virtual ~Actor() = default;
+protected:
+    std::vector<std::shared_ptr<Component>> m_Components;
 protected:
     std::string m_Name;
     std::unordered_set<std::string> m_Tags;

@@ -20,7 +20,9 @@
     <ClInclude Include="AssetManager.h" />
     <ClInclude Include="Component.h" />
     <ClInclude Include="Config.h" />
+    <ClInclude Include="EngineAPI.h" />
     <ClInclude Include="GLMisc.h" />
+    <ClCompile Include="EngineAPI.cpp" />
     <ClCompile Include="implBee.cpp" />
     <ClInclude Include="implBee.h" />
   </ItemGroup>

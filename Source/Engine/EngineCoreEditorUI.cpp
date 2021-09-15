@@ -18,7 +18,7 @@ namespace EngineCore
     extern std::vector<ComponentItem> componentItems;
 
     extern int  coreSelectedActorInEditorScene;
-    extern bool coreRenderDefaultSceneInEditorScene;
+    extern bool coreRenderGridInEditorScene;
     extern int  coreRenderModeFillOrLineInEditorScene;
     // FROM EngineCore.cpp
 
@@ -153,7 +153,7 @@ namespace EngineCore
 
         // === Exchange With Engine Core
         coreSelectedActorInEditorScene = actorCurrent;
-        coreRenderDefaultSceneInEditorScene = renderDefaultScene;
+        coreRenderGridInEditorScene = renderDefaultScene;
         coreRenderModeFillOrLineInEditorScene = renderMode;
         // === Exchange With Engine Core
 

@@ -77,7 +77,7 @@ inline void addClassToProject(const char* className)
     if (headerFile)
     {
         fprintf(headerFile, "#include \"Actor.h\"\n");
-        fprintf(headerFile, "#include \"EngineCore.h\"\n");
+        fprintf(headerFile, "#include \"EngineAPI.h\"\n");
         fprintf(headerFile, "\n");
         fprintf(headerFile, "class %s : public Actor\n", className);
         fprintf(headerFile, "{\n");
@@ -169,6 +169,7 @@ inline void updateInitHeader
         fprintf(initHeader, "#include<memory>\n");
         fprintf(initHeader, "\n");
         fprintf(initHeader, "#include\"Actor.h\"\n");
+        fprintf(initHeader, "#include\"Component.h\"\n");
         fprintf(initHeader, "\n");
         fprintf(initHeader, "void initScene(std::vector<std::shared_ptr<Actor>>* actorsInScene)\n");
         fprintf(initHeader, "{\n");

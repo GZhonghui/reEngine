@@ -145,60 +145,70 @@ void GLManager::RenderSkybox()
 
 void GLManager::InitGrid()
 {
-    m_DefaultSceneTextureID = GLMisc::GenDefaultTextureWithImageFile("../Asset/Texture/UV_Texture.png");
+    uint32_t groundVertShaderID = GLMisc::CompileShader(Shader("GLLine", sType::VERT).m_ShaderCode.data(), sType::VERT);
+    uint32_t groundFragShaderID = GLMisc::CompileShader(Shader("GLLine", sType::FRAG).m_ShaderCode.data(), sType::FRAG);
 
-    uint32_t groundVertShaderID = GLMisc::CompileShader(Shader("GLDefault", sType::VERT).m_ShaderCode.data(), sType::VERT);
-    uint32_t groundFragShaderID = GLMisc::CompileShader(Shader("GLDefault", sType::FRAG).m_ShaderCode.data(), sType::FRAG);
-
-    m_DefaultSceneShaderProgramID = glCreateProgram();
-    glAttachShader(m_DefaultSceneShaderProgramID, groundVertShaderID);
-    glAttachShader(m_DefaultSceneShaderProgramID, groundFragShaderID);
-    glLinkProgram (m_DefaultSceneShaderProgramID);
+    m_GridShaderProgramID = glCreateProgram();
+    glAttachShader(m_GridShaderProgramID, groundVertShaderID);
+    glAttachShader(m_GridShaderProgramID, groundFragShaderID);
+    glLinkProgram (m_GridShaderProgramID);
 
     glDeleteShader(groundVertShaderID);
     glDeleteShader(groundFragShaderID);
 
-    int repeatCount = 1;
-    float groundVertices[] =
+    glGenVertexArrays(1, &m_GridVAOID);
+    glGenBuffers(1, &m_GridVBOID);
+
+    std::vector<float> V;
+
+    const int   GridSize = 100;
+    const float GridOffset = 0.1;
+    const float GridStart = GridSize * -0.5 * GridOffset;
+    const float GridEnd = -GridStart;
+    
+    for (int wIndex = 0; wIndex <= GridSize; wIndex += 1)
     {
-         -10.0f, 0.0f, 10.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f,
-         -10.0f, 0.0f,-10.0f, 0.0f, 1.0f, 0.0f, 0.0f, repeatCount,
-          10.0f, 0.0f,-10.0f, 0.0f, 1.0f, 0.0f, repeatCount, repeatCount,
+        V.push_back(GridStart + wIndex * GridOffset);
+        V.push_back(0);
+        V.push_back(GridStart);
 
-         -10.0f, 0.0f, 10.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f,
-          10.0f, 0.0f,-10.0f, 0.0f, 1.0f, 0.0f, repeatCount, repeatCount,
-          10.0f, 0.0f, 10.0f, 0.0f, 1.0f, 0.0f, repeatCount, 0.0f
-    };
+        V.push_back(GridStart + wIndex * GridOffset);
+        V.push_back(0);
+        V.push_back(GridEnd);
+    }
 
-    glGenVertexArrays(1, &m_DefaultSceneVAOID);
-    glGenBuffers(1, &m_DefaultSceneVBOID);
+    for (int hIndex = 0; hIndex <= GridSize; hIndex += 1)
+    {
+        V.push_back(GridStart);
+        V.push_back(0);
+        V.push_back(GridStart + hIndex * GridOffset);
+        
+        V.push_back(GridEnd);
+        V.push_back(0);
+        V.push_back(GridStart + hIndex * GridOffset);
+    }
 
-    glBindVertexArray(m_DefaultSceneVAOID);
-    glBindBuffer(GL_ARRAY_BUFFER, m_DefaultSceneVBOID);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(groundVertices), groundVertices, GL_STATIC_DRAW);
+    m_GridVerticesCount = V.size() / 3;
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+    glBindVertexArray(m_GridVAOID);
+    glBindBuffer(GL_ARRAY_BUFFER, m_GridVBOID);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * V.size(), V.data(), GL_STATIC_DRAW);
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
-
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
-
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-    glEnableVertexAttribArray(2);
 }
 
 void GLManager::DestroyGrid()
 {
-    glDeleteTextures(1, &m_DefaultSceneTextureID);
-    glDeleteProgram(m_DefaultSceneShaderProgramID);
+    glDeleteProgram(m_GridShaderProgramID);
 
-    glDeleteVertexArrays(1, &m_DefaultSceneVAOID);
-    glDeleteBuffers(1, &m_DefaultSceneVBOID);
+    glDeleteVertexArrays(1, &m_GridVAOID);
+    glDeleteBuffers(1, &m_GridVBOID);
 }
 
 void GLManager::RenderGrid()
 {
-    glUseProgram(m_DefaultSceneShaderProgramID);
+    glUseProgram(m_GridShaderProgramID);
 
     auto M = glm::mat4(1);
     
@@ -207,21 +217,15 @@ void GLManager::RenderGrid()
     
     auto P = glm::perspective(glm::radians(Aspect), (float)m_ViewWidth / m_ViewHeight, NearZ, FarZ);
 
-    glUniformMatrix4fv(glGetUniformLocation(m_DefaultSceneShaderProgramID, "M"), 1, GL_FALSE, glm::value_ptr(M));
-    glUniformMatrix4fv(glGetUniformLocation(m_DefaultSceneShaderProgramID, "V"), 1, GL_FALSE, glm::value_ptr(V));
-    glUniformMatrix4fv(glGetUniformLocation(m_DefaultSceneShaderProgramID, "P"), 1, GL_FALSE, glm::value_ptr(P));
+    glUniformMatrix4fv(glGetUniformLocation(m_GridShaderProgramID, "M"), 1, GL_FALSE, glm::value_ptr(M));
+    glUniformMatrix4fv(glGetUniformLocation(m_GridShaderProgramID, "V"), 1, GL_FALSE, glm::value_ptr(V));
+    glUniformMatrix4fv(glGetUniformLocation(m_GridShaderProgramID, "P"), 1, GL_FALSE, glm::value_ptr(P));
+    glUniform3f(glGetUniformLocation(m_GridShaderProgramID, "lineColor"), colorGray.x(), colorGray.y(), colorGray.z());
 
-    glUniform3f(glGetUniformLocation(m_DefaultSceneShaderProgramID, "diffuseColor"), 1, 1, 1);
+    glBindVertexArray(m_GridVAOID);
 
-    glUniform1i(glGetUniformLocation(m_DefaultSceneShaderProgramID, "enableDiffuseTexture"), 1);
-    glUniform1i(glGetUniformLocation(m_SkyboxShaderProgramID, "diffuseTexture"), 0);
-
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, m_DefaultSceneTextureID);
-
-    glBindVertexArray(m_DefaultSceneVAOID);
-
-    glDrawArrays(GL_TRIANGLES, 0, 6);
+    glLineWidth(1.0);
+    glDrawArrays(GL_LINES, 0, m_GridVerticesCount);
 }
 
 void GLManager::InitAxis()

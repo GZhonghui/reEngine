@@ -7,6 +7,7 @@
 #include<memory>
 
 #include"Actor.h"
+#include"Component.h"
 
 void initScene(std::vector<std::shared_ptr<Actor>>* actorsInScene)
 {
@@ -19,6 +20,7 @@ void initScene(std::vector<std::shared_ptr<Actor>>* actorsInScene)
 #include<memory>
 
 #include"Actor.h"
+#include"Component.h"
 
 #include"implBee.h"
 

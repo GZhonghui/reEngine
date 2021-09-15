@@ -27,7 +27,7 @@ namespace EngineCore
 
     // Exchange with UI
     int  coreSelectedActorInEditorScene;
-    bool coreRenderDefaultSceneInEditorScene;
+    bool coreRenderGridInEditorScene;
     int  coreRenderModeFillOrLineInEditorScene;
 
     void initGLFW()
@@ -109,7 +109,7 @@ namespace EngineCore
 
         glManager.RenderSkybox();
 
-        if (coreRenderDefaultSceneInEditorScene)
+        if (coreRenderGridInEditorScene)
         {
             glManager.RenderGrid();
         }
@@ -140,7 +140,7 @@ namespace EngineCore
         glManager.BeginRenderGame(nowWidth, nowHeight, Event::getCameraLocation(), Event::getCameraDir());
 
         glManager.RenderSkybox();
-        glManager.RenderDefaultScene();
+        glManager.RenderGrid();
 
         glManager.EndRenderGame();
     }
@@ -197,30 +197,6 @@ namespace EngineCore
         {
             aIndex->get()->Update(Delta);
         }
-    }
-
-    std::shared_ptr<Actor> getActorByID(unsigned int actorID)
-    {
-        return nullptr;
-    }
-
-    std::shared_ptr<Actor> getActorByName(const std::string& actorName)
-    {
-        return nullptr;
-    }
-
-    std::vector<std::shared_ptr<Actor>> getActorsByTag(const std::string& tagName)
-    {
-        std::vector<std::shared_ptr<Actor>> findResult;
-
-        return findResult;
-    }
-
-    std::vector<std::shared_ptr<Actor>> getActorsByClass(const std::string& className)
-    {
-        std::vector<std::shared_ptr<Actor>> findResult;
-
-        return findResult;
     }
 
     void applyWorldSettings()

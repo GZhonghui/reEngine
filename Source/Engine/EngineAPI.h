@@ -1,11 +1,21 @@
 #pragma once
 
-// 新增文件 记得添加到VS的工程文件中
+#include"MathAIO.h"
+#include"ToolAIO.h"
 
-// 将引擎提供的API声明在此文件内
-// 原来的API在Engine Core当中
+#include"AssetManager.h"
+#include"ProjectParser.h"
+
+#include"VulkanManager.h"
+#include"GLManager.h"
+
+#include"Actor.h"
+#include"Component.h"
 
 namespace EngineCore
 {
-
+    std::shared_ptr<Actor> getActorByID(unsigned int actorID);
+    std::shared_ptr<Actor> getActorByName(const std::string& actorName);
+    std::vector<std::shared_ptr<Actor>> getActorsByTag(const std::string& tagName);
+    std::vector<std::shared_ptr<Actor>> getActorsByClass(const std::string& className);
 };

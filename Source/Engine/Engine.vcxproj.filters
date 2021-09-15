@@ -77,6 +77,9 @@
     <ClCompile Include="implBee.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="EngineAPI.cpp">
+      <Filter>Engine Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h">
@@ -141,6 +144,9 @@
     </ClInclude>
     <ClInclude Include="Component.h">
       <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineAPI.h">
+      <Filter>Engine Header</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
