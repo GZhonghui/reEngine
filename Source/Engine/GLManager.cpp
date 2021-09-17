@@ -5,40 +5,13 @@ void GLManager::InitSkybox()
     glGenTextures(1, &m_SkyboxTextureID);
     glBindTexture(GL_TEXTURE_CUBE_MAP, m_SkyboxTextureID);
 
-    int texWidth, texHeight, texChannels;
-    unsigned char* texData;
-
-    const std::string SkyboxPath("../Asset/Skybox/Creek/");
-
-    texData = stbi_load((SkyboxPath + "posX.jpg").c_str(), &texWidth, &texHeight, &texChannels, 3);
-    glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X, 0, GL_RGB, texWidth, texHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, texData);
-    stbi_image_free(texData);
-
-    texData = stbi_load((SkyboxPath + "negX.jpg").c_str(), &texWidth, &texHeight, &texChannels, 3);
-    glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_X, 0, GL_RGB, texWidth, texHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, texData);
-    stbi_image_free(texData);
-
-    texData = stbi_load((SkyboxPath + "negZ.jpg").c_str(), &texWidth, &texHeight, &texChannels, 3);
-    glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Y, 0, GL_RGB, texWidth, texHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, texData);
-    stbi_image_free(texData);
-
-    texData = stbi_load((SkyboxPath + "posZ.jpg").c_str(), &texWidth, &texHeight, &texChannels, 3);
-    glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, 0, GL_RGB, texWidth, texHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, texData);
-    stbi_image_free(texData);
-
-    texData = stbi_load((SkyboxPath + "posY.jpg").c_str(), &texWidth, &texHeight, &texChannels, 3);
-    glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Z, 0, GL_RGB, texWidth, texHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, texData);
-    stbi_image_free(texData);
-
-    texData = stbi_load((SkyboxPath + "negY.jpg").c_str(), &texWidth, &texHeight, &texChannels, 3);
-    glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, 0, GL_RGB, texWidth, texHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, texData);
-    stbi_image_free(texData);
-
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+    ChangeSkybox(1);
 
     uint32_t skyboxVertShaderID = GLMisc::CompileShader(Shader("GLSkybox", sType::VERT).m_ShaderCode.data(), sType::VERT);
     uint32_t skyboxFragShaderID = GLMisc::CompileShader(Shader("GLSkybox", sType::FRAG).m_ShaderCode.data(), sType::FRAG);
@@ -141,6 +114,52 @@ void GLManager::RenderSkybox()
     glDrawArrays(GL_TRIANGLES, 0, 36);
 
     glDepthMask(GL_TRUE);
+}
+
+void GLManager::ChangeSkybox(int Which)
+{
+    std::string SkyboxPath;
+
+    switch (Which)
+    {
+    case 0:
+    {
+        SkyboxPath = "../Asset/Skybox/Creek/";
+    }break;
+    case 1:
+    {
+        SkyboxPath = "../Asset/Skybox/Water/";
+    }
+    break;
+    default: return;
+    }
+
+    int texWidth, texHeight, texChannels;
+    unsigned char* texData;
+
+    texData = stbi_load((SkyboxPath + "posX.jpg").c_str(), &texWidth, &texHeight, &texChannels, 3);
+    glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X, 0, GL_RGB, texWidth, texHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, texData);
+    stbi_image_free(texData);
+
+    texData = stbi_load((SkyboxPath + "negX.jpg").c_str(), &texWidth, &texHeight, &texChannels, 3);
+    glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_X, 0, GL_RGB, texWidth, texHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, texData);
+    stbi_image_free(texData);
+
+    texData = stbi_load((SkyboxPath + "negZ.jpg").c_str(), &texWidth, &texHeight, &texChannels, 3);
+    glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Y, 0, GL_RGB, texWidth, texHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, texData);
+    stbi_image_free(texData);
+
+    texData = stbi_load((SkyboxPath + "posZ.jpg").c_str(), &texWidth, &texHeight, &texChannels, 3);
+    glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, 0, GL_RGB, texWidth, texHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, texData);
+    stbi_image_free(texData);
+
+    texData = stbi_load((SkyboxPath + "posY.jpg").c_str(), &texWidth, &texHeight, &texChannels, 3);
+    glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Z, 0, GL_RGB, texWidth, texHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, texData);
+    stbi_image_free(texData);
+
+    texData = stbi_load((SkyboxPath + "negY.jpg").c_str(), &texWidth, &texHeight, &texChannels, 3);
+    glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, 0, GL_RGB, texWidth, texHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, texData);
+    stbi_image_free(texData);
 }
 
 void GLManager::InitGrid()

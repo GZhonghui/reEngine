@@ -28,7 +28,7 @@ namespace EngineCore
     // Exchange with UI
     int  coreSelectedActorInEditorScene;
     bool coreRenderGridInEditorScene;
-    int  coreRenderModeFillOrLineInEditorScene;
+    int  coreRenderModeInEditorScene;
 
     void initGLFW()
     {
@@ -122,7 +122,7 @@ namespace EngineCore
                 glManager.Render(classesInSceneOfEditor[i->m_ClassName],
                     Transform(i->m_Location, i->m_Rotation, i->m_Scale),
                     actorIndex == coreSelectedActorInEditorScene,
-                    coreRenderModeFillOrLineInEditorScene);
+                    coreRenderModeInEditorScene);
             }
             ++actorIndex;
         }

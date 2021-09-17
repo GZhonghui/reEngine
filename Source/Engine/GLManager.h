@@ -59,6 +59,11 @@ protected:
 
 public:
     void RenderSkybox();
+    void ChangeSkybox(int Which);
+
+public:
+    const char*  getSkyboxList()  const { return "Creek\0Water\0"; }
+    unsigned int gerSkyboxCount() const { return 2; }
 // Skybox
 
 // Grid

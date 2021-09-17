@@ -17,14 +17,16 @@
       <Configuration>Release</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
-    <ClInclude Include="AssetManager.h" />
-    <ClInclude Include="Component.h" />
-    <ClInclude Include="Config.h" />
-    <ClInclude Include="EngineAPI.h" />
-    <ClInclude Include="GLMisc.h" />
-    <ClCompile Include="EngineAPI.cpp" />
-    <ClCompile Include="implBee.cpp" />
-    <ClInclude Include="implBee.h" />
+    <ClInclude Include="AssetManager.h"/>
+    <ClInclude Include="Component.h"/>
+    <ClInclude Include="Config.h"/>
+    <ClInclude Include="EngineAPI.h"/>
+    <ClInclude Include="GLMisc.h"/>
+    <ClCompile Include="EngineAPI.cpp"/>
+    <ClCompile Include="implBee.cpp"/>
+    <ClInclude Include="implBee.h"/>
+    <ClCompile Include="implBox.cpp"/>
+    <ClInclude Include="implBox.h"/>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
@@ -33,62 +35,62 @@
     <RootNamespace>Engine</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
-  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props"/>
+  <PropertyGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+  <PropertyGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+  <PropertyGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+  <PropertyGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
-  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
-  <ImportGroup Label="ExtensionSettings" />
-  <ImportGroup Label="Shared" />
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props"/>
+  <ImportGroup Label="ExtensionSettings"/>
+  <ImportGroup Label="Shared"/>
+  <ImportGroup Label="PropertySheets" Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists(&apos;$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props&apos;)" Label="LocalAppDataPlatform"/>
   </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  <ImportGroup Label="PropertySheets" Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists(&apos;$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props&apos;)" Label="LocalAppDataPlatform"/>
   </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  <ImportGroup Label="PropertySheets" Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists(&apos;$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props&apos;)" Label="LocalAppDataPlatform"/>
   </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  <ImportGroup Label="PropertySheets" Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists(&apos;$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props&apos;)" Label="LocalAppDataPlatform"/>
   </ImportGroup>
-  <PropertyGroup Label="UserMacros" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+  <PropertyGroup Label="UserMacros"/>
+  <PropertyGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">
     <LinkIncremental>true</LinkIncremental>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+  <PropertyGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+  <PropertyGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">
     <LinkIncremental>true</LinkIncremental>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+  <PropertyGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+  <ItemDefinitionGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;">
     <ClCompile>
       <WarningLevel>TurnOffAllWarnings</WarningLevel>
       <SDLCheck>true</SDLCheck>
@@ -106,7 +108,7 @@
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
     </Link>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+  <ItemDefinitionGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;">
     <ClCompile>
       <WarningLevel>TurnOffAllWarnings</WarningLevel>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -128,7 +130,7 @@
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
     </Link>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+  <ItemDefinitionGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">
     <ClCompile>
       <WarningLevel>TurnOffAllWarnings</WarningLevel>
       <SDLCheck>true</SDLCheck>
@@ -146,7 +148,7 @@
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
     </Link>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+  <ItemDefinitionGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;">
     <ClCompile>
       <WarningLevel>TurnOffAllWarnings</WarningLevel>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -169,41 +171,41 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\Support\Include\ImGUI\ImGuiFileDialog.cpp" />
-    <ClCompile Include="..\Support\Include\glad\glad.c" />
-    <ClCompile Include="..\Support\Include\ImGUI\backends\imgui_impl_glfw.cpp" />
-    <ClCompile Include="..\Support\Include\ImGUI\backends\imgui_impl_opengl3.cpp" />
-    <ClCompile Include="..\Support\Include\ImGUI\backends\imgui_impl_vulkan.cpp" />
-    <ClCompile Include="..\Support\Include\ImGUI\imgui.cpp" />
-    <ClCompile Include="..\Support\Include\ImGUI\imgui_demo.cpp" />
-    <ClCompile Include="..\Support\Include\ImGUI\imgui_draw.cpp" />
-    <ClCompile Include="..\Support\Include\ImGUI\imgui_tables.cpp" />
-    <ClCompile Include="..\Support\Include\ImGUI\imgui_widgets.cpp" />
-    <ClCompile Include="EngineCoreEditorUI.cpp" />
-    <ClInclude Include="GLRenderable.h" />
-    <ClCompile Include="GLRenderable.cpp" />
-    <ClCompile Include="EngineCore.cpp" />
-    <ClCompile Include="GLManager.cpp" />
-    <ClCompile Include="Main.cpp" />
-    <ClCompile Include="VulkanManager.cpp" />
+    <ClCompile Include="..\Support\Include\ImGUI\ImGuiFileDialog.cpp"/>
+    <ClCompile Include="..\Support\Include\glad\glad.c"/>
+    <ClCompile Include="..\Support\Include\ImGUI\backends\imgui_impl_glfw.cpp"/>
+    <ClCompile Include="..\Support\Include\ImGUI\backends\imgui_impl_opengl3.cpp"/>
+    <ClCompile Include="..\Support\Include\ImGUI\backends\imgui_impl_vulkan.cpp"/>
+    <ClCompile Include="..\Support\Include\ImGUI\imgui.cpp"/>
+    <ClCompile Include="..\Support\Include\ImGUI\imgui_demo.cpp"/>
+    <ClCompile Include="..\Support\Include\ImGUI\imgui_draw.cpp"/>
+    <ClCompile Include="..\Support\Include\ImGUI\imgui_tables.cpp"/>
+    <ClCompile Include="..\Support\Include\ImGUI\imgui_widgets.cpp"/>
+    <ClCompile Include="EngineCoreEditorUI.cpp"/>
+    <ClInclude Include="GLRenderable.h"/>
+    <ClCompile Include="GLRenderable.cpp"/>
+    <ClCompile Include="EngineCore.cpp"/>
+    <ClCompile Include="GLManager.cpp"/>
+    <ClCompile Include="Main.cpp"/>
+    <ClCompile Include="VulkanManager.cpp"/>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Actor.h" />
-    <ClInclude Include="Camera.h" />
-    <ClInclude Include="CodeTemplate.h" />
-    <ClInclude Include="EngineCore.h" />
-    <ClInclude Include="Event.h" />
-    <ClInclude Include="GLManager.h" />
-    <ClInclude Include="Init.h" />
-    <ClInclude Include="Loader.h" />
-    <ClInclude Include="MathAIO.h" />
-    <ClInclude Include="Object.h" />
-    <ClInclude Include="ProjectParser.h" />
-    <ClInclude Include="Shader.h" />
-    <ClInclude Include="ToolAIO.h" />
-    <ClInclude Include="VulkanManager.h" />
-    <ClInclude Include="VulkanMisc.h" />
+    <ClInclude Include="Actor.h"/>
+    <ClInclude Include="Camera.h"/>
+    <ClInclude Include="CodeTemplate.h"/>
+    <ClInclude Include="EngineCore.h"/>
+    <ClInclude Include="Event.h"/>
+    <ClInclude Include="GLManager.h"/>
+    <ClInclude Include="Init.h"/>
+    <ClInclude Include="Loader.h"/>
+    <ClInclude Include="MathAIO.h"/>
+    <ClInclude Include="Object.h"/>
+    <ClInclude Include="ProjectParser.h"/>
+    <ClInclude Include="Shader.h"/>
+    <ClInclude Include="ToolAIO.h"/>
+    <ClInclude Include="VulkanManager.h"/>
+    <ClInclude Include="VulkanMisc.h"/>
   </ItemGroup>
-  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
-  <ImportGroup Label="ExtensionTargets" />
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets"/>
+  <ImportGroup Label="ExtensionTargets"/>
 </Project>

@@ -3,6 +3,11 @@
 #include"ToolAIO.h"
 #include"MathAIO.h"
 
+enum class aType
+{
+    OBJ, TEXTURE
+};
+
 namespace AssetManager
 {
     inline bool addAsset(const std::string& filePathName, const std::string& fileName)
@@ -54,7 +59,7 @@ namespace AssetManager
         return true;
     }
 
-    inline int getAssetList(std::vector<std::string>& assetList, std::vector<std::string>& assetTypeList)
+    inline int getAssetList(std::vector<std::string>& assetList, std::vector<aType>& assetTypeList)
     {
         assetList.clear();
         assetTypeList.clear();
@@ -67,11 +72,11 @@ namespace AssetManager
             bool rightType = true;
             if (endsWith(upperName, "OBJ"))
             {
-                assetTypeList.push_back("OBJ");
+                assetTypeList.push_back(aType::OBJ);
             }
             else if (endsWith(upperName, "PNG"))
             {
-                assetTypeList.push_back("PNG");
+                assetTypeList.push_back(aType::TEXTURE);
             }
             else rightType = false;
 

@@ -68,6 +68,20 @@ inline Eigen::Vector3d Convert(const glm::vec3& From)
     return Eigen::Vector3d(From[0], From[1], From[2]);
 }
 
+inline void Fill(float* Target, const Eigen::Vector3d& Source)
+{
+    Target[0] = Source.x();
+    Target[1] = Source.y();
+    Target[2] = Source.z();
+}
+
+inline void Fill(Eigen::Vector3d& Target, const float* Source)
+{
+    Target.x() = Source[0];
+    Target.y() = Source[1];
+    Target.z() = Source[2];
+}
+
 inline bool Near(double x, double y, double localEPS = eps)
 {
     return std::abs(x - y) < localEPS;
