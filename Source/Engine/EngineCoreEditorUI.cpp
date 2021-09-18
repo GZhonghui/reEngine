@@ -79,7 +79,7 @@ namespace EngineCore
         const double lightPowerMax = 20.0;
 
         const char* skyboxChoices      = glManager.getSkyboxList();
-        const int   skyboxChoicesCount = glManager.gerSkyboxCount();
+        const int   skyboxChoicesCount = glManager.getSkyboxCount();
 
         const double cameraMoveSpeedMin = 1.0;
         const double cameraMoveSpeedMax = 10.0;
@@ -98,9 +98,11 @@ namespace EngineCore
         // Part 1 Static
         static uint8_t leftEnableTab = 0;// Actor List or Class List or Component
 
-        static int actorCurrent = 0;
-        static int classCurrent = 0;
-        static int componentCurrent = 0;
+        static int actorCurrent = -1;
+        static int classCurrent = -1;
+        static int componentCurrent = -1;
+
+        static int selectedAssetID = -1;
 
         // Part 2 Static
         static int tagCurrent = -1;
@@ -129,7 +131,7 @@ namespace EngineCore
 
         static float  lightDirf3[3];
         static float  lightColorf3[3];
-        static double lightPower = 0;
+        static double lightPower = 1.0;
 
         static int  skyboxLast    = 0;
         static int  skyboxCurrent = 0;
@@ -241,6 +243,8 @@ namespace EngineCore
         }
         // === Update ===
 
+        ImGui::ShowDemoWindow();
+
         // === Part 1 ===
         {
             int listBoxHeightCount = ((actorListHeight - 68) / ImGui::GetTextLineHeightWithSpacing());
@@ -308,6 +312,7 @@ namespace EngineCore
                             ImGui::TableSetColumnIndex(0);
                             ImGui::Text("%03d", i);
 
+                            ImGui::TableSetColumnIndex(1);
                             std::string assetTypeStr;
                             if (assetTypeList[i] == aType::OBJ)
                             {
@@ -317,21 +322,47 @@ namespace EngineCore
                             {
                                 assetTypeStr = "Texture";
                             }
-
-                            ImGui::TableSetColumnIndex(1);
                             ImGui::TextColored(textColor, "%s", assetTypeStr.c_str());
 
                             ImGui::TableSetColumnIndex(2);
-                            ImGui::Text("%s", assetList[i].c_str());
+                            if (ImGui::Selectable(assetList[i].c_str(), selectedAssetID == i,
+                                ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_DontClosePopups))
+                            {
+                                selectedAssetID = i;
+                            }
                         }
-
                         ImGui::EndTable();
                     }
 
                     ImGui::Separator();
                     if (ImGui::Button("Close"))
                     {
+                        selectedAssetID = -1;
                         ImGui::CloseCurrentPopup();
+                    }
+                    ImGui::SameLine();
+                    if (ImGui::Button("Refresh"))
+                    {
+                        AssetManager::getAssetList(assetList, assetTypeList);
+                    }
+                    ImGui::SameLine();
+
+                    bool canDeleteAsset = Inside(selectedAssetID, 0, assetList.size() - 1);
+
+                    if (!canDeleteAsset)
+                    {
+                        ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
+                        ImGui::PushStyleVar(ImGuiStyleVar_Alpha, 0.5f);
+                    }
+                    if (ImGui::Button("Delete"))
+                    {
+                        AssetManager::deleteAsset(assetList[selectedAssetID]);
+                        AssetManager::getAssetList(assetList, assetTypeList);
+                    }
+                    if (!canDeleteAsset)
+                    {
+                        ImGui::PopItemFlag();
+                        ImGui::PopStyleVar();
                     }
                     ImGui::EndPopup();
                 }
@@ -422,6 +453,7 @@ namespace EngineCore
                                 ImGui::EndPopup();
                             }
                             ImGui::SameLine();
+                            
                             if (ImGui::Button("Del Tag"))
                             {
                                 if (leftEnableTab == 0 &&
@@ -527,6 +559,9 @@ namespace EngineCore
 
                         ImGui::Text("Model");
                         ImGui::Combo("##Model", &classModelCurrent, assetModel.data(), assetModel.size());
+                        ImGui::Text("Shader");
+                        static int whichShader = 0;
+                        ImGui::Combo("##Shader", &whichShader, "Phong\0Glass\0", 2);
                         ImGui::Text("Diffuse Color");
                         ImGui::ColorEdit3("##DiffuseColor", (float*)&classDiffuseColor);
                         ImGui::ColorButton("", *(ImVec4*)&classDiffuseColor, 0, ImVec2(imageSize, 48));

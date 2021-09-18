@@ -29,6 +29,7 @@
 #include<boost/algorithm/string.hpp>
 
 #include<imgui.h>
+#include<imgui_internal.h>
 #include<imgui_impl_glfw.h>
 #include<imgui_impl_vulkan.h>
 #include<imgui_impl_opengl3.h>
@@ -209,4 +210,9 @@ inline std::string FloatToStr(double inFloat)
     snprintf(printBuffer, sizeof(printBuffer), "%.10lf", inFloat);
 
     return std::string(printBuffer);
+}
+
+inline bool Inside(int x, int Left, int Right)
+{
+    return Left <= x && x <= Right;
 }

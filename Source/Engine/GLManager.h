@@ -53,6 +53,10 @@ protected:
     uint32_t m_SkyboxVAOID;
     uint32_t m_SkyboxVBOID;
 
+    const char* m_SkyboxsChar;
+    std::vector<std::string> m_Skyboxs;
+    std::vector<std::string> m_SkyboxsPath;
+
 protected:
     void InitSkybox();
     void DestroySkybox();
@@ -62,8 +66,8 @@ public:
     void ChangeSkybox(int Which);
 
 public:
-    const char*  getSkyboxList()  const { return "Creek\0Water\0"; }
-    unsigned int gerSkyboxCount() const { return 2; }
+    const char*  getSkyboxList()  const { return m_SkyboxsChar;    }
+    unsigned int getSkyboxCount() const { return m_Skyboxs.size(); }
 // Skybox
 
 // Grid

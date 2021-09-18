@@ -2,6 +2,13 @@
 
 void GLManager::InitSkybox()
 {
+    m_Skyboxs.push_back("Creek");
+    m_SkyboxsPath.push_back("../Asset/Skybox/Creek/");
+    m_Skyboxs.push_back("Water");
+    m_SkyboxsPath.push_back("../Asset/Skybox/Water/");
+
+    m_SkyboxsChar = "Creek\0Water\0";
+
     glGenTextures(1, &m_SkyboxTextureID);
     glBindTexture(GL_TEXTURE_CUBE_MAP, m_SkyboxTextureID);
 
@@ -11,7 +18,7 @@ void GLManager::InitSkybox()
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
-    ChangeSkybox(1);
+    ChangeSkybox(0);
 
     uint32_t skyboxVertShaderID = GLMisc::CompileShader(Shader("GLSkybox", sType::VERT).m_ShaderCode.data(), sType::VERT);
     uint32_t skyboxFragShaderID = GLMisc::CompileShader(Shader("GLSkybox", sType::FRAG).m_ShaderCode.data(), sType::FRAG);
@@ -118,25 +125,15 @@ void GLManager::RenderSkybox()
 
 void GLManager::ChangeSkybox(int Which)
 {
-    std::string SkyboxPath;
+    if (Which >= m_SkyboxsPath.size()) return;
 
-    switch (Which)
-    {
-    case 0:
-    {
-        SkyboxPath = "../Asset/Skybox/Creek/";
-    }break;
-    case 1:
-    {
-        SkyboxPath = "../Asset/Skybox/Water/";
-    }
-    break;
-    default: return;
-    }
+    std::string SkyboxPath = m_SkyboxsPath[Which];
 
     int texWidth, texHeight, texChannels;
     unsigned char* texData;
 
+    // Don't Need On Cubemap
+    stbi_set_flip_vertically_on_load(false);
     texData = stbi_load((SkyboxPath + "posX.jpg").c_str(), &texWidth, &texHeight, &texChannels, 3);
     glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X, 0, GL_RGB, texWidth, texHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, texData);
     stbi_image_free(texData);
@@ -145,21 +142,22 @@ void GLManager::ChangeSkybox(int Which)
     glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_X, 0, GL_RGB, texWidth, texHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, texData);
     stbi_image_free(texData);
 
-    texData = stbi_load((SkyboxPath + "negZ.jpg").c_str(), &texWidth, &texHeight, &texChannels, 3);
+    texData = stbi_load((SkyboxPath + "posY.jpg").c_str(), &texWidth, &texHeight, &texChannels, 3);
     glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Y, 0, GL_RGB, texWidth, texHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, texData);
     stbi_image_free(texData);
 
-    texData = stbi_load((SkyboxPath + "posZ.jpg").c_str(), &texWidth, &texHeight, &texChannels, 3);
+    texData = stbi_load((SkyboxPath + "negY.jpg").c_str(), &texWidth, &texHeight, &texChannels, 3);
     glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, 0, GL_RGB, texWidth, texHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, texData);
     stbi_image_free(texData);
 
-    texData = stbi_load((SkyboxPath + "posY.jpg").c_str(), &texWidth, &texHeight, &texChannels, 3);
+    texData = stbi_load((SkyboxPath + "posZ.jpg").c_str(), &texWidth, &texHeight, &texChannels, 3);
     glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Z, 0, GL_RGB, texWidth, texHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, texData);
     stbi_image_free(texData);
 
-    texData = stbi_load((SkyboxPath + "negY.jpg").c_str(), &texWidth, &texHeight, &texChannels, 3);
+    texData = stbi_load((SkyboxPath + "negZ.jpg").c_str(), &texWidth, &texHeight, &texChannels, 3);
     glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, 0, GL_RGB, texWidth, texHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, texData);
     stbi_image_free(texData);
+    stbi_set_flip_vertically_on_load(true);
 }
 
 void GLManager::InitGrid()
@@ -180,10 +178,10 @@ void GLManager::InitGrid()
 
     std::vector<float> V;
 
-    const int   GridSize = 100;
+    const int   GridSize   = 100;
     const float GridOffset = 0.1;
-    const float GridStart = GridSize * -0.5 * GridOffset;
-    const float GridEnd = -GridStart;
+    const float GridStart  = GridSize * -0.5 * GridOffset;
+    const float GridEnd    = -GridStart;
     
     for (int wIndex = 0; wIndex <= GridSize; wIndex += 1)
     {
@@ -540,12 +538,9 @@ void GLManager::Render(std::shared_ptr<GLRenderable> renderObj,
     glUniformMatrix4fv(glGetUniformLocation(ShaderID, "V"), 1, GL_FALSE, glm::value_ptr(MVP[1]));
     glUniformMatrix4fv(glGetUniformLocation(ShaderID, "P"), 1, GL_FALSE, glm::value_ptr(MVP[2]));
 
-    glUniform3f(glGetUniformLocation(ShaderID, "lightDir"),
-        m_LightDir.x(), m_LightDir.y(), m_LightDir.z());
-    glUniform3f(glGetUniformLocation(ShaderID, "lightColor"),
-        m_LightColor.x(), m_LightColor.y(), m_LightColor.z());
-    glUniform1f(glGetUniformLocation(ShaderID, "lightPower"),
-        m_LightPower);
+    glUniform3f(glGetUniformLocation(ShaderID, "lightDir"), m_LightDir.x(), m_LightDir.y(), m_LightDir.z());
+    glUniform3f(glGetUniformLocation(ShaderID, "lightColor"), m_LightColor.x(), m_LightColor.y(), m_LightColor.z());
+    glUniform1f(glGetUniformLocation(ShaderID, "lightPower"), m_LightPower);
 
     renderObj->Draw();
 
