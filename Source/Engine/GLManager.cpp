@@ -1,6 +1,6 @@
 #include"GLManager.h"
 
-void GLManager::InitSkybox()
+void GLManager::Skybox::Init()
 {
     // HARD CODE
     m_Skyboxs.push_back("Creek");
@@ -9,6 +9,7 @@ void GLManager::InitSkybox()
     m_SkyboxsPath.push_back("../Asset/Skybox/Water/");
 
     m_SkyboxsChar = "Creek\0Water\0";
+    // HARD CODE
 
     glGenTextures(1, &m_SkyboxTextureID);
     glBindTexture(GL_TEXTURE_CUBE_MAP, m_SkyboxTextureID);
@@ -19,7 +20,7 @@ void GLManager::InitSkybox()
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
-    ChangeSkybox(0);
+    Change(0);
     m_NowSkybox = 0;
 
     uint32_t skyboxVertShaderID = GLMisc::CompileShader(Shader("GLSkybox", sType::VERT).m_ShaderCode.data(), sType::VERT);
@@ -88,44 +89,39 @@ void GLManager::InitSkybox()
     glEnableVertexAttribArray(0);
 }
 
-void GLManager::DestroySkybox()
+void GLManager::Skybox::Destroy()
 {
     glDeleteTextures(1, &m_SkyboxTextureID);
-    glDeleteProgram(m_SkyboxShaderProgramID);
+    glDeleteProgram (m_SkyboxShaderProgramID);
 
     glDeleteVertexArrays(1, &m_SkyboxVAOID);
     glDeleteBuffers(1, &m_SkyboxVBOID);
 }
 
-void GLManager::RenderSkybox()
+void GLManager::Skybox::Render(glm::mat4* VP)
 {
     glDepthMask(GL_FALSE);
 
     glUseProgram(m_SkyboxShaderProgramID);
 
-    glm::vec3 cameraLocation = Convert(m_CameraLocation);
-    glm::vec3 cameraTarget = Convert(m_CameraLocation + m_CameraDir);
-
-    auto P = glm::perspective(glm::radians(Aspect), (float)m_ViewWidth / m_ViewHeight, NearZ, FarZ);
-
     // Skybox's View is Different
-    auto V = glm::mat4(glm::mat3(glm::lookAt(cameraLocation, cameraTarget, glm::vec3(0, 1, 0))));
+    auto skyboxV = glm::mat4(glm::mat3(VP[0]));
 
-    glUniformMatrix4fv(glGetUniformLocation(m_SkyboxShaderProgramID, "V"), 1, GL_FALSE, glm::value_ptr(V));
-    glUniformMatrix4fv(glGetUniformLocation(m_SkyboxShaderProgramID, "P"), 1, GL_FALSE, glm::value_ptr(P));
+    glUniformMatrix4fv(glGetUniformLocation(m_SkyboxShaderProgramID, "V"), 1, GL_FALSE, glm::value_ptr(skyboxV));
+    glUniformMatrix4fv(glGetUniformLocation(m_SkyboxShaderProgramID, "P"), 1, GL_FALSE, glm::value_ptr(VP[1]));
 
     glUniform1i(glGetUniformLocation(m_SkyboxShaderProgramID, "skyboxTexture"), 0);
 
-    glBindVertexArray(m_SkyboxVAOID);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_CUBE_MAP, m_SkyboxTextureID);
 
+    glBindVertexArray(m_SkyboxVAOID);
     glDrawArrays(GL_TRIANGLES, 0, 36);
 
     glDepthMask(GL_TRUE);
 }
 
-void GLManager::ChangeSkybox(int Which)
+void GLManager::Skybox::Change(int Which)
 {
     if (Which >= m_SkyboxsPath.size()) return;
     if (m_NowSkybox == Which) return;
@@ -165,7 +161,7 @@ void GLManager::ChangeSkybox(int Which)
     m_NowSkybox = Which;
 }
 
-void GLManager::InitGrid()
+void GLManager::Grid::Init()
 {
     uint32_t groundVertShaderID = GLMisc::CompileShader(Shader("GLLine", sType::VERT).m_ShaderCode.data(), sType::VERT);
     uint32_t groundFragShaderID = GLMisc::CompileShader(Shader("GLLine", sType::FRAG).m_ShaderCode.data(), sType::FRAG);
@@ -185,7 +181,7 @@ void GLManager::InitGrid()
 
     const int   GridSize   = 100;
     const float GridOffset = 0.1;
-    const float GridStart  = GridSize * -0.5 * GridOffset;
+    const float GridStart  =  GridSize * -0.5 * GridOffset;
     const float GridEnd    = -GridStart;
     
     for (int wIndex = 0; wIndex <= GridSize; wIndex += 1)
@@ -220,7 +216,7 @@ void GLManager::InitGrid()
     glEnableVertexAttribArray(0);
 }
 
-void GLManager::DestroyGrid()
+void GLManager::Grid::Destroy()
 {
     glDeleteProgram(m_GridShaderProgramID);
 
@@ -228,29 +224,24 @@ void GLManager::DestroyGrid()
     glDeleteBuffers(1, &m_GridVBOID);
 }
 
-void GLManager::RenderGrid()
+void GLManager::Grid::Render(glm::mat4* VP)
 {
     glUseProgram(m_GridShaderProgramID);
 
     auto M = glm::mat4(1);
-    
-    glm::mat4 V;
-    Event::mainCamera.updateView(V);
-    
-    auto P = glm::perspective(glm::radians(Aspect), (float)m_ViewWidth / m_ViewHeight, NearZ, FarZ);
 
     glUniformMatrix4fv(glGetUniformLocation(m_GridShaderProgramID, "M"), 1, GL_FALSE, glm::value_ptr(M));
-    glUniformMatrix4fv(glGetUniformLocation(m_GridShaderProgramID, "V"), 1, GL_FALSE, glm::value_ptr(V));
-    glUniformMatrix4fv(glGetUniformLocation(m_GridShaderProgramID, "P"), 1, GL_FALSE, glm::value_ptr(P));
+    glUniformMatrix4fv(glGetUniformLocation(m_GridShaderProgramID, "V"), 1, GL_FALSE, glm::value_ptr(VP[0]));
+    glUniformMatrix4fv(glGetUniformLocation(m_GridShaderProgramID, "P"), 1, GL_FALSE, glm::value_ptr(VP[1]));
     glUniform3f(glGetUniformLocation(m_GridShaderProgramID, "lineColor"), colorGray.x(), colorGray.y(), colorGray.z());
 
-    glBindVertexArray(m_GridVAOID);
-
     glLineWidth(1.0);
+
+    glBindVertexArray(m_GridVAOID);
     glDrawArrays(GL_LINES, 0, m_GridVerticesCount);
 }
 
-void GLManager::InitAxis()
+void GLManager::Axis::Init()
 {
     uint32_t axisEndVertShaderID = GLMisc::CompileShader(Shader("GLAxisEnd", sType::VERT).m_ShaderCode.data(), sType::VERT);
     uint32_t axisEndFragShaderID = GLMisc::CompileShader(Shader("GLAxisEnd", sType::FRAG).m_ShaderCode.data(), sType::FRAG);
@@ -258,7 +249,7 @@ void GLManager::InitAxis()
     m_AxisEndShaderProgramID = glCreateProgram();
     glAttachShader(m_AxisEndShaderProgramID, axisEndVertShaderID);
     glAttachShader(m_AxisEndShaderProgramID, axisEndFragShaderID);
-    glLinkProgram(m_AxisEndShaderProgramID);
+    glLinkProgram (m_AxisEndShaderProgramID);
 
     glDeleteShader(axisEndVertShaderID);
     glDeleteShader(axisEndFragShaderID);
@@ -269,7 +260,7 @@ void GLManager::InitAxis()
     m_AxisLineShaderProgramID = glCreateProgram();
     glAttachShader(m_AxisLineShaderProgramID, axisLineVertShaderID);
     glAttachShader(m_AxisLineShaderProgramID, axisLineFragShaderID);
-    glLinkProgram(m_AxisLineShaderProgramID);
+    glLinkProgram (m_AxisLineShaderProgramID);
 
     glDeleteShader(axisLineVertShaderID);
     glDeleteShader(axisLineFragShaderID);
@@ -355,7 +346,7 @@ void GLManager::InitAxis()
     glEnableVertexAttribArray(1);
 }
 
-void GLManager::DestroyAxis()
+void GLManager::Axis::Destroy()
 {
     glDeleteProgram(m_AxisEndShaderProgramID);
     glDeleteProgram(m_AxisLineShaderProgramID);
@@ -366,7 +357,7 @@ void GLManager::DestroyAxis()
     glDeleteBuffers(1, &m_AxisLineVBOID);
 }
 
-void GLManager::RenderAxis(double Length, double Size, glm::mat4* MVP)
+void GLManager::Axis::Render(double Length, double Size, glm::mat4* MVP)
 {
     glDisable(GL_DEPTH_TEST);
 
@@ -398,13 +389,14 @@ void GLManager::RenderAxis(double Length, double Size, glm::mat4* MVP)
     glUniform1f(glGetUniformLocation(m_AxisLineShaderProgramID, "lineLength"), Length);
 
     glLineWidth(3);
+
     glBindVertexArray(m_AxisLineVAOID);
     glDrawArrays(GL_LINES, 0, 6);
 
     glEnable(GL_DEPTH_TEST);
 }
 
-void GLManager::InitOutline()
+void GLManager::Outline::Init()
 {
     uint32_t outlineVertShaderID = GLMisc::CompileShader(Shader("GLOutline", sType::VERT).m_ShaderCode.data(), sType::VERT);
     uint32_t outlineFragShaderID = GLMisc::CompileShader(Shader("GLOutline", sType::FRAG).m_ShaderCode.data(), sType::FRAG);
@@ -412,18 +404,18 @@ void GLManager::InitOutline()
     m_OutlineShaderID = glCreateProgram();
     glAttachShader(m_OutlineShaderID, outlineVertShaderID);
     glAttachShader(m_OutlineShaderID, outlineFragShaderID);
-    glLinkProgram(m_OutlineShaderID);
+    glLinkProgram (m_OutlineShaderID);
 
     glDeleteShader(outlineVertShaderID);
     glDeleteShader(outlineFragShaderID);
 }
 
-void GLManager::DestroyOutline()
+void GLManager::Outline::Destroy()
 {
     glDeleteProgram(m_OutlineShaderID);
 }
 
-void GLManager::InitShaders()
+void GLManager::ShaderManager::Init()
 {
     // HARD CODE
     m_SupportShaders.push_back("Default");
@@ -433,6 +425,7 @@ void GLManager::InitShaders()
     m_SupportShadersPath.push_back("GLGlass");
 
     m_SupportShadersChar = "Default\0Glass\0";
+    // HARD CODE
 
     auto loadAGroupShader = [](const std::string& ShaderPath)->uint32_t
     {
@@ -450,14 +443,14 @@ void GLManager::InitShaders()
         return ShaderProgramID;
     };
     
-    m_DefaultShaderID = loadAGroupShader(m_SupportShadersPath[0]);
-    m_GlassShaderID   = loadAGroupShader(m_SupportShadersPath[1]);
+    m_DefaultShaderProgramID = loadAGroupShader(m_SupportShadersPath[0]);
+    m_GlassShaderProgramID   = loadAGroupShader(m_SupportShadersPath[1]);
 }
 
-void GLManager::DestroyShader()
+void GLManager::ShaderManager::Destroy()
 {
-    glDeleteProgram(m_DefaultShaderID);
-    glDeleteProgram(m_GlassShaderID);
+    glDeleteProgram(m_DefaultShaderProgramID);
+    glDeleteProgram(m_GlassShaderProgramID);
 }
 
 bool GLManager::Init()
@@ -467,15 +460,20 @@ bool GLManager::Init()
 
     glGenTextures(1, &m_SceneTextureID);
     glBindTexture(GL_TEXTURE_2D, m_SceneTextureID);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 128, 128, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
+
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 128, 128, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
+    
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_SceneTextureID, 0);
     glBindTexture(GL_TEXTURE_2D, 0);
 
     glGenTextures(1, &m_DepthTextureID);
     glBindTexture(GL_TEXTURE_2D, m_DepthTextureID);
+    
     glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8, 128, 128, 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, nullptr);
+    
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, m_DepthTextureID, 0);
     glBindTexture(GL_TEXTURE_2D, 0);
 
@@ -487,11 +485,11 @@ bool GLManager::Init()
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-    InitSkybox();
-    InitGrid();
-    InitAxis();
-    InitOutline();
-    InitShaders();
+    m_Skybox.Init();
+    m_Grid.Init();
+    m_Axis.Init();
+    m_Outline.Init();
+    m_ShaderManager.Init();
 
     Out::Log(pType::MESSAGE, "Inited OpenGL");
 
@@ -505,38 +503,39 @@ bool GLManager::Destroy()
     glDeleteTextures(1, &m_SceneTextureID);
     glDeleteTextures(1, &m_DepthTextureID);
 
-    DestroySkybox();
-    DestroyGrid();
-    DestroyAxis();
-    DestroyOutline();
-    DestroyShader();
+    m_Skybox.Destroy();
+    m_Grid.Destroy();
+    m_Axis.Destroy();
+    m_Outline.Destroy();
+    m_ShaderManager.Destroy();
 
     Out::Log(pType::MESSAGE, "Cleaned OpenGL");
 
     return true;
 }
 
-void GLManager::BeginRenderEditor(uint32_t viewWidth, uint32_t viewHeight,
-    const Point& mainCameraLocation, const Direction& mainCameraDir)
+void GLManager::BeginRenderEditor(uint32_t viewW, uint32_t viewH, const Point& CameraL, const Direction& CameraD)
 {
-    m_ViewWidth      = viewWidth;
-    m_ViewHeight     = viewHeight;
-    m_CameraLocation = mainCameraLocation;
-    m_CameraDir      = mainCameraDir;
+    m_ViewWidth      = viewW;
+    m_ViewHeight     = viewH;
+    m_CameraLocation = CameraL;
+    m_CameraDir      = CameraD;
+
+    m_P = glm::perspective(glm::radians(Aspect), (double)m_ViewWidth / m_ViewHeight, NearZ, FarZ);
 
     glBindFramebuffer(GL_FRAMEBUFFER, m_SceneFBO);
 
     glEnable(GL_DEPTH_TEST);
 
     glBindTexture(GL_TEXTURE_2D, m_SceneTextureID);
-    glTexImage2D (GL_TEXTURE_2D, 0, GL_RGB, viewWidth, viewHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
+    glTexImage2D (GL_TEXTURE_2D, 0, GL_RGB, viewW, viewH, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
     glBindTexture(GL_TEXTURE_2D, 0);
 
     glBindTexture(GL_TEXTURE_2D, m_DepthTextureID);
-    glTexImage2D (GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8, viewWidth, viewHeight, 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, nullptr);
+    glTexImage2D (GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8, viewW, viewH, 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, nullptr);
     glBindTexture(GL_TEXTURE_2D, 0);
 
-    glViewport(0, 0, viewWidth, viewHeight);
+    glViewport(0, 0, viewW, viewH);
 
     glClearColor(colorGray.x(), colorGray.y(), colorGray.z(), 1.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -547,19 +546,20 @@ void GLManager::EndRenderEditor()
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void GLManager::BeginRenderGame(uint32_t viewWidth, uint32_t viewHeight,
-    const Point& mainCameraLocation, const Direction& mainCameraDir)
+void GLManager::BeginRenderGame(uint32_t viewW, uint32_t viewH, const Point& CameraL, const Direction& CameraD)
 {
-    m_ViewWidth      = viewWidth;
-    m_ViewHeight     = viewHeight;
-    m_CameraLocation = mainCameraLocation;
-    m_CameraDir      = mainCameraDir;
+    m_ViewWidth      = viewW;
+    m_ViewHeight     = viewH;
+    m_CameraLocation = CameraL;
+    m_CameraDir      = CameraD;
+
+    m_P = glm::perspective(glm::radians(Aspect), (double)m_ViewWidth / m_ViewHeight, NearZ, FarZ);
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     glEnable(GL_DEPTH_TEST);
 
-    glViewport(0, 0, viewWidth, viewHeight);
+    glViewport(0, 0, viewW, viewH);
 
     glClearColor(colorGreen.x(), colorGreen.y(), colorGreen.z(), 1.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -570,8 +570,11 @@ void GLManager::EndRenderGame()
     // End Render Game
 }
 
-void GLManager::Render(std::shared_ptr<GLRenderable> renderObj,
-    const Transform& ObjTransform, bool Selected, bool LineMode)
+void GLManager::Render
+(
+    std::shared_ptr<GLRenderable> renderObj,
+    const Transform& ObjTransform, bool Selected, bool LineMode
+)
 {
     if (!renderObj) return;
 
@@ -592,7 +595,7 @@ void GLManager::Render(std::shared_ptr<GLRenderable> renderObj,
 
     Event::mainCamera.updateView(MVP[1]);
 
-    MVP[2] = glm::perspective(glm::radians(Aspect), (float)m_ViewWidth / m_ViewHeight, NearZ, FarZ);
+    MVP[2] = m_P;
 
     if (LineMode) glPolygonMode(GL_FRONT_AND_BACK, GL_LINE), glLineWidth(1);
 
@@ -600,9 +603,9 @@ void GLManager::Render(std::shared_ptr<GLRenderable> renderObj,
 
     if (renderObj->m_Shader == "Default")
     {
-        usedShaderID = m_DefaultShaderID;
+        usedShaderID = m_ShaderManager.m_DefaultShaderProgramID;
 
-        glUniform3f(glGetUniformLocation(usedShaderID, "lightDir"),   m_LightDir.x(),   m_LightDir.y(),   m_LightDir.z());
+        glUniform3f(glGetUniformLocation(usedShaderID, "lightDir"), m_LightDir.x(), m_LightDir.y(), m_LightDir.z());
         glUniform3f(glGetUniformLocation(usedShaderID, "lightColor"), m_LightColor.x(), m_LightColor.y(), m_LightColor.z());
         glUniform1f(glGetUniformLocation(usedShaderID, "lightPower"), m_LightPower);
 
@@ -612,7 +615,10 @@ void GLManager::Render(std::shared_ptr<GLRenderable> renderObj,
         if (renderObj->m_EnableDiffuseTexture)
         {
             glUniform1i(glGetUniformLocation(usedShaderID, "enableDiffuseTexture"), 1);
-            glUniform1i(glGetUniformLocation(usedShaderID, "diffuseTexture"), renderObj->m_DiffuseTextureID);
+            glUniform1i(glGetUniformLocation(usedShaderID, "diffuseTexture"), 0);
+
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, renderObj->m_DiffuseTextureID);
         }
         else
         {
@@ -622,7 +628,10 @@ void GLManager::Render(std::shared_ptr<GLRenderable> renderObj,
         if (renderObj->m_EnableNormalTexture)
         {
             glUniform1i(glGetUniformLocation(usedShaderID, "enableNormalTexture"), 1);
-            glUniform1i(glGetUniformLocation(usedShaderID, "normalTexture"), renderObj->m_NormalTextureID);
+            glUniform1i(glGetUniformLocation(usedShaderID, "normalTexture"), 1);
+
+            glActiveTexture(GL_TEXTURE1);
+            glBindTexture(GL_TEXTURE_2D, renderObj->m_NormalTextureID);
         }
         else
         {
@@ -632,7 +641,10 @@ void GLManager::Render(std::shared_ptr<GLRenderable> renderObj,
         if (renderObj->m_EnableSpecularTexture)
         {
             glUniform1i(glGetUniformLocation(usedShaderID, "enableSpecularTexture"), 1);
-            glUniform1i(glGetUniformLocation(usedShaderID, "specularTexture"), renderObj->m_SpecularTextureID);
+            glUniform1i(glGetUniformLocation(usedShaderID, "specularTexture"), 2);
+
+            glActiveTexture(GL_TEXTURE2);
+            glBindTexture(GL_TEXTURE_2D, renderObj->m_SpecularTextureID);
         }
         else
         {
@@ -641,13 +653,12 @@ void GLManager::Render(std::shared_ptr<GLRenderable> renderObj,
     }
     else if (renderObj->m_Shader == "Glass")
     {
-        usedShaderID = m_GlassShaderID;
+        usedShaderID = m_ShaderManager.m_GlassShaderProgramID;
     }
     else
     {
         return;
     }
-    
 
     glUniformMatrix4fv(glGetUniformLocation(usedShaderID, "M"), 1, GL_FALSE, glm::value_ptr(MVP[0]));
     glUniformMatrix4fv(glGetUniformLocation(usedShaderID, "V"), 1, GL_FALSE, glm::value_ptr(MVP[1]));
@@ -660,6 +671,6 @@ void GLManager::Render(std::shared_ptr<GLRenderable> renderObj,
     if (Selected)
     {
         MVP[0] = ModelWithoutScale;
-        RenderAxis(1, 0.1, MVP);
+        m_Axis.Render(1, 0.1, MVP);
     }
 }
