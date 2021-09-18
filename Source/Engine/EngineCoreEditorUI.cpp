@@ -6,10 +6,9 @@ namespace EngineCore
     extern GLFWwindow* mainWindow;
     extern GLManager glManager;
 
-    // Game Mode
+    // Game Mode Only
     extern std::vector<std::shared_ptr<Actor>> actorsInSceneOfGame;
 
-    // Editor Mode
     extern std::unordered_map<std::string, std::shared_ptr<GLRenderable>> classesInSceneForRender;
 
     extern WorldSetting worldSettings;
@@ -74,6 +73,8 @@ namespace EngineCore
 
         const ImVec4 textColor = ImVec4(colorGreen.x(), colorGreen.y(), colorGreen.z(), 1.0);
 
+        const char* avaliableShader = glManager.getSupportShaderList();
+
         // Part 2 Const
         const double lightPowerMin = 0.1;
         const double lightPowerMax = 20.0;
@@ -92,8 +93,6 @@ namespace EngineCore
         // Global Static
         static std::vector<std::string> assetList;
         static std::vector<aType>       assetTypeList;
-        static std::vector<const char*> assetModel;
-        static std::vector<const char*> assetTexture;
 
         // Part 1 Static
         static uint8_t leftEnableTab = 0;// Actor List or Class List or Component
@@ -102,7 +101,7 @@ namespace EngineCore
         static int classCurrent = -1;
         static int componentCurrent = -1;
 
-        static int selectedAssetID = -1;
+        static int selectedAssetID = -1;// In Asset Viewer
 
         // Part 2 Static
         static int tagCurrent = -1;
@@ -114,14 +113,14 @@ namespace EngineCore
         static float actorRotationf3[3];
         static float actorScalef3[3];
 
-        static std::vector<const char*> classTexturesChar;
-        static std::vector<const char*> classModelChar;
-
         static int  classModelCurrent    = 0;
+
         static bool classEnableDiffuse   = false;
         static int  classDiffuseCurrent  = 0;
+
         static bool classEnableNormal    = false;
         static int  classNormalCurrent   = 0;
+
         static bool classEnableSpecular  = false;
         static int  classSpecularCurrent = 0;
 
@@ -133,7 +132,6 @@ namespace EngineCore
         static float  lightColorf3[3];
         static double lightPower = 1.0;
 
-        static int  skyboxLast    = 0;
         static int  skyboxCurrent = 0;
         static bool renderGrid = true;
         static int  renderMode = 0; // 0 : Fill; 1: Line
@@ -146,10 +144,15 @@ namespace EngineCore
         static bool newClassAddActor = false;
         static bool renderNewClass = false; // Check box
 
-        static int renderNewClassModelCurrent   = 0;
-        static int renderNewClassTextureCurrent = 0;
+        static int renderNewClassModelCurrent = 0;
+
+        static int renderNewClassShaderCurrent = 0;
 
         static float renderNewClassDiffuseColorf3[3];
+
+        static int renderNewClassDiffuseTextureCurrent  = 0;
+        static int renderNewClassNormalTextureCurrent   = 0;
+        static int renderNewClassSpecularTextureCurrent = 0;
 
         static char newComponentName[32];
 
@@ -178,6 +181,9 @@ namespace EngineCore
 
         std::unordered_set<std::string> componentNameSet;
         std::vector<const char*> componentItemsChar;
+
+        std::vector<const char*> assetModel;
+        std::vector<const char*> assetTexture;
         // === LOCAL ===
 
         // Update Once
@@ -188,7 +194,7 @@ namespace EngineCore
             
             AssetManager::getAssetList(assetList, assetTypeList);
             
-            glManager.ChangeSkybox(worldSettings.m_Skybox);
+            glManager.ChangeSkybox(glManager.getIdxOfSkybox(worldSettings.m_Skybox));
         }
 
         // === Update ===
@@ -263,8 +269,6 @@ namespace EngineCore
         }
         // === Update ===
 
-        ImGui::ShowDemoWindow();
-
         // === Part 1 ===
         {
             int listBoxHeightCount = ((actorListHeight - 68) / ImGui::GetTextLineHeightWithSpacing());
@@ -289,6 +293,7 @@ namespace EngineCore
                         ImGui::PushItemWidth(-FLT_MIN);
                         ImGui::ListBox("", &classCurrent,
                             classItemsChar.data(), classItemsChar.size(), listBoxHeightCount);
+                        ImGui::PopItemWidth();
                         ImGui::EndTabItem();
                     }
                     if (ImGui::BeginTabItem("Component"))
@@ -297,6 +302,7 @@ namespace EngineCore
                         ImGui::PushItemWidth(-FLT_MIN);
                         ImGui::ListBox("", &componentCurrent,
                             componentItemsChar.data(), componentItemsChar.size(), listBoxHeightCount);
+                        ImGui::PopItemWidth();
                         ImGui::EndTabItem();
                     }
                     ImGui::EndTabBar();
@@ -370,21 +376,15 @@ namespace EngineCore
 
                     bool canDeleteAsset = Inside(selectedAssetID, 0, assetList.size() - 1);
 
-                    if (!canDeleteAsset)
-                    {
-                        ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
-                        ImGui::PushStyleVar(ImGuiStyleVar_Alpha, 0.5f);
-                    }
+                    if (!canDeleteAsset) uiBeginDisable();
+
                     if (ImGui::Button("Delete"))
                     {
                         AssetManager::deleteAsset(assetList[selectedAssetID]);
                         AssetManager::getAssetList(assetList, assetTypeList);
                     }
-                    if (!canDeleteAsset)
-                    {
-                        ImGui::PopItemFlag();
-                        ImGui::PopStyleVar();
-                    }
+                    if (!canDeleteAsset) uiEndDisable();
+
                     ImGui::EndPopup();
                 }
 
@@ -405,6 +405,7 @@ namespace EngineCore
                         std::string fileName = ImGuiFileDialog::Instance()->GetCurrentFileName();
 
                         AssetManager::addAsset(filePathName, fileName);
+                        AssetManager::getAssetList(assetList, assetTypeList);
                     }
                     ImGuiFileDialog::Instance()->Close();
                 }
@@ -422,7 +423,8 @@ namespace EngineCore
                 {
                     ImGui::TextColored(textColor, "=== Actor Details ===");
                     ImGui::Separator();
-                    if (actorCurrent >= 0 && actorCurrent < actorItemsChar.size())
+                    
+                    if (Inside(actorCurrent, 0, actorItems.size() - 1))
                     {
                         ImGui::Text("Actor Name: %s", actorItemsChar[actorCurrent]);
                         ImGui::Text("Actor Type: %s", actorItems[actorCurrent].m_ClassName.c_str());
@@ -443,10 +445,7 @@ namespace EngineCore
 
                             if (ImGui::Button("New Tag"))
                             {
-                                if (leftEnableTab == 0 && actorCurrent >= 0 && actorCurrent < actorItemsChar.size())
-                                {
-                                    ImGui::OpenPopup("New Tag");
-                                }
+                                ImGui::OpenPopup("New Tag");
                             }
                             if (ImGui::BeginPopupModal("New Tag", nullptr, popWinFlag))
                             {
@@ -455,16 +454,22 @@ namespace EngineCore
                                 ImGui::Text("Input the Tag Name");
                                 ImGui::InputText("", newTagName, IM_ARRAYSIZE(newTagName));
                                 ImGui::Separator();
+
+                                bool canAddTag = checkSimpleStr(newTagName) &&
+                                    !actorItems[actorCurrent].m_Tags.count(newTagName);
+
+                                if (!canAddTag) uiBeginDisable();
+
                                 if (ImGui::Button("Add"))
                                 {
-                                    if (checkSimpleStr(newTagName))
-                                    {
-                                        actorItems[actorCurrent].m_Tags.insert(newTagName);
+                                    actorItems[actorCurrent].m_Tags.insert(newTagName);
 
-                                        *newTagName = 0;
-                                        ImGui::CloseCurrentPopup();
-                                    }
+                                    *newTagName = 0;
+                                    ImGui::CloseCurrentPopup();
                                 }
+
+                                if (!canAddTag) uiEndDisable();
+
                                 ImGui::SameLine();
                                 if (ImGui::Button("Cancel"))
                                 {
@@ -491,6 +496,9 @@ namespace EngineCore
                     }
                     else
                     {
+                        tagCurrent = -1;
+                        tagCurrentStr.clear();
+
                         ImGui::Text("No Actor Selected");
                     }
                     ImGui::Text("");

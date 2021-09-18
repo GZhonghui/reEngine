@@ -5,8 +5,11 @@ void GLManager::Skybox::Init()
     // HARD CODE
     m_Skyboxs.push_back("Creek");
     m_SkyboxsPath.push_back("../Asset/Skybox/Creek/");
+    m_RevSkyboxs[std::string("Creek")] = 0;
+
     m_Skyboxs.push_back("Water");
     m_SkyboxsPath.push_back("../Asset/Skybox/Water/");
+    m_RevSkyboxs[std::string("Water")] = 1;
 
     m_SkyboxsChar = "Creek\0Water\0";
     // HARD CODE
@@ -123,7 +126,7 @@ void GLManager::Skybox::Render(glm::mat4* VP)
 
 void GLManager::Skybox::Change(int Which)
 {
-    if (Which >= m_SkyboxsPath.size()) return;
+    if (!Inside(Which, 0, m_Skyboxs.size() - 1)) return;
     if (m_NowSkybox == Which) return;
 
     std::string SkyboxPath = m_SkyboxsPath[Which];
@@ -420,9 +423,11 @@ void GLManager::ShaderManager::Init()
     // HARD CODE
     m_SupportShaders.push_back("Default");
     m_SupportShadersPath.push_back("GLDefault");
+    m_RevSupportShaders[std::string("Default")] = 0;
 
     m_SupportShaders.push_back("Glass");
     m_SupportShadersPath.push_back("GLGlass");
+    m_RevSupportShaders[std::string("Glass")] = 0;
 
     m_SupportShadersChar = "Default\0Glass\0";
     // HARD CODE

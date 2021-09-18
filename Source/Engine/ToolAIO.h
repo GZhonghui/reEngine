@@ -242,3 +242,15 @@ inline bool Inside(int x, int Left, int Right)
 {
     return Left <= x && x <= Right;
 }
+
+inline void uiBeginDisable()
+{
+    ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
+    ImGui::PushStyleVar(ImGuiStyleVar_Alpha, 0.5f);
+}
+
+inline void uiEndDisable()
+{
+    ImGui::PopItemFlag();
+    ImGui::PopStyleVar();
+}

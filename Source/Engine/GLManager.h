@@ -68,6 +68,7 @@ protected:
         const char* m_SkyboxsChar;
         std::vector<std::string> m_Skyboxs;
         std::vector<std::string> m_SkyboxsPath;
+        std::unordered_map<std::string, int> m_RevSkyboxs;
 
         int m_NowSkybox;
 
@@ -95,9 +96,15 @@ public:
         m_Skybox.Change(Which);
     }
 
+    unsigned int getNowSkybox()   const { return m_Skybox.m_NowSkybox;      }
     const char*  getSkyboxList()  const { return m_Skybox.m_SkyboxsChar;    }
     unsigned int getSkyboxCount() const { return m_Skybox.m_Skyboxs.size(); }
     std::string  getSkyboxAt(int Idx)   { return m_Skybox.m_Skyboxs[Idx];   }
+    int          getIdxOfSkybox(const std::string& inStr)
+    {
+        if (!m_Skybox.m_RevSkyboxs.count(inStr)) return -1;
+        return m_Skybox.m_RevSkyboxs[inStr];
+    }
 
 protected:
     class Grid
@@ -182,6 +189,7 @@ protected:
         const char* m_SupportShadersChar;
         std::vector<std::string> m_SupportShaders;
         std::vector<std::string> m_SupportShadersPath;
+        std::unordered_map<std::string, int> m_RevSupportShaders;
 
     public:
         void Init();
@@ -192,6 +200,11 @@ public:
     const char*  getSupportShaderList()  const { return m_ShaderManager.m_SupportShadersChar;    }
     unsigned int getSupportShaderCount() const { return m_ShaderManager.m_SupportShaders.size(); }
     std::string  getSupportShaderAt(int Idx)   { return m_ShaderManager.m_SupportShaders[Idx];   }
+    int          getIdxOfSupportShader(const std::string& inStr)
+    {
+        if (!m_ShaderManager.m_RevSupportShaders.count(inStr)) return -1;
+        return m_ShaderManager.m_RevSupportShaders[inStr];
+    }
 
 public:
     bool Init();

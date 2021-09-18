@@ -93,7 +93,7 @@ inline void readProject
             }
             else if (worldItem.first == "Skybox")
             {
-                worldSettings.m_Skybox = StrToInt(worldItem.second.get<std::string>(""));
+                worldSettings.m_Skybox = worldItem.second.get<std::string>("");
             }
         }
     }
@@ -276,7 +276,7 @@ inline void saveProject
 
     worldNode.add("LightPower", FloatToStr(worldSettings.m_LightPower));
 
-    worldNode.add("Skybox", IntToStr(worldSettings.m_Skybox));
+    worldNode.add("Skybox", worldSettings.m_Skybox);
 
     for (auto actorIndex = actorItems.begin(); actorIndex != actorItems.end(); ++actorIndex)
     {

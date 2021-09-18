@@ -13,8 +13,6 @@ public:
         m_LightDir   = Direction(1, -1, 1);
         m_LightColor = Color(1, 1, 1);
         m_LightPower = 2;
-
-        m_Skybox = 0;
     }
     virtual ~WorldSetting() = default;
 
@@ -23,7 +21,7 @@ public:
     Color     m_LightColor;
     double    m_LightPower;
 
-    int m_Skybox;
+    std::string m_Skybox;
 };
 
 class ActorItem
