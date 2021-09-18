@@ -13,6 +13,8 @@ public:
         m_LightDir   = Direction(1, -1, 1);
         m_LightColor = Color(1, 1, 1);
         m_LightPower = 2;
+
+        m_Skybox = 0;
     }
     virtual ~WorldSetting() = default;
 
@@ -20,43 +22,75 @@ public:
     Direction m_LightDir;
     Color     m_LightColor;
     double    m_LightPower;
-};
 
-class ClassItem
-{
-public:
-    ClassItem() = default;
-    virtual ~ClassItem() = default;
-
-public:
-    std::string m_Name;
-
-    bool Render;
-    std::string m_ModelFile;
-    std::string m_DiffuseTextureFile;
-    Color       m_DiffuseColor;
+    int m_Skybox;
 };
 
 class ActorItem
 {
 public:
-    ActorItem() = default;
+    ActorItem()
+    {
+        m_Location = Eigen::Vector3d(0, 0, 0);
+        m_Rotation = Eigen::Vector3d(0, 0, 0);
+        m_Scale    = Eigen::Vector3d(1, 1, 1);
+    }
     virtual ~ActorItem() = default;
 
 public:
     std::string m_Name;
     std::string m_ClassName;
     std::unordered_set<std::string> m_Tags;
+    std::unordered_set<std::string> m_Components;
 
     Eigen::Vector3d m_Location;
     Eigen::Vector3d m_Rotation;
     Eigen::Vector3d m_Scale;
 };
 
+class ClassItem
+{
+public:
+    ClassItem()
+    {
+        m_Render = false;
+
+        m_DiffuseColor = Color(1, 1, 1);
+
+        m_EnableDiffuseTexture  = false;
+        m_EnableNormalTexture   = false;
+        m_EnableSpecularTexture = false;
+
+        m_N = 1.4;
+    }
+    virtual ~ClassItem() = default;
+
+public:
+    std::string m_Name;
+
+    bool m_Render;
+    std::string m_Model;
+
+    std::string m_Shader;
+    Color m_DiffuseColor;
+
+    bool m_EnableDiffuseTexture;
+    std::string m_DiffuseTexture;
+
+    bool m_EnableNormalTexture;
+    std::string m_NormalTexture;
+
+    bool m_EnableSpecularTexture;
+    std::string m_SpecularTexture;
+
+    // Refractive index
+    double m_N;
+};
+
 class ComponentItem
 {
 public:
-    ComponentItem() = default;
+    ComponentItem() { }
     virtual ~ComponentItem() = default;
 
 public:
@@ -66,10 +100,10 @@ public:
 inline void addClassToProject(const char* className)
 {
     std::string sourceFileName(className);
-    sourceFileName = "impl" + sourceFileName + ".cpp";
+    sourceFileName = "implClass_" + sourceFileName + ".cpp";
 
     std::string headerFileName(className);
-    headerFileName = "impl" + headerFileName + ".h";
+    headerFileName = "implClass_" + headerFileName + ".h";
 
     bool createFailed = false;
 
@@ -174,6 +208,7 @@ inline void updateInitHeader
         fprintf(initHeader, "void initScene(std::vector<std::shared_ptr<Actor>>* actorsInScene)\n");
         fprintf(initHeader, "{\n");
         fprintf(initHeader, "}\n");
+        fprintf(initHeader, "\n");
         fprintf(initHeader, "*/\n");
         fprintf(initHeader, "\n");
         // Default Code
@@ -214,8 +249,10 @@ inline void updateInitHeader
             
             fprintf(initHeader, "        newActor->setLocation(Eigen::Vector3d(%.6lf, %.6lf, %.6lf));\n",
                 actorItem.m_Location.x(), actorItem.m_Location.y(), actorItem.m_Location.z());
+
             fprintf(initHeader, "        newActor->setRotation(Eigen::Vector3d(%.6lf, %.6lf, %.6lf));\n",
                 actorItem.m_Rotation.x(), actorItem.m_Rotation.y(), actorItem.m_Rotation.z());
+
             fprintf(initHeader, "        newActor->setScale(Eigen::Vector3d(%.6lf, %.6lf, %.6lf));\n",
                 actorItem.m_Scale.x(), actorItem.m_Scale.y(), actorItem.m_Scale.z());
 

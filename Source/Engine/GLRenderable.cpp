@@ -1,22 +1,11 @@
 #include"GLRenderable.h"
 
-void GLRenderable::Init(const std::string& Model, const std::string& DiffuseTexture, Color DiffuseColor)
+void GLRenderable::reLoadModel(const std::string& Model)
 {
-    uint32_t vertShaderID = GLMisc::CompileShader(Shader("GLDefault", sType::VERT).m_ShaderCode.data(), sType::VERT);
-    uint32_t fragShaderID = GLMisc::CompileShader(Shader("GLDefault", sType::FRAG).m_ShaderCode.data(), sType::FRAG);
+    if (m_VAOID) glDeleteVertexArrays(1, &m_VAOID);
+    if (m_VBOID) glDeleteBuffers(1, &m_VBOID);
+    if (m_EBOID) glDeleteBuffers(1, &m_EBOID);
 
-    m_ShaderProgramID = glCreateProgram();
-    glAttachShader(m_ShaderProgramID, vertShaderID);
-    glAttachShader(m_ShaderProgramID, fragShaderID);
-    glLinkProgram(m_ShaderProgramID);
-
-    glDeleteShader(vertShaderID);
-    glDeleteShader(fragShaderID);
-
-    m_DiffuseTextureID = GLMisc::GenDefaultTextureWithImageFile((G_IMPORT_PATH + DiffuseTexture).c_str());
-
-    m_DiffuseColor = DiffuseColor;
-    
     // Location UV : 8 Float per Vertex
     std::vector<float> VBuffer;
     std::vector<unsigned int> EBuffer;
@@ -35,7 +24,8 @@ void GLRenderable::Init(const std::string& Model, const std::string& DiffuseText
                 EBuffer.push_back((*faceIndex)->z() + VertexNumber);
             }
 
-            for (auto vertexIndex = (*meshIndex)->Vertices.begin(); vertexIndex != (*meshIndex)->Vertices.end(); ++vertexIndex)
+            auto pV = &(*meshIndex)->Vertices;
+            for (auto vertexIndex = pV->begin(); vertexIndex != pV->end(); ++vertexIndex)
             {
                 VBuffer.push_back((*vertexIndex)->m_Location.x());
                 VBuffer.push_back((*vertexIndex)->m_Location.y());
@@ -74,40 +64,40 @@ void GLRenderable::Init(const std::string& Model, const std::string& DiffuseText
 
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
     glEnableVertexAttribArray(2);
+}
 
-    m_NeedClear = true;
+void GLRenderable::reLoadDiffuseTexture(const std::string& DiffuseTextureName)
+{
+    if (m_DiffuseTextureID)  glDeleteTextures(1, &m_DiffuseTextureID);
+    m_DiffuseTextureID = GLMisc::GenDefaultTextureWithImageFile((G_IMPORT_PATH + DiffuseTextureName).c_str());
+}
+
+void GLRenderable::reLoadNormalTexture(const std::string& NormalTextureName)
+{
+    if (m_NormalTextureID)   glDeleteTextures(1, &m_NormalTextureID);
+    m_NormalTextureID = GLMisc::GenDefaultTextureWithImageFile((G_IMPORT_PATH + NormalTextureName).c_str());
+}
+
+void GLRenderable::reLoadSpecularTexture(const std::string& SpecularTextureName)
+{
+    if (m_SpecularTextureID) glDeleteTextures(1, &m_SpecularTextureID);
+    m_SpecularTextureID = GLMisc::GenDefaultTextureWithImageFile((G_IMPORT_PATH + SpecularTextureName).c_str());
 }
 
 void GLRenderable::Clear()
 {
-    if (m_NeedClear)
-    {
-        glDeleteProgram(m_ShaderProgramID);
+    if (m_VAOID) glDeleteVertexArrays(1, &m_VAOID);
+    if (m_VBOID) glDeleteBuffers(1, &m_VBOID);
+    if (m_EBOID) glDeleteBuffers(1, &m_EBOID);
 
-        glDeleteVertexArrays(1, &m_VAOID);
-
-        glDeleteBuffers(1, &m_VBOID);
-        glDeleteBuffers(1, &m_EBOID);
-
-        glDeleteTextures(1, &m_DiffuseTextureID);
-
-        m_NeedClear = false;
-    }
+    if (m_DiffuseTextureID)  glDeleteTextures(1, &m_DiffuseTextureID);
+    if (m_NormalTextureID)   glDeleteTextures(1, &m_NormalTextureID);
+    if (m_SpecularTextureID) glDeleteTextures(1, &m_SpecularTextureID);
 }
 
 void GLRenderable::Draw()
 {
-    glUniform3f(glGetUniformLocation(m_ShaderProgramID, "diffuseColor"),
-        m_DiffuseColor.x(), m_DiffuseColor.y(), m_DiffuseColor.z());
-
-    glUniform1i(glGetUniformLocation(m_ShaderProgramID, "enableDiffuseTexture"), 1);
-    glUniform1i(glGetUniformLocation(m_ShaderProgramID, "diffuseTexture"), 0);
-
-    glUniform1i(glGetUniformLocation(m_ShaderProgramID, "enableNormalTexture"), 0);
-
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, m_DiffuseTextureID);
-
+    if (!m_VAOID) return;
     glBindVertexArray(m_VAOID);
     glDrawElements(GL_TRIANGLES, m_ElementCount, GL_UNSIGNED_INT, 0);
 }

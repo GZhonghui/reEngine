@@ -74,9 +74,6 @@
     <ClCompile Include="..\Support\Include\ImGUI\ImGuiFileDialog.cpp">
       <Filter>ImGUI</Filter>
     </ClCompile>
-    <ClCompile Include="implBee.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="EngineAPI.cpp">
       <Filter>Engine Source</Filter>
     </ClCompile>
@@ -135,9 +132,6 @@
     </ClInclude>
     <ClInclude Include="Config.h">
       <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="implBee.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Object.h">
       <Filter>Core</Filter>

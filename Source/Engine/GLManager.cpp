@@ -2,6 +2,7 @@
 
 void GLManager::InitSkybox()
 {
+    // HARD CODE
     m_Skyboxs.push_back("Creek");
     m_SkyboxsPath.push_back("../Asset/Skybox/Creek/");
     m_Skyboxs.push_back("Water");
@@ -19,6 +20,7 @@ void GLManager::InitSkybox()
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
     ChangeSkybox(0);
+    m_NowSkybox = 0;
 
     uint32_t skyboxVertShaderID = GLMisc::CompileShader(Shader("GLSkybox", sType::VERT).m_ShaderCode.data(), sType::VERT);
     uint32_t skyboxFragShaderID = GLMisc::CompileShader(Shader("GLSkybox", sType::FRAG).m_ShaderCode.data(), sType::FRAG);
@@ -126,6 +128,7 @@ void GLManager::RenderSkybox()
 void GLManager::ChangeSkybox(int Which)
 {
     if (Which >= m_SkyboxsPath.size()) return;
+    if (m_NowSkybox == Which) return;
 
     std::string SkyboxPath = m_SkyboxsPath[Which];
 
@@ -158,6 +161,8 @@ void GLManager::ChangeSkybox(int Which)
     glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, 0, GL_RGB, texWidth, texHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, texData);
     stbi_image_free(texData);
     stbi_set_flip_vertically_on_load(true);
+
+    m_NowSkybox = Which;
 }
 
 void GLManager::InitGrid()
@@ -399,6 +404,62 @@ void GLManager::RenderAxis(double Length, double Size, glm::mat4* MVP)
     glEnable(GL_DEPTH_TEST);
 }
 
+void GLManager::InitOutline()
+{
+    uint32_t outlineVertShaderID = GLMisc::CompileShader(Shader("GLOutline", sType::VERT).m_ShaderCode.data(), sType::VERT);
+    uint32_t outlineFragShaderID = GLMisc::CompileShader(Shader("GLOutline", sType::FRAG).m_ShaderCode.data(), sType::FRAG);
+
+    m_OutlineShaderID = glCreateProgram();
+    glAttachShader(m_OutlineShaderID, outlineVertShaderID);
+    glAttachShader(m_OutlineShaderID, outlineFragShaderID);
+    glLinkProgram(m_OutlineShaderID);
+
+    glDeleteShader(outlineVertShaderID);
+    glDeleteShader(outlineFragShaderID);
+}
+
+void GLManager::DestroyOutline()
+{
+    glDeleteProgram(m_OutlineShaderID);
+}
+
+void GLManager::InitShaders()
+{
+    // HARD CODE
+    m_SupportShaders.push_back("Default");
+    m_SupportShadersPath.push_back("GLDefault");
+
+    m_SupportShaders.push_back("Glass");
+    m_SupportShadersPath.push_back("GLGlass");
+
+    m_SupportShadersChar = "Default\0Glass\0";
+
+    auto loadAGroupShader = [](const std::string& ShaderPath)->uint32_t
+    {
+        uint32_t vertShader = GLMisc::CompileShader(Shader(ShaderPath.c_str(), sType::VERT).m_ShaderCode.data(), sType::VERT);
+        uint32_t fragShader = GLMisc::CompileShader(Shader(ShaderPath.c_str(), sType::FRAG).m_ShaderCode.data(), sType::FRAG);
+
+        uint32_t ShaderProgramID = glCreateProgram();
+        glAttachShader(ShaderProgramID, vertShader);
+        glAttachShader(ShaderProgramID, fragShader);
+        glLinkProgram (ShaderProgramID);
+
+        glDeleteShader(vertShader);
+        glDeleteShader(fragShader);
+
+        return ShaderProgramID;
+    };
+    
+    m_DefaultShaderID = loadAGroupShader(m_SupportShadersPath[0]);
+    m_GlassShaderID   = loadAGroupShader(m_SupportShadersPath[1]);
+}
+
+void GLManager::DestroyShader()
+{
+    glDeleteProgram(m_DefaultShaderID);
+    glDeleteProgram(m_GlassShaderID);
+}
+
 bool GLManager::Init()
 {
     glGenFramebuffers(1, &m_SceneFBO);
@@ -429,6 +490,8 @@ bool GLManager::Init()
     InitSkybox();
     InitGrid();
     InitAxis();
+    InitOutline();
+    InitShaders();
 
     Out::Log(pType::MESSAGE, "Inited OpenGL");
 
@@ -445,6 +508,8 @@ bool GLManager::Destroy()
     DestroySkybox();
     DestroyGrid();
     DestroyAxis();
+    DestroyOutline();
+    DestroyShader();
 
     Out::Log(pType::MESSAGE, "Cleaned OpenGL");
 
@@ -531,16 +596,62 @@ void GLManager::Render(std::shared_ptr<GLRenderable> renderObj,
 
     if (LineMode) glPolygonMode(GL_FRONT_AND_BACK, GL_LINE), glLineWidth(1);
 
-    unsigned int ShaderID = renderObj->getShaderID();
-    glUseProgram(ShaderID);
+    unsigned int usedShaderID = 0;
 
-    glUniformMatrix4fv(glGetUniformLocation(ShaderID, "M"), 1, GL_FALSE, glm::value_ptr(MVP[0]));
-    glUniformMatrix4fv(glGetUniformLocation(ShaderID, "V"), 1, GL_FALSE, glm::value_ptr(MVP[1]));
-    glUniformMatrix4fv(glGetUniformLocation(ShaderID, "P"), 1, GL_FALSE, glm::value_ptr(MVP[2]));
+    if (renderObj->m_Shader == "Default")
+    {
+        usedShaderID = m_DefaultShaderID;
 
-    glUniform3f(glGetUniformLocation(ShaderID, "lightDir"), m_LightDir.x(), m_LightDir.y(), m_LightDir.z());
-    glUniform3f(glGetUniformLocation(ShaderID, "lightColor"), m_LightColor.x(), m_LightColor.y(), m_LightColor.z());
-    glUniform1f(glGetUniformLocation(ShaderID, "lightPower"), m_LightPower);
+        glUniform3f(glGetUniformLocation(usedShaderID, "lightDir"),   m_LightDir.x(),   m_LightDir.y(),   m_LightDir.z());
+        glUniform3f(glGetUniformLocation(usedShaderID, "lightColor"), m_LightColor.x(), m_LightColor.y(), m_LightColor.z());
+        glUniform1f(glGetUniformLocation(usedShaderID, "lightPower"), m_LightPower);
+
+        auto pColor = &renderObj->m_DiffuseColor;
+        glUniform3f(glGetUniformLocation(usedShaderID, "diffuseColor"), pColor->x(), pColor->y(), pColor->z());
+
+        if (renderObj->m_EnableDiffuseTexture)
+        {
+            glUniform1i(glGetUniformLocation(usedShaderID, "enableDiffuseTexture"), 1);
+            glUniform1i(glGetUniformLocation(usedShaderID, "diffuseTexture"), renderObj->m_DiffuseTextureID);
+        }
+        else
+        {
+            glUniform1i(glGetUniformLocation(usedShaderID, "enableDiffuseTexture"), 0);
+        }
+
+        if (renderObj->m_EnableNormalTexture)
+        {
+            glUniform1i(glGetUniformLocation(usedShaderID, "enableNormalTexture"), 1);
+            glUniform1i(glGetUniformLocation(usedShaderID, "normalTexture"), renderObj->m_NormalTextureID);
+        }
+        else
+        {
+            glUniform1i(glGetUniformLocation(usedShaderID, "enableNormalTexture"), 0);
+        }
+
+        if (renderObj->m_EnableSpecularTexture)
+        {
+            glUniform1i(glGetUniformLocation(usedShaderID, "enableSpecularTexture"), 1);
+            glUniform1i(glGetUniformLocation(usedShaderID, "specularTexture"), renderObj->m_SpecularTextureID);
+        }
+        else
+        {
+            glUniform1i(glGetUniformLocation(usedShaderID, "enableSpecularTexture"), 0);
+        }
+    }
+    else if (renderObj->m_Shader == "Glass")
+    {
+        usedShaderID = m_GlassShaderID;
+    }
+    else
+    {
+        return;
+    }
+    
+
+    glUniformMatrix4fv(glGetUniformLocation(usedShaderID, "M"), 1, GL_FALSE, glm::value_ptr(MVP[0]));
+    glUniformMatrix4fv(glGetUniformLocation(usedShaderID, "V"), 1, GL_FALSE, glm::value_ptr(MVP[1]));
+    glUniformMatrix4fv(glGetUniformLocation(usedShaderID, "P"), 1, GL_FALSE, glm::value_ptr(MVP[2]));
 
     renderObj->Draw();
 

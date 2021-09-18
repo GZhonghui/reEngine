@@ -41,4 +41,6 @@ namespace EngineCore
 
     void applyWorldSettings();
     void collectWorldSettings();
+
+    void loadClassForRender();
 };

@@ -36,14 +36,14 @@ protected:
     double    m_LightPower;
 
 public:
-    Direction getLightDir() const noexcept { return m_LightDir; }
-    void      setLightDir(const Direction& newDir) { m_LightDir = newDir; }
+    Direction getLightDir() const noexcept         { return m_LightDir;       }
+    void      setLightDir(const Direction& newDir) { m_LightDir = newDir;     }
 
-    Color     getLightColor() const noexcept { return m_LightColor; }
+    Color     getLightColor() const noexcept       { return m_LightColor;     }
     void      setLightColor(const Color& newColor) { m_LightColor = newColor; }
     
-    double    getLightPower() const noexcept { return m_LightPower; }
-    void      setLightPower(double newPower) { m_LightPower = newPower; }
+    double    getLightPower() const noexcept       { return m_LightPower;     }
+    void      setLightPower(double newPower)       { m_LightPower = newPower; }
 // Light
 
 // Skybox
@@ -57,6 +57,8 @@ protected:
     std::vector<std::string> m_Skyboxs;
     std::vector<std::string> m_SkyboxsPath;
 
+    int m_NowSkybox;
+
 protected:
     void InitSkybox();
     void DestroySkybox();
@@ -68,6 +70,7 @@ public:
 public:
     const char*  getSkyboxList()  const { return m_SkyboxsChar;    }
     unsigned int getSkyboxCount() const { return m_Skyboxs.size(); }
+    std::string  getSkyboxAt(int Idx)   { return m_Skyboxs[Idx];   }
 // Skybox
 
 // Grid
@@ -103,6 +106,35 @@ protected:
 public:
     void RenderAxis(double Length, double Size, glm::mat4* MVP);
 // Axis
+
+// Outline
+protected:
+    uint32_t m_OutlineShaderID;
+
+protected:
+    void InitOutline();
+    void DestroyOutline();
+// Outline
+
+// Shaders
+protected:
+    uint32_t m_DefaultShaderID;
+    uint32_t m_GlassShaderID;
+
+    const char* m_SupportShadersChar;
+    std::vector<std::string> m_SupportShaders;
+    std::vector<std::string> m_SupportShadersPath;
+
+protected:
+    void InitShaders();
+    void DestroyShader();
+
+public:
+    const char*  getSupportShaderList()  const { return m_SupportShadersChar;    }
+    unsigned int getSupportShaderCount() const { return m_SupportShaders.size(); }
+    std::string  getSupportShaderAt(int Idx)   { return m_SupportShaders[Idx];   }
+
+// Shaders
 
 public:
     bool Init();

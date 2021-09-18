@@ -10,16 +10,20 @@ Project
         LightDir   x="" y="" z=""
         LightColor x="" y="" z=""
         LightPower
+        Skybox
 
     Actor
         ActorItem Name="" ClassName=""
             Tag=""
+            Component=""
+            Component=""
             Location x="" y="" z=""
             Rotation x="" y="" z=""
             Scale    x="" y="" z=""
         ActorItem Name="" ClassName=""
             Tag=""
             Tag=""
+            Component=""
             Location x="" y="" z=""
             Rotation x="" y="" z=""
             Scale    x="" y="" z=""
@@ -28,8 +32,12 @@ Project
         ClassItem Name="" Render="False"
         ClassItem Name="" Render="True"
             Model
-            DiffuseTexture
+            Shader
             DiffuseColor x="" y="" z=""
+            DiffuseTexture Enable="True/False"
+            NormalTexture Enable="True/False"
+            SpecularTexture Enable="True/False"
+            N
 
     Component
         ComponentItem Name=""
@@ -39,8 +47,8 @@ Project
 inline void readProject
 (
     WorldSetting& worldSettings,
-    std::vector<ClassItem>& classItems,
     std::vector<ActorItem>& actorItems,
+    std::vector<ClassItem>& classItems,
     std::vector<ComponentItem>& componentItems
 )
 {
@@ -83,6 +91,10 @@ inline void readProject
             {
                 worldSettings.m_LightPower = StrToFloat(worldItem.second.get<std::string>(""));
             }
+            else if (worldItem.first == "Skybox")
+            {
+                worldSettings.m_Skybox = StrToInt(worldItem.second.get<std::string>(""));
+            }
         }
     }
     catch (...)
@@ -114,6 +126,11 @@ inline void readProject
                             std::string nowTag = infoItem.second.get<std::string>("");
                             thisActor.m_Tags.insert(nowTag);
                         }
+                        else if (infoItem.first == "Component")
+                        {
+                            std::string nowComponent = infoItem.second.get<std::string>("");
+                            thisActor.m_Components.insert(nowComponent);
+                        }
                         else if (infoItem.first == "Location")
                         {
                             thisActor.m_Location.x() = StrToFloat(infoItem.second.get<std::string>("<xmlattr>.x"));
@@ -133,7 +150,6 @@ inline void readProject
                             thisActor.m_Scale.z() = StrToFloat(infoItem.second.get<std::string>("<xmlattr>.z"));
                         }
                     }
-
                     actorItems.push_back(thisActor);
                 }
             }
@@ -159,19 +175,33 @@ inline void readProject
                     ClassItem thisClass;
                     thisClass.m_Name = thisClassName;
 
-                    if (classItem.second.get<std::string>("<xmlattr>.Render") == "True")
+                    if (classItem.second.get<std::string>("<xmlattr>.Render") == True)
                     {
-                        thisClass.Render = true;
-                        thisClass.m_ModelFile = classItem.second.get<std::string>("Model");
-                        thisClass.m_DiffuseTextureFile = classItem.second.get<std::string>("DiffuseTexture");
+                        thisClass.m_Render = true;
+                        thisClass.m_Model  = classItem.second.get<std::string>("Model");
+                        thisClass.m_Shader = classItem.second.get<std::string>("Shader");
 
                         thisClass.m_DiffuseColor.x() = StrToFloat(classItem.second.get<std::string>("DiffuseColor.<xmlattr>.x"));
                         thisClass.m_DiffuseColor.y() = StrToFloat(classItem.second.get<std::string>("DiffuseColor.<xmlattr>.y"));
                         thisClass.m_DiffuseColor.z() = StrToFloat(classItem.second.get<std::string>("DiffuseColor.<xmlattr>.z"));
+
+                        thisClass.m_EnableDiffuseTexture = 
+                            classItem.second.get<std::string>("DiffuseTexture.<xmlattr>.Enable") == True;
+                        thisClass.m_DiffuseTexture = classItem.second.get<std::string>("DiffuseTexture");
+
+                        thisClass.m_EnableNormalTexture =
+                            classItem.second.get<std::string>("NormalTexture.<xmlattr>.Enable") == True;
+                        thisClass.m_NormalTexture = classItem.second.get<std::string>("NormalTexture");
+
+                        thisClass.m_EnableSpecularTexture =
+                            classItem.second.get<std::string>("SpecularTexture.<xmlattr>.Enable") == True;
+                        thisClass.m_SpecularTexture = classItem.second.get<std::string>("SpecularTexture");
+
+                        thisClass.m_N = StrToFloat(classItem.second.get<std::string>("N"));
                     }
                     else
                     {
-                        thisClass.Render = false;
+                        thisClass.m_Render = false;
                     }
 
                     classItems.push_back(thisClass);
@@ -218,8 +248,8 @@ inline void readProject
 inline void saveProject
 (
     WorldSetting& worldSettings,
-    const std::vector<ClassItem>& classItems,
     const std::vector<ActorItem>& actorItems,
+    const std::vector<ClassItem>& classItems,
     const std::vector<ComponentItem>& componentItems
 )
 {
@@ -235,16 +265,18 @@ inline void saveProject
     ptree& componentNode = rootProject.add("Component", "");
 
     ptree& lightDirNode = worldNode.add("LightDir", "");
-    lightDirNode.put("<xmlattr>.x", FloatToStr(worldSettings.m_LightDir.x()).c_str());
-    lightDirNode.put("<xmlattr>.y", FloatToStr(worldSettings.m_LightDir.y()).c_str());
-    lightDirNode.put("<xmlattr>.z", FloatToStr(worldSettings.m_LightDir.z()).c_str());
+    lightDirNode.put("<xmlattr>.x", FloatToStr(worldSettings.m_LightDir.x()));
+    lightDirNode.put("<xmlattr>.y", FloatToStr(worldSettings.m_LightDir.y()));
+    lightDirNode.put("<xmlattr>.z", FloatToStr(worldSettings.m_LightDir.z()));
 
     ptree& lightColorNode = worldNode.add("LightColor", "");
-    lightColorNode.put("<xmlattr>.x", FloatToStr(worldSettings.m_LightColor.x()).c_str());
-    lightColorNode.put("<xmlattr>.y", FloatToStr(worldSettings.m_LightColor.y()).c_str());
-    lightColorNode.put("<xmlattr>.z", FloatToStr(worldSettings.m_LightColor.z()).c_str());
+    lightColorNode.put("<xmlattr>.x", FloatToStr(worldSettings.m_LightColor.x()));
+    lightColorNode.put("<xmlattr>.y", FloatToStr(worldSettings.m_LightColor.y()));
+    lightColorNode.put("<xmlattr>.z", FloatToStr(worldSettings.m_LightColor.z()));
 
-    ptree& lightPowerNode = worldNode.add("LightPower", FloatToStr(worldSettings.m_LightPower).c_str());
+    worldNode.add("LightPower", FloatToStr(worldSettings.m_LightPower));
+
+    worldNode.add("Skybox", IntToStr(worldSettings.m_Skybox));
 
     for (auto actorIndex = actorItems.begin(); actorIndex != actorItems.end(); ++actorIndex)
     {
@@ -258,39 +290,60 @@ inline void saveProject
             actorItem.add("Tag", nowTag->c_str());
         }
 
+        auto pComponents = &actorIndex->m_Components;
+        for (auto nowComponent = pComponents->begin(); nowComponent != pComponents->end(); ++nowComponent)
+        {
+            actorItem.add("Component", nowComponent->c_str());
+        }
+
         ptree& LocationNode = actorItem.add("Location", "");
         ptree& RotationNode = actorItem.add("Rotation", "");
-        ptree& ScaleNode = actorItem.add("Scale", "");
+        ptree& ScaleNode    = actorItem.add("Scale", "");
 
-        LocationNode.put("<xmlattr>.x", FloatToStr(actorIndex->m_Location.x()).c_str());
-        LocationNode.put("<xmlattr>.y", FloatToStr(actorIndex->m_Location.y()).c_str());
-        LocationNode.put("<xmlattr>.z", FloatToStr(actorIndex->m_Location.z()).c_str());
+        LocationNode.put("<xmlattr>.x", FloatToStr(actorIndex->m_Location.x()));
+        LocationNode.put("<xmlattr>.y", FloatToStr(actorIndex->m_Location.y()));
+        LocationNode.put("<xmlattr>.z", FloatToStr(actorIndex->m_Location.z()));
 
-        RotationNode.put("<xmlattr>.x", FloatToStr(actorIndex->m_Rotation.x()).c_str());
-        RotationNode.put("<xmlattr>.y", FloatToStr(actorIndex->m_Rotation.y()).c_str());
-        RotationNode.put("<xmlattr>.z", FloatToStr(actorIndex->m_Rotation.z()).c_str());
+        RotationNode.put("<xmlattr>.x", FloatToStr(actorIndex->m_Rotation.x()));
+        RotationNode.put("<xmlattr>.y", FloatToStr(actorIndex->m_Rotation.y()));
+        RotationNode.put("<xmlattr>.z", FloatToStr(actorIndex->m_Rotation.z()));
 
-        ScaleNode.put("<xmlattr>.x", FloatToStr(actorIndex->m_Scale.x()).c_str());
-        ScaleNode.put("<xmlattr>.y", FloatToStr(actorIndex->m_Scale.y()).c_str());
-        ScaleNode.put("<xmlattr>.z", FloatToStr(actorIndex->m_Scale.z()).c_str());
+        ScaleNode.put("<xmlattr>.x", FloatToStr(actorIndex->m_Scale.x()));
+        ScaleNode.put("<xmlattr>.y", FloatToStr(actorIndex->m_Scale.y()));
+        ScaleNode.put("<xmlattr>.z", FloatToStr(actorIndex->m_Scale.z()));
     }
 
     for (auto classIndex = classItems.begin(); classIndex != classItems.end(); ++classIndex)
     {
         ptree& classItem = classNode.add("ClassItem", "");
 
-        classItem.put("<xmlattr>.Name", classIndex->m_Name.c_str());
-        if (classIndex->Render)
+        classItem.put("<xmlattr>.Name", classIndex->m_Name);
+
+        if (classIndex->m_Render)
         {
             classItem.put("<xmlattr>.Render", "True");
 
-            classItem.add("Model", classIndex->m_ModelFile.c_str());
-            classItem.add("DiffuseTexture", classIndex->m_DiffuseTextureFile.c_str());
+            classItem.add("Model", classIndex->m_Model);
+            classItem.add("Shader", classIndex->m_Shader);
 
             ptree& diffuseColorNode = classItem.add("DiffuseColor", "");
-            diffuseColorNode.put("<xmlattr>.x", FloatToStr(classIndex->m_DiffuseColor.x()).c_str());
-            diffuseColorNode.put("<xmlattr>.y", FloatToStr(classIndex->m_DiffuseColor.y()).c_str());
-            diffuseColorNode.put("<xmlattr>.z", FloatToStr(classIndex->m_DiffuseColor.z()).c_str());
+            diffuseColorNode.put("<xmlattr>.x", FloatToStr(classIndex->m_DiffuseColor.x()));
+            diffuseColorNode.put("<xmlattr>.y", FloatToStr(classIndex->m_DiffuseColor.y()));
+            diffuseColorNode.put("<xmlattr>.z", FloatToStr(classIndex->m_DiffuseColor.z()));
+
+            ptree& diffuseNode = classItem.add("DiffuseTexture", "");
+            diffuseNode.put("<xmlattr>.Enable", classIndex->m_EnableDiffuseTexture ? True : False);
+            diffuseNode.put("", classIndex->m_DiffuseTexture);
+
+            ptree& normalNode = classItem.add("NormalTexture", "");
+            normalNode.put("<xmlattr>.Enable", classIndex->m_EnableNormalTexture ? True : False);
+            normalNode.put("", classIndex->m_NormalTexture);
+
+            ptree& specularNode = classItem.add("SpecularTexture", "");
+            specularNode.put("<xmlattr>.Enable", classIndex->m_EnableSpecularTexture ? True : False);
+            specularNode.put("", classIndex->m_SpecularTexture);
+
+            classItem.add("N", FloatToStr(classIndex->m_N));
         }
         else
         {
@@ -301,15 +354,14 @@ inline void saveProject
     for (auto componentIndex = componentItems.begin(); componentIndex != componentItems.end(); ++componentIndex)
     {
         ptree& componentItem = componentNode.add("ComponentItem","");
-        componentItem.put("<xmlattr>.Name", componentIndex->m_Name.c_str());
+        componentItem.put("<xmlattr>.Name", componentIndex->m_Name);
     }
 
     const boost::property_tree::xml_writer_settings<ptree::key_type> writeSettings(' ', 2);
     write_xml(projectFilePath, ptProject, std::locale(), writeSettings);
 
-    Out::Log(pType::MESSAGE, "Save File Done");
-
     updateInitHeader(classItems, actorItems, componentItems);
-
     Out::Log(pType::MESSAGE, "Generated Init Header");
+
+    Out::Log(pType::MESSAGE, "Save File Done");
 }

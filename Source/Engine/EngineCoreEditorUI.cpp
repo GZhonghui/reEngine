@@ -10,7 +10,7 @@ namespace EngineCore
     extern std::vector<std::shared_ptr<Actor>> actorsInSceneOfGame;
 
     // Editor Mode
-    extern std::unordered_map<std::string, std::shared_ptr<GLRenderable>> classesInSceneOfEditor;
+    extern std::unordered_map<std::string, std::shared_ptr<GLRenderable>> classesInSceneForRender;
 
     extern WorldSetting worldSettings;
     extern std::vector<ClassItem> classItems;
@@ -184,8 +184,11 @@ namespace EngineCore
         static bool FirstFrame = true;
         if (FirstFrame)
         {
-            AssetManager::getAssetList(assetList, assetTypeList);
             FirstFrame = false;
+            
+            AssetManager::getAssetList(assetList, assetTypeList);
+            
+            glManager.ChangeSkybox(worldSettings.m_Skybox);
         }
 
         // === Update ===
@@ -205,17 +208,34 @@ namespace EngineCore
                 classItemsChar.push_back(classIndex->m_Name.c_str());
             }
 
-            if (!classesInSceneOfEditor.count(classIndex->m_Name))
+            if (!classesInSceneForRender.count(classIndex->m_Name))
             {
-                if (classIndex->Render)
+                if (classIndex->m_Render)
                 {
-                    classesInSceneOfEditor[classIndex->m_Name] = std::make_shared<GLRenderable>();
-                    classesInSceneOfEditor[classIndex->m_Name]->Init(classIndex->m_ModelFile,
-                        classIndex->m_DiffuseTextureFile, classIndex->m_DiffuseColor);
+                    classesInSceneForRender[classIndex->m_Name] = std::make_shared<GLRenderable>();
+                    
+                    classesInSceneForRender[classIndex->m_Name]->setShader(classIndex->m_Shader);
+
+                    classesInSceneForRender[classIndex->m_Name]->reLoadModel(classIndex->m_Model);
+                    classesInSceneForRender[classIndex->m_Name]->setDiffuseColor(classIndex->m_DiffuseColor);
+
+                    if (classIndex->m_EnableDiffuseTexture)
+                    {
+                        classesInSceneForRender[classIndex->m_Name]->reLoadDiffuseTexture(classIndex->m_DiffuseTexture);
+                    }
+                    if (classIndex->m_EnableNormalTexture)
+                    {
+                        classesInSceneForRender[classIndex->m_Name]->reLoadNormalTexture(classIndex->m_NormalTexture);
+                    }
+                    if (classIndex->m_EnableSpecularTexture)
+                    {
+                        classesInSceneForRender[classIndex->m_Name]->reLoadSpecularTexture(classIndex->m_SpecularTexture);
+                    }
+                    classesInSceneForRender[classIndex->m_Name]->setN(classIndex->m_N);
                 }
                 else
                 {
-                    classesInSceneOfEditor[classIndex->m_Name] = nullptr;
+                    classesInSceneForRender[classIndex->m_Name] = nullptr;
                 }
             }
         }
@@ -232,7 +252,7 @@ namespace EngineCore
         assetTexture.clear();
         for (auto assetIdx = 0; assetIdx < assetList.size(); ++assetIdx)
         {
-            if (assetTypeList[assetIdx] == aType::OBJ)
+            if (assetTypeList[assetIdx] == aType::MODEL)
             {
                 assetModel.push_back(assetList[assetIdx].c_str());
             }
@@ -260,6 +280,7 @@ namespace EngineCore
                         ImGui::PushItemWidth(-FLT_MIN);
                         ImGui::ListBox("", &actorCurrent,
                             actorItemsChar.data(), actorItemsChar.size(), listBoxHeightCount);
+                        ImGui::PopItemWidth();
                         ImGui::EndTabItem();
                     }
                     if (ImGui::BeginTabItem("Class"))
@@ -314,7 +335,7 @@ namespace EngineCore
 
                             ImGui::TableSetColumnIndex(1);
                             std::string assetTypeStr;
-                            if (assetTypeList[i] == aType::OBJ)
+                            if (assetTypeList[i] == aType::MODEL)
                             {
                                 assetTypeStr = " Model ";
                             }
@@ -546,7 +567,7 @@ namespace EngineCore
                     ImGui::TextColored(textColor, "=== Class Visibility===");
                     ImGui::Separator();
                     if (classCurrent >= 0 && classCurrent < classItemsChar.size() &&
-                        classItems[classCurrent].Render)
+                        classItems[classCurrent].m_Render)
                     {
                         classDiffuseColor.x = classItems[classCurrent].m_DiffuseColor.x();
                         classDiffuseColor.y = classItems[classCurrent].m_DiffuseColor.y();
@@ -569,9 +590,9 @@ namespace EngineCore
                         if (classEnableDiffuse)
                         {
                             ImGui::Combo("##DiffuseTexture", &classDiffuseCurrent, assetTexture.data(), assetTexture.size());
-                            if (classesInSceneOfEditor.count(classItems[classCurrent].m_Name))
+                            if (classesInSceneForRender.count(classItems[classCurrent].m_Name))
                             {
-                                ImGui::Image((void*)classesInSceneOfEditor[classItems[classCurrent].m_Name]->getDiffuseTextureID(),
+                                ImGui::Image((void*)classesInSceneForRender[classItems[classCurrent].m_Name]->getDiffuseTextureID(),
                                     ImVec2(imageSize, imageSize));
                             }
                         }
@@ -701,14 +722,14 @@ namespace EngineCore
                     {
                         if (ImGui::Button("Read", toolboxButtonSize))
                         {
-                            readProject(worldSettings, classItems, actorItems, componentItems);
+                            readProject(worldSettings, actorItems, classItems, componentItems);
                             applyWorldSettings();
                         }
                         ImGui::SameLine();
                         if (ImGui::Button("Save", toolboxButtonSize))
                         {
                             collectWorldSettings();
-                            saveProject(worldSettings, classItems, actorItems, componentItems);
+                            saveProject(worldSettings, actorItems, classItems, componentItems);
                         }
                         ImGui::EndTabItem();
                     }
@@ -848,11 +869,11 @@ namespace EngineCore
 
                                         ClassItem newClass;
                                         newClass.m_Name = std::string(newClassName);
-                                        newClass.Render = renderNewClass;
+                                        newClass.m_Render = renderNewClass;
                                         if (renderNewClass)
                                         {
-                                            newClass.m_ModelFile = assetModel[renderNewClassModelCurrent];
-                                            newClass.m_DiffuseTextureFile = assetTexture[renderNewClassTextureCurrent];
+                                            newClass.m_Model = assetModel[renderNewClassModelCurrent];
+                                            newClass.m_DiffuseTexture = assetTexture[renderNewClassTextureCurrent];
 
                                             newClass.m_DiffuseColor.x() = renderNewClassDiffuseColorf3[0];
                                             newClass.m_DiffuseColor.y() = renderNewClassDiffuseColorf3[1];
@@ -871,12 +892,16 @@ namespace EngineCore
                                                 newActor.m_ClassName = newClass.m_Name;
                                                 newActor.m_Tags.insert(newClass.m_Name);
 
+                                                newActor.m_Location = Eigen::Vector3d(0, 0, 0);
+                                                newActor.m_Rotation = Eigen::Vector3d(0, 0, 0);
+                                                newActor.m_Scale = Eigen::Vector3d(1, 1, 1);
+
                                                 actorItems.push_back(newActor);
                                             }
                                         }
 
                                         collectWorldSettings();
-                                        saveProject(worldSettings, classItems, actorItems, componentItems);
+                                        saveProject(worldSettings, actorItems, classItems,componentItems);
 
                                         *newClassName    = 0;
                                         newClassAddActor = false;
@@ -931,7 +956,7 @@ namespace EngineCore
                                     ImGui::CloseCurrentPopup();
 
                                     collectWorldSettings();
-                                    saveProject(worldSettings, classItems, actorItems, componentItems);
+                                    saveProject(worldSettings, actorItems, classItems, componentItems);
                                 }
                             }
                             ImGui::SameLine();

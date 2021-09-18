@@ -13,6 +13,9 @@ uniform sampler2D diffuseTexture;
 uniform int       enableNormalTexture;
 uniform sampler2D normalTexture;
 
+uniform int       enableSpecularTexture;
+uniform sampler2D specularTexture;
+
 uniform vec3  lightDir;
 uniform vec3  lightColor;
 uniform float lightPower;

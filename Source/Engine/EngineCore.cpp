@@ -14,11 +14,10 @@ namespace EngineCore
     GLFWwindow* mainWindow;
     GLManager glManager;
 
-    // Game Mode
+    // Game Mode Only
     std::vector<std::shared_ptr<Actor>> actorsInSceneOfGame;
 
-    // Editor Mode
-    std::unordered_map<std::string, std::shared_ptr<GLRenderable>> classesInSceneOfEditor;
+    std::unordered_map<std::string, std::shared_ptr<GLRenderable>> classesInSceneForRender;
 
     WorldSetting worldSettings;
     std::vector<ClassItem> classItems;
@@ -117,9 +116,9 @@ namespace EngineCore
         int actorIndex = 0;
         for (auto i = actorItems.begin(); i != actorItems.end(); ++i)
         {
-            if (classesInSceneOfEditor.count(i->m_ClassName) && classesInSceneOfEditor[i->m_ClassName])
+            if (classesInSceneForRender.count(i->m_ClassName) && classesInSceneForRender[i->m_ClassName])
             {
-                glManager.Render(classesInSceneOfEditor[i->m_ClassName],
+                glManager.Render(classesInSceneForRender[i->m_ClassName],
                     Transform(i->m_Location, i->m_Rotation, i->m_Scale),
                     actorIndex == coreSelectedActorInEditorScene,
                     coreRenderModeInEditorScene);
@@ -212,11 +211,40 @@ namespace EngineCore
         worldSettings.m_LightColor = glManager.getLightColor();
         worldSettings.m_LightPower = glManager.getLightPower();
     }
-};
 
-namespace EngineAPI
-{
-    // Code
+    void loadClassForRender()
+    {
+        classesInSceneForRender.clear();
+        for (auto i = classItems.begin(); i != classItems.end(); ++i)
+        {
+            if (i->m_Render)
+            {
+                classesInSceneForRender[i->m_Name] = std::make_shared<GLRenderable>();
+                classesInSceneForRender[i->m_Name]->setShader(i->m_Shader);
+
+                classesInSceneForRender[i->m_Name]->reLoadModel(i->m_Model);
+                classesInSceneForRender[i->m_Name]->setDiffuseColor(i->m_DiffuseColor);
+                
+                if (i->m_EnableDiffuseTexture)
+                {
+                    classesInSceneForRender[i->m_Name]->reLoadDiffuseTexture(i->m_DiffuseTexture);
+                }
+                if (i->m_EnableNormalTexture)
+                {
+                    classesInSceneForRender[i->m_Name]->reLoadNormalTexture(i->m_NormalTexture);
+                }
+                if (i->m_EnableSpecularTexture)
+                {
+                    classesInSceneForRender[i->m_Name]->reLoadSpecularTexture(i->m_SpecularTexture);
+                }
+                classesInSceneForRender[i->m_Name]->setN(i->m_N);
+            }
+            else
+            {
+                classesInSceneForRender[i->m_Name] = nullptr;
+            }
+        }
+    }
 };
 
 int engineMain(void (*initScene)(std::vector<std::shared_ptr<Actor>>* actorsInScene))
@@ -230,7 +258,11 @@ int engineMain(void (*initScene)(std::vector<std::shared_ptr<Actor>>* actorsInSc
 
     Event::initEventState();
 
-    readProject(EngineCore::worldSettings, EngineCore::classItems, EngineCore::actorItems, EngineCore::componentItems);
+    readProject
+    (
+        EngineCore::worldSettings, EngineCore::actorItems,
+        EngineCore::classItems, EngineCore::componentItems
+    );
     EngineCore::applyWorldSettings();
 
     if (G_BUILD_GAME_MODE)
@@ -240,23 +272,8 @@ int engineMain(void (*initScene)(std::vector<std::shared_ptr<Actor>>* actorsInSc
 
         EngineCore::initActors();
     }
-    else
-    {
-        // No Need to Clear
-        EngineCore::classesInSceneOfEditor.clear();
-        for (auto i = EngineCore::classItems.begin(); i != EngineCore::classItems.end(); ++i)
-        {
-            if (i->Render)
-            {
-                EngineCore::classesInSceneOfEditor[i->m_Name] = std::make_shared<GLRenderable>();
-                EngineCore::classesInSceneOfEditor[i->m_Name]->Init(i->m_ModelFile, i->m_DiffuseTextureFile, i->m_DiffuseColor);
-            }
-            else
-            {
-                EngineCore::classesInSceneOfEditor[i->m_Name] = nullptr;
-            }
-        }
-    }
+
+    EngineCore::loadClassForRender();
 
     while (!glfwWindowShouldClose(EngineCore::mainWindow))
     {

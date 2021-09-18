@@ -61,8 +61,9 @@ namespace GLMisc
         if (!TextureData)
         {
             Out::Log(pType::ERROR, "Generate Texture with Image Failed");
+            glDeleteTextures(1, &textureID);
 
-            return textureID;
+            return 0;
         }
 
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, textureWidth, textureHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, TextureData);

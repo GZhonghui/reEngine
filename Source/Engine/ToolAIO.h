@@ -54,6 +54,9 @@
 
 #define DEBUG_MESSAGE
 
+const char True[]  = "True";
+const char False[] = "False";
+
 enum class pType
 {
     MESSAGE, WARNING, ERROR
@@ -89,7 +92,9 @@ void Out::printTime()
     }
     if (G_ENABLE_WIN_OUTPUT)
     {
-        snprintf(printBuffer, sizeof(printBuffer), "[%02d:%02d:%02d]", ltm->tm_hour, ltm->tm_min, ltm->tm_sec);
+        snprintf(printBuffer, sizeof(printBuffer), "[%02d:%02d:%02d]",
+            ltm->tm_hour, ltm->tm_min, ltm->tm_sec);
+
         thisLog += printBuffer;
     }
 }
@@ -186,10 +191,10 @@ inline bool checkSimpleStr(const char* inputName)
     return true;
 }
 
-inline bool endsWith(std::string const& value, std::string const& ending)
+inline bool endsWith(std::string const& Value, std::string const& Ending)
 {
-    if (ending.size() > value.size()) return false;
-    return std::equal(ending.rbegin(), ending.rend(), value.rbegin());
+    if (Ending.size() > Value.size()) return false;
+    return std::equal(Ending.rbegin(), Ending.rend(), Value.rbegin());
 }
 
 inline double StrToFloat(const std::string& inStr)
@@ -208,6 +213,27 @@ inline std::string FloatToStr(double inFloat)
 {
     char printBuffer[64];
     snprintf(printBuffer, sizeof(printBuffer), "%.10lf", inFloat);
+
+    return std::string(printBuffer);
+}
+
+inline int StrToInt(const std::string& inStr)
+{
+    int Res = -1;
+
+    try
+    {
+        sscanf(inStr.c_str(), "%d", &Res);
+    }
+    catch (...) {}
+
+    return Res;
+}
+
+inline std::string IntToStr(int inInt)
+{
+    char printBuffer[64];
+    snprintf(printBuffer, sizeof(printBuffer), "%d", inInt);
 
     return std::string(printBuffer);
 }

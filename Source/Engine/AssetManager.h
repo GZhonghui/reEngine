@@ -5,7 +5,7 @@
 
 enum class aType
 {
-    OBJ, TEXTURE
+    MODEL, TEXTURE
 };
 
 namespace AssetManager
@@ -55,7 +55,7 @@ namespace AssetManager
             return false;
         }
 
-        Out::Log(pType::MESSAGE, "Delete Done");
+        Out::Log(pType::MESSAGE, "Delete %s Done", fileName.c_str());
         return true;
     }
 
@@ -72,7 +72,7 @@ namespace AssetManager
             bool rightType = true;
             if (endsWith(upperName, "OBJ"))
             {
-                assetTypeList.push_back(aType::OBJ);
+                assetTypeList.push_back(aType::MODEL);
             }
             else if (endsWith(upperName, "PNG"))
             {
