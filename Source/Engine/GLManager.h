@@ -202,7 +202,7 @@ public:
     std::string  getSupportShaderAt(int Idx)   { return m_ShaderManager.m_SupportShaders[Idx];   }
     int          getIdxOfSupportShader(const std::string& inStr)
     {
-        if (!m_ShaderManager.m_RevSupportShaders.count(inStr)) return -1;
+        if (!m_ShaderManager.m_RevSupportShaders.count(inStr)) return 0;
         return m_ShaderManager.m_RevSupportShaders[inStr];
     }
 

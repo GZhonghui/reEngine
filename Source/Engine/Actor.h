@@ -9,10 +9,9 @@ public:
     Actor(const std::string& Name) :m_Name(Name) {}
     virtual ~Actor() = default;
 protected:
-    std::vector<std::shared_ptr<Component>> m_Components;
-protected:
     std::string m_Name;
     std::unordered_set<std::string> m_Tags;
+    std::vector<std::shared_ptr<Component>> m_Components;
     Eigen::Vector3d m_Location;
     Eigen::Vector3d m_Rotation;
     Eigen::Vector3d m_Scale;
@@ -28,6 +27,8 @@ public:
     bool hasTag(const std::string& checkTag) const { return m_Tags.count(checkTag); }
     void insertTag(const std::string& Tag) { m_Tags.insert(Tag); }
     void deleteTag(const std::string& Tag) { m_Tags.erase(Tag);  }
+public:
+    void addComponent(std::shared_ptr<Component> newComponent) { m_Components.push_back(newComponent); }
 public:
     virtual void Init() = 0;
     virtual void Update(float Delta) = 0;

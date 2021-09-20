@@ -177,7 +177,77 @@ inline void addClassToProject(const char* className)
 
 inline void addComponentToProject(const char* componentName)
 {
+    std::string sourceFileName(componentName);
+    sourceFileName = "implComponent_" + sourceFileName + ".cpp";
 
+    std::string headerFileName(componentName);
+    headerFileName = "implComponent_" + headerFileName + ".h";
+
+    bool createFailed = false;
+
+    FILE* headerFile = fopen(headerFileName.c_str(), "wt");
+    if (headerFile)
+    {
+        fprintf(headerFile, "#include \"Component.h\"\n");
+        fprintf(headerFile, "#include \"EngineAPI.h\"\n");
+        fprintf(headerFile, "\n");
+        fprintf(headerFile, "class %s : public Component\n", componentName);
+        fprintf(headerFile, "{\n");
+        fprintf(headerFile, "public:\n");
+        fprintf(headerFile, "    %s(const std::string& Owner) : Component(Owner) { }\n", componentName);
+        fprintf(headerFile, "    virtual ~%s() = default;\n", componentName);
+        fprintf(headerFile, "public:\n");
+        fprintf(headerFile, "    virtual void Init();\n");
+        fprintf(headerFile, "    virtual void Update(float Delta);\n");
+        fprintf(headerFile, "    virtual void Destroy();\n");
+        fprintf(headerFile, "};\n");
+
+        fclose(headerFile);
+    }
+    else createFailed = true;
+
+    FILE* sourceFile = fopen(sourceFileName.c_str(), "wt");
+    if (sourceFile)
+    {
+        fprintf(sourceFile, "#include \"%s\"\n", headerFileName.c_str());
+        fprintf(sourceFile, "\n");
+        fprintf(sourceFile, "void %s::Init()\n", componentName);
+        fprintf(sourceFile, "{\n");
+        fprintf(sourceFile, "\n");
+        fprintf(sourceFile, "}\n");
+        fprintf(sourceFile, "\n");
+        fprintf(sourceFile, "void %s::Update(float Delta)\n", componentName);
+        fprintf(sourceFile, "{\n");
+        fprintf(sourceFile, "\n");
+        fprintf(sourceFile, "}\n");
+        fprintf(sourceFile, "\n");
+        fprintf(sourceFile, "void %s::Destroy()\n", componentName);
+        fprintf(sourceFile, "{\n");
+        fprintf(sourceFile, "\n");
+        fprintf(sourceFile, "}\n");
+
+        fclose(sourceFile);
+    }
+    else createFailed = true;
+
+    if (createFailed)
+    {
+        Out::Log(pType::ERROR, "Create %s Failed", componentName);
+        return;
+    }
+
+    using namespace boost::property_tree;
+
+    ptree ptProject;
+    read_xml("Engine.vcxproj", ptProject, xml_parser::trim_whitespace);
+
+    ptree& sourceItem = ptProject.add("Project.ItemGroup.ClCompile", "");
+    sourceItem.put("<xmlattr>.Include", sourceFileName.c_str());
+    ptree& headerItem = ptProject.add("Project.ItemGroup.ClInclude", "");
+    headerItem.put("<xmlattr>.Include", headerFileName.c_str());
+
+    const boost::property_tree::xml_writer_settings<ptree::key_type> writeSettings(' ', 2);
+    write_xml("Engine.vcxproj", ptProject, std::locale(), writeSettings);
 }
 
 inline void updateInitHeader
@@ -220,14 +290,24 @@ inline void updateInitHeader
         fprintf(initHeader, "\n");
 
         //For Each
-        auto addInclude = [initHeader](const char* className)
+        auto addClassInclude = [initHeader](const char* className)
         {
             fprintf(initHeader, "#include\"implClass_%s.h\"\n\n", className);
         };
 
+        auto addComponentInclde = [initHeader](const char* componentName)
+        {
+            fprintf(initHeader, "#include\"implComponent_%s.h\"\n\n", componentName);
+        };
+
         for (auto classIndex = classItems.begin(); classIndex != classItems.end(); ++classIndex)
         {
-            addInclude(classIndex->m_Name.c_str());
+            addClassInclude(classIndex->m_Name.c_str());
+        }
+
+        for (auto componentIndex = componentItems.begin(); componentIndex != componentItems.end(); ++componentIndex)
+        {
+            addComponentInclde(componentIndex->m_Name.c_str());
         }
 
         fprintf(initHeader, "void initScene(std::vector<std::shared_ptr<Actor>>* actorsInScene)\n");
@@ -243,6 +323,11 @@ inline void updateInitHeader
             for (auto nowTag = actorItem.m_Tags.begin(); nowTag != actorItem.m_Tags.end(); ++nowTag)
             {
                 fprintf(initHeader, "        newActor->insertTag(\"%s\");\n", nowTag->c_str());
+            }
+
+            for (auto nowComponent = actorItem.m_Components.begin(); nowComponent != actorItem.m_Components.end(); ++nowComponent)
+            {
+                fprintf(initHeader, "        newActor->addComponent(std::make_shared<Component>(\"%s\"));\n", actorItem.m_Name.c_str());
             }
             
             fprintf(initHeader, "        newActor->setLocation(Eigen::Vector3d(%.6lf, %.6lf, %.6lf));\n",

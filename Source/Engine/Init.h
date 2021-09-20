@@ -24,6 +24,7 @@ void initScene(std::vector<std::shared_ptr<Actor>>* actorsInScene)
 
 #include"implClass_Car.h"
 
+
 void initScene(std::vector<std::shared_ptr<Actor>>* actorsInScene)
 {
     {

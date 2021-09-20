@@ -232,40 +232,57 @@ namespace EngineCore
                 classItemsChar.push_back(classIndex->m_Name.c_str());
             }
 
-            if (!classesInSceneForRender.count(classIndex->m_Name))
+            if (classIndex->m_Render)
             {
-                if (classIndex->m_Render)
+                if (!classesInSceneForRender.count(classIndex->m_Name))
                 {
                     classesInSceneForRender[classIndex->m_Name] = std::make_shared<GLRenderable>();
+
+                    auto thisRenderObj = classesInSceneForRender[classIndex->m_Name];
                     
-                    classesInSceneForRender[classIndex->m_Name]->setShader(classIndex->m_Shader);
+                    thisRenderObj->setShader(classIndex->m_Shader);
 
-                    classesInSceneForRender[classIndex->m_Name]->reLoadModel(classIndex->m_Model);
-                    cantDeleteAssets.insert(classIndex->m_Model);
+                    thisRenderObj->reLoadModel(classIndex->m_Model);
 
-                    classesInSceneForRender[classIndex->m_Name]->setDiffuseColor(classIndex->m_DiffuseColor);
+                    thisRenderObj->setDiffuseColor(classIndex->m_DiffuseColor);
 
                     if (classIndex->m_EnableDiffuseTexture)
                     {
-                        classesInSceneForRender[classIndex->m_Name]->reLoadDiffuseTexture(classIndex->m_DiffuseTexture);
-                        cantDeleteAssets.insert(classIndex->m_DiffuseTexture);
+                        thisRenderObj->reLoadDiffuseTexture(classIndex->m_DiffuseTexture);
                     }
                     if (classIndex->m_EnableNormalTexture)
                     {
-                        classesInSceneForRender[classIndex->m_Name]->reLoadNormalTexture(classIndex->m_NormalTexture);
-                        cantDeleteAssets.insert(classIndex->m_NormalTexture);
+                        thisRenderObj->reLoadNormalTexture(classIndex->m_NormalTexture);
+                        
                     }
                     if (classIndex->m_EnableSpecularTexture)
                     {
-                        classesInSceneForRender[classIndex->m_Name]->reLoadSpecularTexture(classIndex->m_SpecularTexture);
-                        cantDeleteAssets.insert(classIndex->m_SpecularTexture);
+                        thisRenderObj->reLoadSpecularTexture(classIndex->m_SpecularTexture);
                     }
-                    classesInSceneForRender[classIndex->m_Name]->setN(classIndex->m_N);
+
+                    thisRenderObj->setN(classIndex->m_N);
                 }
-                else
+                
+                if (!classIndex->m_Model.empty())
                 {
-                    classesInSceneForRender[classIndex->m_Name] = nullptr;
+                    cantDeleteAssets.insert(classIndex->m_Model);
                 }
+                if (classIndex->m_EnableDiffuseTexture && !classIndex->m_DiffuseTexture.empty())
+                {
+                    cantDeleteAssets.insert(classIndex->m_DiffuseTexture);
+                }
+                if (classIndex->m_EnableNormalTexture && !classIndex->m_NormalTexture.empty())
+                {
+                    cantDeleteAssets.insert(classIndex->m_NormalTexture);
+                }
+                if (classIndex->m_EnableSpecularTexture && !classIndex->m_SpecularTexture.empty())
+                {
+                    cantDeleteAssets.insert(classIndex->m_SpecularTexture);
+                }
+            }
+            else
+            {
+                classesInSceneForRender[classIndex->m_Name] = nullptr;
             }
         }
         for (auto componentIndex = componentItems.begin(); componentIndex != componentItems.end(); ++componentIndex)
@@ -351,11 +368,12 @@ namespace EngineCore
 
                 if (ImGui::BeginPopupModal("View Assets", nullptr, popWinFlag))
                 {
-                    if (ImGui::BeginTable("Assets List", 3,
+                    if (ImGui::BeginTable("Assets List", 4,
                         ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg,
                         ImVec2(480, 200)))
                     {
                         ImGui::TableSetupColumn("ID");
+                        ImGui::TableSetupColumn("Use");
                         ImGui::TableSetupColumn("Type");
                         ImGui::TableSetupColumn("Name");
                         ImGui::TableHeadersRow();
@@ -368,6 +386,16 @@ namespace EngineCore
                             ImGui::Text("%03d", i);
 
                             ImGui::TableSetColumnIndex(1);
+                            if (cantDeleteAssets.count(assetList[i]))
+                            {
+                                ImGui::Text("Using");
+                            }
+                            else
+                            {
+                                ImGui::Text("Blank");
+                            }
+
+                            ImGui::TableSetColumnIndex(2);
                             std::string assetTypeStr;
                             if (assetTypeList[i] == aType::MODEL)
                             {
@@ -379,7 +407,7 @@ namespace EngineCore
                             }
                             ImGui::TextColored(textColor, "%s", assetTypeStr.c_str());
 
-                            ImGui::TableSetColumnIndex(2);
+                            ImGui::TableSetColumnIndex(3);
                             if (ImGui::Selectable(assetList[i].c_str(), selectedAssetID == i,
                                 ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_DontClosePopups))
                             {
@@ -449,18 +477,20 @@ namespace EngineCore
             {
                 if (leftEnableTab == 0)
                 {
+                    ActorItem* pSelectedActor = Inside(actorCurrent, 0, actorItems.size() - 1) ?
+                        &actorItems[actorCurrent] : nullptr;
+
                     ImGui::TextColored(textColor, "=== Actor Details ===");
                     ImGui::Separator();
-                    
-                    if (Inside(actorCurrent, 0, actorItems.size() - 1))
+
+                    if (pSelectedActor)
                     {
-                        ImGui::Text("Actor Name: %s", actorItemsChar[actorCurrent]);
-                        ImGui::Text("Actor Type: %s", actorItems[actorCurrent].m_ClassName.c_str());
+                        ImGui::Text("Actor Name: %s", pSelectedActor->m_Name.c_str());
+                        ImGui::Text("Actor Type: %s", pSelectedActor->m_ClassName.c_str());
                         if (ImGui::TreeNode("   Tags:"))
                         {
                             int tagIndex = 0;
-                            for (auto i = actorItems[actorCurrent].m_Tags.begin();
-                                i != actorItems[actorCurrent].m_Tags.end(); ++i)
+                            for (auto i = pSelectedActor->m_Tags.begin(); i != pSelectedActor->m_Tags.end(); ++i)
                             {
                                 std::string Tag = "> [" + *i + "]";
                                 if (ImGui::Selectable(Tag.c_str(), tagIndex == tagOfActorCurrent))
@@ -477,20 +507,19 @@ namespace EngineCore
                             }
                             if (ImGui::BeginPopup("New Tag", popWinFlag))
                             {
-                                ImGui::Text("Guide for Add a Tag for %s", actorItemsChar[actorCurrent]);
+                                ImGui::Text("Guide for Add a Tag for %s", pSelectedActor->m_Name.c_str());
                                 ImGui::Separator();
                                 ImGui::Text("Input the Tag Name");
                                 ImGui::InputText("", newTagName, IM_ARRAYSIZE(newTagName));
                                 ImGui::Separator();
 
-                                bool canAddTag = checkSimpleStr(newTagName) &&
-                                    !actorItems[actorCurrent].m_Tags.count(newTagName);
+                                bool canAddTag = checkSimpleStr(newTagName) && !pSelectedActor->m_Tags.count(newTagName);
 
                                 if (!canAddTag) uiBeginDisable();
 
                                 if (ImGui::Button("Add"))
                                 {
-                                    actorItems[actorCurrent].m_Tags.insert(newTagName);
+                                    pSelectedActor->m_Tags.insert(newTagName);
 
                                     *newTagName = 0;
                                     ImGui::CloseCurrentPopup();
@@ -508,12 +537,12 @@ namespace EngineCore
                             }
                             ImGui::SameLine();
                             
-                            bool canDeleteTag = Inside(tagOfActorCurrent, 0, actorItems[actorCurrent].m_Tags.size() - 1);
+                            bool canDeleteTag = Inside(tagOfActorCurrent, 0, pSelectedActor->m_Tags.size() - 1);
                             if (!canDeleteTag) uiBeginDisable();
                             if (ImGui::Button("Del Tag"))
                             {
                                 Out::Log(pType::MESSAGE, "Delete Tag [%s] for %s", tagOfActorCurrentStr.c_str(),
-                                    actorItemsChar[actorCurrent]);
+                                    pSelectedActor->m_Name.c_str());
                                 actorItems[actorCurrent].m_Tags.erase(tagOfActorCurrentStr);
                             }
                             if (!canDeleteTag) uiEndDisable();
@@ -531,43 +560,43 @@ namespace EngineCore
 
                     ImGui::TextColored(textColor, "=== Actor Transform ===");
                     ImGui::Separator();
-                    if (Inside(actorCurrent, 0, actorItems.size() - 1))
+                    if (pSelectedActor)
                     {
                         ImGui::Text("Location ");
                         ImGui::SameLine();
                         if (ImGui::Button("Reset##Location"))
                         {
-                            actorItems[actorCurrent].m_Location = Eigen::Vector3d(0, 0, 0);
+                            pSelectedActor->m_Location = Eigen::Vector3d(0, 0, 0);
                         }
-                        Fill(actorLocationf3, actorItems[actorCurrent].m_Location);
+                        Fill(actorLocationf3, pSelectedActor->m_Location);
                         ImGui::PushItemWidth(-FLT_MIN);
                         ImGui::DragFloat3("##Location", actorLocationf3, 0.01f);
                         ImGui::PopItemWidth();
-                        Fill(actorItems[actorCurrent].m_Location, actorLocationf3);
+                        Fill(pSelectedActor->m_Location, actorLocationf3);
 
                         ImGui::Text("Rotation ");
                         ImGui::SameLine();
                         if (ImGui::Button("Reset##Rotation"))
                         {
-                            actorItems[actorCurrent].m_Rotation = Eigen::Vector3d(0, 0, 0);
+                            pSelectedActor->m_Rotation = Eigen::Vector3d(0, 0, 0);
                         }
-                        Fill(actorRotationf3, actorItems[actorCurrent].m_Rotation);
+                        Fill(actorRotationf3, pSelectedActor->m_Rotation);
                         ImGui::PushItemWidth(-FLT_MIN);
                         ImGui::DragFloat3("##Rotation", actorRotationf3, 0.1f, -360.0f, 360.0f);
                         ImGui::PopItemWidth();
-                        Fill(actorItems[actorCurrent].m_Rotation, actorRotationf3);
+                        Fill(pSelectedActor->m_Rotation, actorRotationf3);
 
                         ImGui::Text("Scale    ");
                         ImGui::SameLine();
                         if (ImGui::Button("Reset##Scale"))
                         {
-                            actorItems[actorCurrent].m_Scale = Eigen::Vector3d(1, 1, 1);
+                            pSelectedActor->m_Scale = Eigen::Vector3d(1, 1, 1);
                         }
-                        Fill(actorScalef3, actorItems[actorCurrent].m_Scale);
+                        Fill(actorScalef3, pSelectedActor->m_Scale);
                         ImGui::PushItemWidth(-FLT_MIN);
                         ImGui::DragFloat3("##Scale", actorScalef3, 0.001f, 0.1f, 10.0f);
                         ImGui::PopItemWidth();
-                        Fill(actorItems[actorCurrent].m_Scale, actorScalef3);
+                        Fill(pSelectedActor->m_Scale, actorScalef3);
                     }
                     else
                     {
@@ -577,7 +606,7 @@ namespace EngineCore
 
                     ImGui::TextColored(textColor, "=== Actor Components ===");
                     ImGui::Separator();
-                    if (Inside(actorCurrent, 0, actorItems.size() - 1))
+                    if (pSelectedActor)
                     {
                         if (ImGui::Button("Add Component"))
                         {
@@ -590,8 +619,7 @@ namespace EngineCore
                         }
 
                         int componentIndex = 0;
-                        for (auto i = actorItems[actorCurrent].m_Components.begin();
-                            i != actorItems[actorCurrent].m_Components.end(); ++i)
+                        for (auto i = pSelectedActor->m_Components.begin(); i != pSelectedActor->m_Components.end(); ++i)
                         {
                             std::string Component = "> " + *i + "";
                             if (ImGui::Selectable(Component.c_str(), componentIndex == componentOfActorCurrent))
@@ -609,12 +637,17 @@ namespace EngineCore
                 }
                 else if (leftEnableTab == 1)
                 {
+                    ClassItem* selectedClass = Inside(classCurrent, 0, classItems.size() - 1) ?
+                        &classItems[classCurrent] : nullptr;
+                    std::shared_ptr<GLRenderable> selectedClassRenderObj = selectedClass ?
+                        classesInSceneForRender[selectedClass->m_Name] : nullptr;
+
                     ImGui::TextColored(textColor, "=== Class Details ===");
                     ImGui::Separator();
                     
-                    if (Inside(classCurrent, 0, classItems.size() - 1))
+                    if (selectedClass)
                     {
-                        ImGui::Text("Class Name: %s", classItemsChar[classCurrent]);
+                        ImGui::Text("Class Name: %s", selectedClass->m_Name);
                     }
                     else
                     {
@@ -624,92 +657,90 @@ namespace EngineCore
 
                     ImGui::TextColored(textColor, "=== Class Visibility===");
                     ImGui::Separator();
-                    if (Inside(classCurrent, 0, classItems.size() - 1) &&
-                        classItems[classCurrent].m_Render)
+                    if (selectedClass && selectedClass->m_Render)
                     {
-                        classDiffuseColor.x = classItems[classCurrent].m_DiffuseColor.x();
-                        classDiffuseColor.y = classItems[classCurrent].m_DiffuseColor.y();
-                        classDiffuseColor.z = classItems[classCurrent].m_DiffuseColor.z();
-                        classDiffuseColor.w = 1;
-
-                        const int imageSize = rightWindowWidth - 32;
-
                         ImGui::PushItemWidth(-FLT_MIN);
 
                         ImGui::Text("Model");
 
-                        classModelCurrent = revAssetModel.count(classItems[classCurrent].m_Model) ?
-                            revAssetModel[classItems[classCurrent].m_Model] : -1;
-
+                        classModelCurrent = revAssetModel.count(selectedClass->m_Model) ?
+                            revAssetModel[selectedClass->m_Model] : 0;
                         ImGui::Combo("##Model", &classModelCurrent, assetModel.data(), assetModel.size());
-                        classItems[classCurrent].m_Model = assetModel[classModelCurrent];
-                        classesInSceneForRender[classItems[classCurrent].m_Name]->reLoadModel(classItems[classCurrent].m_Model);
+                        selectedClass->m_Model = assetModel[classModelCurrent];
+                        selectedClassRenderObj->reLoadModel(classItems[classCurrent].m_Model);
 
                         ImGui::Text("Shader");
 
-                        classShaderCurrent = glManager.getIdxOfSupportShader(classItems[classCurrent].m_Shader);
+                        classShaderCurrent = glManager.getIdxOfSupportShader(selectedClass->m_Shader);
                         ImGui::Combo("##Shader", &classShaderCurrent, avaliableShader, avaliableShaderCount);
-                        classItems[classCurrent].m_Shader = glManager.getSupportShaderAt(classShaderCurrent);
-                        classesInSceneForRender[classItems[classCurrent].m_Name]->setShader(classItems[classCurrent].m_Shader);
+                        selectedClass->m_Shader = glManager.getSupportShaderAt(classShaderCurrent);
+                        selectedClassRenderObj->setShader(selectedClass->m_Shader);
                         
                         ImGui::Text("Diffuse Color");
+
+                        classDiffuseColor.x = selectedClass->m_DiffuseColor.x();
+                        classDiffuseColor.y = selectedClass->m_DiffuseColor.y();
+                        classDiffuseColor.z = selectedClass->m_DiffuseColor.z();
+                        classDiffuseColor.w = 1;
+
+                        const int imageSize = rightWindowWidth - 32;
+
                         ImGui::ColorEdit3("##DiffuseColor", (float*)&classDiffuseColor);
                         ImGui::ColorButton("", *(ImVec4*)&classDiffuseColor, 0, ImVec2(imageSize, 48));
-                        classItems[classCurrent].m_DiffuseColor.x() = classDiffuseColor.x;
-                        classItems[classCurrent].m_DiffuseColor.y() = classDiffuseColor.y;
-                        classItems[classCurrent].m_DiffuseColor.z() = classDiffuseColor.z;
-                        classesInSceneForRender[classItems[classCurrent].m_Name]->setDiffuseColor(classItems[classCurrent].m_DiffuseColor);
+                        selectedClass->m_DiffuseColor.x() = classDiffuseColor.x;
+                        selectedClass->m_DiffuseColor.y() = classDiffuseColor.y;
+                        selectedClass->m_DiffuseColor.z() = classDiffuseColor.z;
+                        selectedClassRenderObj->setDiffuseColor(selectedClass->m_DiffuseColor);
 
-                        classEnableDiffuse = classItems[classCurrent].m_EnableDiffuseTexture;
+                        classEnableDiffuse = selectedClass->m_EnableDiffuseTexture;
                         ImGui::Checkbox("Enable Diffuse", &classEnableDiffuse);
-                        classItems[classCurrent].m_EnableDiffuseTexture = classEnableDiffuse;
-                        classesInSceneForRender[classItems[classCurrent].m_Name]->EnableDiffuseTexture(classEnableDiffuse);
+                        selectedClass->m_EnableDiffuseTexture = classEnableDiffuse;
+                        selectedClassRenderObj->EnableDiffuseTexture(classEnableDiffuse);
 
                         if (classEnableDiffuse)
                         {
-                            classDiffuseCurrent = revAssetTexture.count(classItems[classCurrent].m_DiffuseTexture) ?
-                                revAssetTexture[classItems[classCurrent].m_DiffuseTexture] : -1;
+                            classDiffuseCurrent = revAssetTexture.count(selectedClass->m_DiffuseTexture) ?
+                                revAssetTexture[selectedClass->m_DiffuseTexture] : 0;
 
                             ImGui::Combo("##DiffuseTexture", &classDiffuseCurrent, assetTexture.data(), assetTexture.size());
-                            classItems[classCurrent].m_DiffuseTexture = assetTexture[classDiffuseCurrent];
-                            classesInSceneForRender[classItems[classCurrent].m_Name]->reLoadDiffuseTexture(classItems[classCurrent].m_DiffuseTexture);
+                            selectedClass->m_DiffuseTexture = assetTexture[classDiffuseCurrent];
+                            selectedClassRenderObj->reLoadDiffuseTexture(selectedClass->m_DiffuseTexture);
 
-                            auto renderObj = classesInSceneForRender[classItems[classCurrent].m_Name];
-                            ImGui::Image((void*)renderObj->getDiffuseTextureID(), ImVec2(imageSize, imageSize));
+                            ImGui::Image((void*)selectedClassRenderObj->getDiffuseTextureID(), ImVec2(imageSize, imageSize));
                         }
 
-                        classEnableNormal = classItems[classCurrent].m_EnableNormalTexture;
+                        classEnableNormal = selectedClass->m_EnableNormalTexture;
                         ImGui::Checkbox("Enable Normal", &classEnableNormal);
-                        classItems[classCurrent].m_EnableNormalTexture = classEnableNormal;
+                        selectedClass->m_EnableNormalTexture = classEnableNormal;
+                        selectedClassRenderObj->EnableNormalTexture(classEnableNormal);
 
                         if (classEnableNormal)
                         {
-                            classNormalCurrent = revAssetTexture.count(classItems[classCurrent].m_NormalTexture) ?
-                                revAssetTexture[classItems[classCurrent].m_NormalTexture] : 0;
+                            classNormalCurrent = revAssetTexture.count(selectedClass->m_NormalTexture) ?
+                                revAssetTexture[selectedClass->m_NormalTexture] : 0;
 
                             ImGui::Combo("##NormalTexture", &classNormalCurrent, assetTexture.data(), assetTexture.size());
-                            classItems[classCurrent].m_NormalTexture = assetTexture[classNormalCurrent];
-                            classesInSceneForRender[classItems[classCurrent].m_Name]->reLoadNormalTexture(classItems[classCurrent].m_NormalTexture);
+                            selectedClass->m_NormalTexture = assetTexture[classNormalCurrent];
+                            selectedClassRenderObj->reLoadNormalTexture(selectedClass->m_NormalTexture);
 
-                            auto renderObj = classesInSceneForRender[classItems[classCurrent].m_Name];
-                            ImGui::Image((void*)renderObj->getNormalTextureID(), ImVec2(imageSize, imageSize));
+                            ImGui::Image((void*)selectedClassRenderObj->getNormalTextureID(), ImVec2(imageSize, imageSize));
                         }
                         
-                        classEnableSpecular = classItems[classCurrent].m_EnableSpecularTexture;
+                        classEnableSpecular = selectedClass->m_EnableSpecularTexture;
                         ImGui::Checkbox("Enable Specular", &classEnableSpecular);
-                        classItems[classCurrent].m_EnableSpecularTexture = classEnableSpecular;
+                        selectedClass->m_EnableSpecularTexture = classEnableSpecular;
+                        selectedClassRenderObj->EnableSpecularTexture(classEnableSpecular);
 
                         if (classEnableSpecular)
                         {
-                            classSpecularCurrent = revAssetTexture.count(classItems[classCurrent].m_SpecularTexture) ?
-                                revAssetTexture[classItems[classCurrent].m_SpecularTexture] : 0;
+                            classSpecularCurrent = revAssetTexture.count(selectedClass->m_SpecularTexture) ?
+                                revAssetTexture[selectedClass->m_SpecularTexture] : 0;
 
                             ImGui::Combo("##SpecularTexture", &classSpecularCurrent, assetTexture.data(), assetTexture.size());
-                            classItems[classCurrent].m_SpecularTexture = assetTexture[classSpecularCurrent];
-                            classesInSceneForRender[classItems[classCurrent].m_Name]->reLoadSpecularTexture(classItems[classCurrent].m_SpecularTexture);
+                            selectedClass->m_SpecularTexture = assetTexture[classSpecularCurrent];
+                            selectedClassRenderObj->reLoadSpecularTexture(selectedClass->m_SpecularTexture);
 
-                            auto renderObj = classesInSceneForRender[classItems[classCurrent].m_Name];
-                            ImGui::Image((void*)renderObj->getSpecularTextureID(), ImVec2(imageSize, imageSize));
+                            ImGui::Image((void*)selectedClassRenderObj->getSpecularTextureID(), ImVec2(imageSize, imageSize));
                         }
 
                         ImGui::PopItemWidth();
@@ -726,7 +757,7 @@ namespace EngineCore
 
                     if (Inside(componentCurrent, 0, componentItems.size() - 1))
                     {
-                        ImGui::Text("Component Name: %s", componentItemsChar[componentCurrent]);
+                        ImGui::Text("Component Name: %s", componentItems[componentCurrent].m_Name.c_str());
                     }
                     else
                     {
@@ -920,6 +951,8 @@ namespace EngineCore
 
                     if (ImGui::BeginTabItem("Class"))
                     {
+                        bool canAddClass = (!assetModel.empty()) && (!assetTexture.empty());
+                        if (!canAddClass) uiBeginDisable();
                         if (ImGui::Button("New Class", toolboxButtonSize))
                         {
                             AssetManager::getAssetList(assetList, assetTypeList);
@@ -929,6 +962,8 @@ namespace EngineCore
 
                             ImGui::OpenPopup("New Class");
                         }
+                        if (!canAddClass) uiEndDisable();
+
                         if (ImGui::BeginPopupModal("New Class", nullptr, popWinFlag))
                         {
                             ImGui::Text("Guide for Create new Class");

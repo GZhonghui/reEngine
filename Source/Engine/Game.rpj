@@ -19,9 +19,9 @@
       <Model>Box.obj</Model>
       <Shader>Default</Shader>
       <DiffuseColor x="1.0000000000" y="0.9999899864" z="0.9999899864"/>
-      <DiffuseTexture Enable="True">BoxDiffuse.png</DiffuseTexture>
-      <NormalTexture Enable="False"/>
-      <SpecularTexture Enable="False"/>
+      <DiffuseTexture Enable="True">BeeTexture.png</DiffuseTexture>
+      <NormalTexture Enable="True">BeeTexture.png</NormalTexture>
+      <SpecularTexture Enable="True">BoxDiffuse.png</SpecularTexture>
       <N>1.4000000000</N>
     </ClassItem>
   </Class>

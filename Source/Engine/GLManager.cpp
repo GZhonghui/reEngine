@@ -608,6 +608,7 @@ void GLManager::Render
 
     if (renderObj->m_Shader == "Default")
     {
+        glUseProgram(m_ShaderManager.m_DefaultShaderProgramID);
         usedShaderID = m_ShaderManager.m_DefaultShaderProgramID;
 
         glUniform3f(glGetUniformLocation(usedShaderID, "lightDir"), m_LightDir.x(), m_LightDir.y(), m_LightDir.z());
@@ -658,6 +659,7 @@ void GLManager::Render
     }
     else if (renderObj->m_Shader == "Glass")
     {
+        glUseProgram(m_ShaderManager.m_GlassShaderProgramID);
         usedShaderID = m_ShaderManager.m_GlassShaderProgramID;
     }
     else
