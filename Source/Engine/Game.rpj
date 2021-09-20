@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  <World>
+    <LightDir x="-1.6799999475" y="-0.0299999993" z="2.1800000668"/>
+    <LightColor x="0.9264705777" y="0.8815893531" z="0.8538061976"/>
+    <LightPower>3.3853770000</LightPower>
+    <Skybox>Water</Skybox>
+  </World>
+  <Actor>
+    <ActorItem Name="Car_Default" ClassName="Car">
+      <Tag>Actor_Car</Tag>
+      <Location x="0.0000000000" y="0.0000000000" z="0.0000000000"/>
+      <Rotation x="0.0000000000" y="0.0000000000" z="0.0000000000"/>
+      <Scale x="1.0000000000" y="1.0000000000" z="1.0000000000"/>
+    </ActorItem>
+  </Actor>
+  <Class>
+    <ClassItem Name="Car" Render="True">
+      <Model>Box.obj</Model>
+      <Shader>Default</Shader>
+      <DiffuseColor x="1.0000000000" y="0.9999899864" z="0.9999899864"/>
+      <DiffuseTexture Enable="True">BoxDiffuse.png</DiffuseTexture>
+      <NormalTexture Enable="False"/>
+      <SpecularTexture Enable="False"/>
+      <N>1.4000000000</N>
+    </ClassItem>
+  </Class>
+  <Component>
+    <ComponentItem Name="Moving"/>
+  </Component>
+</Project>

@@ -222,7 +222,7 @@ inline void updateInitHeader
         //For Each
         auto addInclude = [initHeader](const char* className)
         {
-            fprintf(initHeader, "#include\"impl%s.h\"\n\n", className);
+            fprintf(initHeader, "#include\"implClass_%s.h\"\n\n", className);
         };
 
         for (auto classIndex = classItems.begin(); classIndex != classItems.end(); ++classIndex)

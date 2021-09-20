@@ -135,7 +135,7 @@ public:
 
         VP[1] = m_P;
 
-        m_Skybox.Render(VP);
+        m_Grid.Render(VP);
     }
 
 protected:

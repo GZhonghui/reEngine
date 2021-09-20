@@ -203,6 +203,8 @@ namespace EngineCore
         glManager.setLightDir(worldSettings.m_LightDir);
         glManager.setLightColor(worldSettings.m_LightColor);
         glManager.setLightPower(worldSettings.m_LightPower);
+
+        glManager.ChangeSkybox(glManager.getIdxOfSkybox(worldSettings.m_Skybox));
     }
 
     void collectWorldSettings()
@@ -210,6 +212,8 @@ namespace EngineCore
         worldSettings.m_LightDir = glManager.getLightDir();
         worldSettings.m_LightColor = glManager.getLightColor();
         worldSettings.m_LightPower = glManager.getLightPower();
+
+        worldSettings.m_Skybox = glManager.getSkyboxAt(glManager.getNowSkybox());
     }
 
     void loadClassForRender()

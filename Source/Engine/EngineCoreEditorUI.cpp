@@ -74,6 +74,7 @@ namespace EngineCore
         const ImVec4 textColor = ImVec4(colorGreen.x(), colorGreen.y(), colorGreen.z(), 1.0);
 
         const char* avaliableShader = glManager.getSupportShaderList();
+        const int   avaliableShaderCount = glManager.getSupportShaderCount();
 
         // Part 2 Const
         const double lightPowerMin = 0.1;
@@ -104,8 +105,8 @@ namespace EngineCore
         static int selectedAssetID = -1;// In Asset Viewer
 
         // Part 2 Static
-        static int tagCurrent = -1;
-        static std::string tagCurrentStr;
+        static int tagOfActorCurrent = -1;
+        static std::string tagOfActorCurrentStr;
 
         static char newTagName[32];
 
@@ -113,18 +114,25 @@ namespace EngineCore
         static float actorRotationf3[3];
         static float actorScalef3[3];
 
-        static int  classModelCurrent    = 0;
+        static int componentOfActorCurrent = -1;
+        static std::string componentOfActorCurrentStr;
 
-        static bool classEnableDiffuse   = false;
-        static int  classDiffuseCurrent  = 0;
+        static int classShaderCurrent = 0;
 
-        static bool classEnableNormal    = false;
-        static int  classNormalCurrent   = 0;
+        static int classModelCurrent = 0;
+
+        static float classN = 1.4;
+
+        static ImVec4 classDiffuseColor;
+
+        static bool classEnableDiffuse  = false;
+        static int  classDiffuseCurrent = 0;
+
+        static bool classEnableNormal  = false;
+        static int  classNormalCurrent = 0;
 
         static bool classEnableSpecular  = false;
         static int  classSpecularCurrent = 0;
-
-        static ImVec4 classDiffuseColor;
 
         static double cameraMoveSpeed = 3.0;
 
@@ -138,10 +146,10 @@ namespace EngineCore
 
         // Part 3 Static
         static char newActorName[32];
-        static int  selectClassInNewActor = 0;// Combo
+        static int  selectClassInNewActor = 0; // Combo
 
         static char newClassName[32];
-        static bool newClassAddActor = false;
+        static bool newClassAddActor = false; // Check box
         static bool renderNewClass = false; // Check box
 
         static int renderNewClassModelCurrent = 0;
@@ -150,9 +158,16 @@ namespace EngineCore
 
         static float renderNewClassDiffuseColorf3[3];
 
-        static int renderNewClassDiffuseTextureCurrent  = 0;
-        static int renderNewClassNormalTextureCurrent   = 0;
-        static int renderNewClassSpecularTextureCurrent = 0;
+        static bool renderNewClassEnableDiffuseTexture  = false;
+        static int  renderNewClassDiffuseTextureCurrent = 0;
+
+        static bool renderNewClassEnableNormalTexture  = false;
+        static int  renderNewClassNormalTextureCurrent = 0;
+
+        static bool renderNewClassEnableSpecularTexture  = false;
+        static int  renderNewClassSpecularTextureCurrent = 0;
+
+        static float renderNewClassN = 1.4;
 
         static char newComponentName[32];
 
@@ -184,6 +199,11 @@ namespace EngineCore
 
         std::vector<const char*> assetModel;
         std::vector<const char*> assetTexture;
+
+        std::unordered_map<std::string, int> revAssetModel;
+        std::unordered_map<std::string, int> revAssetTexture;
+        
+        std::unordered_set<std::string> cantDeleteAssets;
         // === LOCAL ===
 
         // Update Once
@@ -193,8 +213,6 @@ namespace EngineCore
             FirstFrame = false;
             
             AssetManager::getAssetList(assetList, assetTypeList);
-            
-            glManager.ChangeSkybox(glManager.getIdxOfSkybox(worldSettings.m_Skybox));
         }
 
         // === Update ===
@@ -223,19 +241,24 @@ namespace EngineCore
                     classesInSceneForRender[classIndex->m_Name]->setShader(classIndex->m_Shader);
 
                     classesInSceneForRender[classIndex->m_Name]->reLoadModel(classIndex->m_Model);
+                    cantDeleteAssets.insert(classIndex->m_Model);
+
                     classesInSceneForRender[classIndex->m_Name]->setDiffuseColor(classIndex->m_DiffuseColor);
 
                     if (classIndex->m_EnableDiffuseTexture)
                     {
                         classesInSceneForRender[classIndex->m_Name]->reLoadDiffuseTexture(classIndex->m_DiffuseTexture);
+                        cantDeleteAssets.insert(classIndex->m_DiffuseTexture);
                     }
                     if (classIndex->m_EnableNormalTexture)
                     {
                         classesInSceneForRender[classIndex->m_Name]->reLoadNormalTexture(classIndex->m_NormalTexture);
+                        cantDeleteAssets.insert(classIndex->m_NormalTexture);
                     }
                     if (classIndex->m_EnableSpecularTexture)
                     {
                         classesInSceneForRender[classIndex->m_Name]->reLoadSpecularTexture(classIndex->m_SpecularTexture);
+                        cantDeleteAssets.insert(classIndex->m_SpecularTexture);
                     }
                     classesInSceneForRender[classIndex->m_Name]->setN(classIndex->m_N);
                 }
@@ -254,6 +277,9 @@ namespace EngineCore
             }
         }
 
+        int assetModelIndex = 0;
+        int assetTextureIndex = 0;
+
         assetModel.clear();
         assetTexture.clear();
         for (auto assetIdx = 0; assetIdx < assetList.size(); ++assetIdx)
@@ -261,10 +287,12 @@ namespace EngineCore
             if (assetTypeList[assetIdx] == aType::MODEL)
             {
                 assetModel.push_back(assetList[assetIdx].c_str());
+                revAssetModel[assetList[assetIdx]] = assetModelIndex++;
             }
             else if (assetTypeList[assetIdx] == aType::TEXTURE)
             {
                 assetTexture.push_back(assetList[assetIdx].c_str());
+                revAssetTexture[assetList[assetIdx]] = assetTextureIndex++;
             }
         }
         // === Update ===
@@ -374,10 +402,10 @@ namespace EngineCore
                     }
                     ImGui::SameLine();
 
-                    bool canDeleteAsset = Inside(selectedAssetID, 0, assetList.size() - 1);
+                    bool canDeleteAsset = Inside(selectedAssetID, 0, assetList.size() - 1) &&
+                        !cantDeleteAssets.count(assetList[selectedAssetID]);
 
                     if (!canDeleteAsset) uiBeginDisable();
-
                     if (ImGui::Button("Delete"))
                     {
                         AssetManager::deleteAsset(assetList[selectedAssetID]);
@@ -435,10 +463,10 @@ namespace EngineCore
                                 i != actorItems[actorCurrent].m_Tags.end(); ++i)
                             {
                                 std::string Tag = "> [" + *i + "]";
-                                if (ImGui::Selectable(Tag.c_str(), tagIndex == tagCurrent))
+                                if (ImGui::Selectable(Tag.c_str(), tagIndex == tagOfActorCurrent))
                                 {
-                                    tagCurrent = tagIndex;
-                                    tagCurrentStr = *i;
+                                    tagOfActorCurrent = tagIndex;
+                                    tagOfActorCurrentStr = *i;
                                 }
                                 tagIndex += 1;
                             }
@@ -447,7 +475,7 @@ namespace EngineCore
                             {
                                 ImGui::OpenPopup("New Tag");
                             }
-                            if (ImGui::BeginPopupModal("New Tag", nullptr, popWinFlag))
+                            if (ImGui::BeginPopup("New Tag", popWinFlag))
                             {
                                 ImGui::Text("Guide for Add a Tag for %s", actorItemsChar[actorCurrent]);
                                 ImGui::Separator();
@@ -480,24 +508,22 @@ namespace EngineCore
                             }
                             ImGui::SameLine();
                             
+                            bool canDeleteTag = Inside(tagOfActorCurrent, 0, actorItems[actorCurrent].m_Tags.size() - 1);
+                            if (!canDeleteTag) uiBeginDisable();
                             if (ImGui::Button("Del Tag"))
                             {
-                                if (leftEnableTab == 0 &&
-                                    actorCurrent >= 0 && actorCurrent < actorItemsChar.size() &&
-                                    tagCurrent >= 0 && tagCurrent < actorItems[actorCurrent].m_Tags.size())
-                                {
-                                    Out::Log(pType::MESSAGE, "Delete Tag [%s] for %s", tagCurrentStr.c_str(),
-                                        actorItemsChar[actorCurrent]);
-                                    actorItems[actorCurrent].m_Tags.erase(tagCurrentStr);
-                                }
+                                Out::Log(pType::MESSAGE, "Delete Tag [%s] for %s", tagOfActorCurrentStr.c_str(),
+                                    actorItemsChar[actorCurrent]);
+                                actorItems[actorCurrent].m_Tags.erase(tagOfActorCurrentStr);
                             }
+                            if (!canDeleteTag) uiEndDisable();
                             ImGui::TreePop();
                         }
                     }
                     else
                     {
-                        tagCurrent = -1;
-                        tagCurrentStr.clear();
+                        tagOfActorCurrent = -1;
+                        tagOfActorCurrentStr.clear();
 
                         ImGui::Text("No Actor Selected");
                     }
@@ -505,28 +531,30 @@ namespace EngineCore
 
                     ImGui::TextColored(textColor, "=== Actor Transform ===");
                     ImGui::Separator();
-                    if (actorCurrent >= 0 && actorCurrent < actorItemsChar.size())
+                    if (Inside(actorCurrent, 0, actorItems.size() - 1))
                     {
                         ImGui::Text("Location ");
                         ImGui::SameLine();
                         if (ImGui::Button("Reset##Location"))
                         {
-                            actorItems[actorCurrent].m_Location = Eigen::Vector3d(0);
+                            actorItems[actorCurrent].m_Location = Eigen::Vector3d(0, 0, 0);
                         }
                         Fill(actorLocationf3, actorItems[actorCurrent].m_Location);
                         ImGui::PushItemWidth(-FLT_MIN);
                         ImGui::DragFloat3("##Location", actorLocationf3, 0.01f);
+                        ImGui::PopItemWidth();
                         Fill(actorItems[actorCurrent].m_Location, actorLocationf3);
 
                         ImGui::Text("Rotation ");
                         ImGui::SameLine();
                         if (ImGui::Button("Reset##Rotation"))
                         {
-                            actorItems[actorCurrent].m_Rotation = Eigen::Vector3d(0);
+                            actorItems[actorCurrent].m_Rotation = Eigen::Vector3d(0, 0, 0);
                         }
                         Fill(actorRotationf3, actorItems[actorCurrent].m_Rotation);
                         ImGui::PushItemWidth(-FLT_MIN);
                         ImGui::DragFloat3("##Rotation", actorRotationf3, 0.1f, -360.0f, 360.0f);
+                        ImGui::PopItemWidth();
                         Fill(actorItems[actorCurrent].m_Rotation, actorRotationf3);
 
                         ImGui::Text("Scale    ");
@@ -538,6 +566,7 @@ namespace EngineCore
                         Fill(actorScalef3, actorItems[actorCurrent].m_Scale);
                         ImGui::PushItemWidth(-FLT_MIN);
                         ImGui::DragFloat3("##Scale", actorScalef3, 0.001f, 0.1f, 10.0f);
+                        ImGui::PopItemWidth();
                         Fill(actorItems[actorCurrent].m_Scale, actorScalef3);
                     }
                     else
@@ -548,21 +577,42 @@ namespace EngineCore
 
                     ImGui::TextColored(textColor, "=== Actor Components ===");
                     ImGui::Separator();
-                    if (ImGui::Button("Add Component"))
+                    if (Inside(actorCurrent, 0, actorItems.size() - 1))
                     {
+                        if (ImGui::Button("Add Component"))
+                        {
 
+                        }
+                        ImGui::SameLine();
+                        if (ImGui::Button("Del Component"))
+                        {
+
+                        }
+
+                        int componentIndex = 0;
+                        for (auto i = actorItems[actorCurrent].m_Components.begin();
+                            i != actorItems[actorCurrent].m_Components.end(); ++i)
+                        {
+                            std::string Component = "> " + *i + "";
+                            if (ImGui::Selectable(Component.c_str(), componentIndex == componentOfActorCurrent))
+                            {
+                                componentOfActorCurrent = componentIndex;
+                                componentOfActorCurrentStr = *i;
+                            }
+                            componentIndex += 1;
+                        }
                     }
-                    ImGui::SameLine();
-                    if (ImGui::Button("Del Component"))
+                    else
                     {
-
+                        ImGui::Text("N/A");
                     }
                 }
                 else if (leftEnableTab == 1)
                 {
                     ImGui::TextColored(textColor, "=== Class Details ===");
                     ImGui::Separator();
-                    if (classCurrent >= 0 && classCurrent < classItemsChar.size())
+                    
+                    if (Inside(classCurrent, 0, classItems.size() - 1))
                     {
                         ImGui::Text("Class Name: %s", classItemsChar[classCurrent]);
                     }
@@ -574,7 +624,7 @@ namespace EngineCore
 
                     ImGui::TextColored(textColor, "=== Class Visibility===");
                     ImGui::Separator();
-                    if (classCurrent >= 0 && classCurrent < classItemsChar.size() &&
+                    if (Inside(classCurrent, 0, classItems.size() - 1) &&
                         classItems[classCurrent].m_Render)
                     {
                         classDiffuseColor.x = classItems[classCurrent].m_DiffuseColor.x();
@@ -587,41 +637,103 @@ namespace EngineCore
                         ImGui::PushItemWidth(-FLT_MIN);
 
                         ImGui::Text("Model");
+
+                        classModelCurrent = revAssetModel.count(classItems[classCurrent].m_Model) ?
+                            revAssetModel[classItems[classCurrent].m_Model] : -1;
+
                         ImGui::Combo("##Model", &classModelCurrent, assetModel.data(), assetModel.size());
+                        classItems[classCurrent].m_Model = assetModel[classModelCurrent];
+                        classesInSceneForRender[classItems[classCurrent].m_Name]->reLoadModel(classItems[classCurrent].m_Model);
+
                         ImGui::Text("Shader");
-                        static int whichShader = 0;
-                        ImGui::Combo("##Shader", &whichShader, "Phong\0Glass\0", 2);
+
+                        classShaderCurrent = glManager.getIdxOfSupportShader(classItems[classCurrent].m_Shader);
+                        ImGui::Combo("##Shader", &classShaderCurrent, avaliableShader, avaliableShaderCount);
+                        classItems[classCurrent].m_Shader = glManager.getSupportShaderAt(classShaderCurrent);
+                        classesInSceneForRender[classItems[classCurrent].m_Name]->setShader(classItems[classCurrent].m_Shader);
+                        
                         ImGui::Text("Diffuse Color");
                         ImGui::ColorEdit3("##DiffuseColor", (float*)&classDiffuseColor);
                         ImGui::ColorButton("", *(ImVec4*)&classDiffuseColor, 0, ImVec2(imageSize, 48));
+                        classItems[classCurrent].m_DiffuseColor.x() = classDiffuseColor.x;
+                        classItems[classCurrent].m_DiffuseColor.y() = classDiffuseColor.y;
+                        classItems[classCurrent].m_DiffuseColor.z() = classDiffuseColor.z;
+                        classesInSceneForRender[classItems[classCurrent].m_Name]->setDiffuseColor(classItems[classCurrent].m_DiffuseColor);
+
+                        classEnableDiffuse = classItems[classCurrent].m_EnableDiffuseTexture;
                         ImGui::Checkbox("Enable Diffuse", &classEnableDiffuse);
+                        classItems[classCurrent].m_EnableDiffuseTexture = classEnableDiffuse;
+                        classesInSceneForRender[classItems[classCurrent].m_Name]->EnableDiffuseTexture(classEnableDiffuse);
+
                         if (classEnableDiffuse)
                         {
+                            classDiffuseCurrent = revAssetTexture.count(classItems[classCurrent].m_DiffuseTexture) ?
+                                revAssetTexture[classItems[classCurrent].m_DiffuseTexture] : -1;
+
                             ImGui::Combo("##DiffuseTexture", &classDiffuseCurrent, assetTexture.data(), assetTexture.size());
-                            if (classesInSceneForRender.count(classItems[classCurrent].m_Name))
-                            {
-                                ImGui::Image((void*)classesInSceneForRender[classItems[classCurrent].m_Name]->getDiffuseTextureID(),
-                                    ImVec2(imageSize, imageSize));
-                            }
+                            classItems[classCurrent].m_DiffuseTexture = assetTexture[classDiffuseCurrent];
+                            classesInSceneForRender[classItems[classCurrent].m_Name]->reLoadDiffuseTexture(classItems[classCurrent].m_DiffuseTexture);
+
+                            auto renderObj = classesInSceneForRender[classItems[classCurrent].m_Name];
+                            ImGui::Image((void*)renderObj->getDiffuseTextureID(), ImVec2(imageSize, imageSize));
                         }
+
+                        classEnableNormal = classItems[classCurrent].m_EnableNormalTexture;
                         ImGui::Checkbox("Enable Normal", &classEnableNormal);
+                        classItems[classCurrent].m_EnableNormalTexture = classEnableNormal;
+
                         if (classEnableNormal)
                         {
-                            // ImGui::Text("Normal");
+                            classNormalCurrent = revAssetTexture.count(classItems[classCurrent].m_NormalTexture) ?
+                                revAssetTexture[classItems[classCurrent].m_NormalTexture] : 0;
+
                             ImGui::Combo("##NormalTexture", &classNormalCurrent, assetTexture.data(), assetTexture.size());
+                            classItems[classCurrent].m_NormalTexture = assetTexture[classNormalCurrent];
+                            classesInSceneForRender[classItems[classCurrent].m_Name]->reLoadNormalTexture(classItems[classCurrent].m_NormalTexture);
+
+                            auto renderObj = classesInSceneForRender[classItems[classCurrent].m_Name];
+                            ImGui::Image((void*)renderObj->getNormalTextureID(), ImVec2(imageSize, imageSize));
                         }
+                        
+                        classEnableSpecular = classItems[classCurrent].m_EnableSpecularTexture;
                         ImGui::Checkbox("Enable Specular", &classEnableSpecular);
+                        classItems[classCurrent].m_EnableSpecularTexture = classEnableSpecular;
+
                         if (classEnableSpecular)
                         {
-                            // ImGui::Text("Specular");
+                            classSpecularCurrent = revAssetTexture.count(classItems[classCurrent].m_SpecularTexture) ?
+                                revAssetTexture[classItems[classCurrent].m_SpecularTexture] : 0;
+
                             ImGui::Combo("##SpecularTexture", &classSpecularCurrent, assetTexture.data(), assetTexture.size());
+                            classItems[classCurrent].m_SpecularTexture = assetTexture[classSpecularCurrent];
+                            classesInSceneForRender[classItems[classCurrent].m_Name]->reLoadSpecularTexture(classItems[classCurrent].m_SpecularTexture);
+
+                            auto renderObj = classesInSceneForRender[classItems[classCurrent].m_Name];
+                            ImGui::Image((void*)renderObj->getSpecularTextureID(), ImVec2(imageSize, imageSize));
                         }
+
+                        ImGui::PopItemWidth();
                     }
                     else
                     {
                         ImGui::Text("N/A");
                     }
                 }
+                else if (leftEnableTab == 2)
+                {
+                    ImGui::TextColored(textColor, "=== Component Details ===");
+                    ImGui::Separator();
+
+                    if (Inside(componentCurrent, 0, componentItems.size() - 1))
+                    {
+                        ImGui::Text("Component Name: %s", componentItemsChar[componentCurrent]);
+                    }
+                    else
+                    {
+                        ImGui::Text("No Component Selected");
+                    }
+                }
+
                 ImGui::End();
             }
 
@@ -636,11 +748,11 @@ namespace EngineCore
 
                 if (Event::mouseAsCursor)
                 {
-                    ImGui::TextColored(ImVec4(1, 0, 0, 1), "> Cursor");
+                    ImGui::TextColored(ImVec4(1, 0, 0, 1), "> [C]ursor");
                 }
                 else
                 {
-                    ImGui::TextColored(ImVec4(1, 1, 0, 1), "> Move");
+                    ImGui::TextColored(ImVec4(1, 1, 0, 1), "> [M]oving");
                 }
 
                 ImGui::Text("Location (%6.2lf,%6.2lf,%6.2lf)", cameraLocation.x(), cameraLocation.y(), cameraLocation.z());
@@ -650,36 +762,31 @@ namespace EngineCore
                 ImGui::PushItemWidth(-FLT_MIN);
                 ImGui::SliderScalar("##CameraMoveSpeed", ImGuiDataType_Double,
                     &cameraMoveSpeed, &cameraMoveSpeedMin, &cameraMoveSpeedMax);
+                ImGui::PopItemWidth();
                 ImGui::Text("");
-
-                auto glLightDir   = glManager.getLightDir();
-                auto glLightColor = glManager.getLightColor();
-                auto glLightPower = glManager.getLightPower();
-
-                lightDirf3[0] = glLightDir.x();
-                lightDirf3[1] = glLightDir.y();
-                lightDirf3[2] = glLightDir.z();
-
-                lightColorf3[0] = glLightColor.x();
-                lightColorf3[1] = glLightColor.y();
-                lightColorf3[2] = glLightColor.z();
-
-                lightPower = glLightPower;
 
                 ImGui::TextColored(textColor, "=== Light ===");
                 ImGui::Separator();
 
-                ImGui::Text("Direction");
+                auto glLightDir = glManager.getLightDir();
+                auto glLightColor = glManager.getLightColor();
+                auto glLightPower = glManager.getLightPower();
+
+                Fill(lightDirf3, glLightDir);
+                Fill(lightColorf3, glLightColor);
+
+                lightPower = glLightPower;
+
                 ImGui::PushItemWidth(-FLT_MIN);
-                ImGui::DragFloat3("##LightDirection", lightDirf3, 0.01f, -1.0f, 1.0f);
+                ImGui::Text("Direction");
+                ImGui::DragFloat3("##LightDirection", lightDirf3, 0.01f, -5.0f, 5.0f);
 
                 ImGui::Text("Color");
-                // ImGui::PushItemWidth(-FLT_MIN);
                 ImGui::ColorEdit3("##LightColor", lightColorf3);
 
                 ImGui::Text("Power");
-                ImGui::PushItemWidth(-FLT_MIN);
                 ImGui::SliderScalar("##LightPower", ImGuiDataType_Double, &lightPower, &lightPowerMin, &lightPowerMax);
+                ImGui::PopItemWidth();
 
                 glManager.setLightDir(Direction(lightDirf3[0], lightDirf3[1], lightDirf3[2]));
                 glManager.setLightColor(Color(lightColorf3[0], lightColorf3[1], lightColorf3[2]));
@@ -688,13 +795,14 @@ namespace EngineCore
 
                 ImGui::TextColored(textColor, "=== Skybox ===");
                 ImGui::Separator();
+
+                skyboxCurrent = glManager.getNowSkybox();
+
                 ImGui::PushItemWidth(-FLT_MIN);
                 ImGui::Combo("##Skybox", &skyboxCurrent, skyboxChoices, skyboxChoicesCount);
-                if (skyboxCurrent != skyboxLast)
-                {
-                    skyboxLast = skyboxCurrent;
-                    glManager.ChangeSkybox(skyboxCurrent);
-                }
+                ImGui::PopItemWidth();
+                
+                glManager.ChangeSkybox(skyboxCurrent);
                 ImGui::Text("");
 
                 ImGui::TextColored(textColor, "=== Grid ===");
@@ -744,17 +852,14 @@ namespace EngineCore
 
                     if (ImGui::BeginTabItem("Actor"))
                     {
+                        bool canAddActorButton = !classItems.empty();
+                        if (!canAddActorButton) uiBeginDisable();
                         if (ImGui::Button("New Actor", toolboxButtonSize))
                         {
-                            if (!classItemsChar.empty())
-                            {
-                                ImGui::OpenPopup("New Actor");
-                            }
-                            else
-                            {
-                                Out::Log(pType::ERROR, "Please Add a Class First");
-                            }
+                            ImGui::OpenPopup("New Actor");
                         }
+                        if (!canAddActorButton) uiEndDisable();
+
                         if (ImGui::BeginPopupModal("New Actor", nullptr, popWinFlag))
                         {
                             ImGui::Text("Guide for Create new Actor");
@@ -764,56 +869,52 @@ namespace EngineCore
                             ImGui::InputText("", newActorName, IM_ARRAYSIZE(newActorName));
                             ImGui::Text("Selete the Class");
                             ImGui::Combo("##SeletedClass", &selectClassInNewActor, classItemsChar.data(), classItemsChar.size());
-
                             ImGui::Separator();
 
+                            bool canAddActor = checkSimpleStr(newActorName) &&
+                                Inside(selectClassInNewActor, 0, classItems.size() - 1) &&
+                                !actorNameSet.count(newActorName);
+
+                            if (!canAddActor) uiBeginDisable();
                             if (ImGui::Button("Add"))
                             {
-                                if (checkSimpleStr(newActorName) &&
-                                    !actorNameSet.count(newActorName) &&
-                                    selectClassInNewActor >= 0 &&
-                                    selectClassInNewActor < classItemsChar.size())
-                                {
-                                    ActorItem newActor;
-                                    newActor.m_Name = std::string(newActorName);
-                                    newActor.m_ClassName = classItems[selectClassInNewActor].m_Name;
-                                    newActor.m_Tags.insert(newActor.m_ClassName);
+                                ActorItem newActor;
+                                newActor.m_Name = std::string(newActorName);
+                                newActor.m_ClassName = classItems[selectClassInNewActor].m_Name;
+                                newActor.m_Tags.insert("Actor_" + newActor.m_ClassName);
 
-                                    newActor.m_Location = Eigen::Vector3d(0, 0, 0);
-                                    newActor.m_Rotation = Eigen::Vector3d(0, 0, 0);
-                                    newActor.m_Scale    = Eigen::Vector3d(1, 1, 1);
+                                newActor.m_Location = Eigen::Vector3d(0, 0, 0);
+                                newActor.m_Rotation = Eigen::Vector3d(0, 0, 0);
+                                newActor.m_Scale    = Eigen::Vector3d(1, 1, 1);
 
-                                    actorItems.push_back(newActor);
+                                actorItems.push_back(newActor);
 
-                                    *newActorName = 0;
-                                    ImGui::CloseCurrentPopup();
-                                }
-                                else
-                                {
-                                    Out::Log(pType::ERROR, "Wrong Actor Name");
-                                }
+                                *newActorName = 0;
+                                selectClassInNewActor = 0;
+                                ImGui::CloseCurrentPopup();
                             }
+                            if (!canAddActor) uiEndDisable();
+
                             ImGui::SameLine();
                             if (ImGui::Button("Cancel"))
                             {
                                 *newActorName = 0;
+                                selectClassInNewActor = 0;
                                 ImGui::CloseCurrentPopup();
                             }
                             ImGui::EndPopup();
                         }
                         ImGui::SameLine();
+
+                        bool canDeleteActor = (leftEnableTab == 0) && Inside(actorCurrent, 0, actorItems.size() - 1);
+                        if (!canDeleteActor) uiBeginDisable();
                         if (ImGui::Button("Del Actor", toolboxButtonSize))
                         {
-                            if (leftEnableTab == 0 && actorCurrent >= 0 && actorCurrent < actorItemsChar.size())
-                            {
-                                Out::Log(pType::MESSAGE, "Delete Actor : %s", actorItemsChar[actorCurrent]);
-                                actorItems.erase(actorItems.begin() + actorCurrent);
-                            }
-                            else
-                            {
-                                Out::Log(pType::ERROR, "No Selected Actor");
-                            }
+                            Out::Log(pType::MESSAGE, "Delete Actor : %s", actorItemsChar[actorCurrent]);
+                            actorItems.erase(actorItems.begin() + actorCurrent);
                         }
+                        if (!canDeleteActor) uiEndDisable();
+
                         ImGui::EndTabItem();
                     }
 
@@ -824,7 +925,7 @@ namespace EngineCore
                             AssetManager::getAssetList(assetList, assetTypeList);
 
                             renderNewClassModelCurrent = 0;
-                            renderNewClassTextureCurrent = 0;
+                            renderNewClassShaderCurrent = 0;
 
                             ImGui::OpenPopup("New Class");
                         }
@@ -844,91 +945,162 @@ namespace EngineCore
                                 ImGui::Combo("##Model", &renderNewClassModelCurrent,
                                     assetModel.data(), assetModel.size());
 
-                                ImGui::Text("Select Diffuse Texture");
-                                ImGui::Combo("##DiffuseTexture", &renderNewClassTextureCurrent,
-                                    assetTexture.data(), assetTexture.size());
+                                ImGui::Text("Select Shader");
+                                ImGui::Combo("##Shader", &renderNewClassShaderCurrent,
+                                    avaliableShader, avaliableShaderCount);
 
-                                ImGui::Text("Select Diffuse Color");
-                                ImGui::ColorEdit3("##DiffuseColor", renderNewClassDiffuseColorf3);
+                                std::string useShader = glManager.getSupportShaderAt(renderNewClassShaderCurrent);
+                                if (useShader == "Default")
+                                {
+                                    ImGui::Text("Select Diffuse Color");
+                                    ImGui::ColorEdit3("##DiffuseColor", renderNewClassDiffuseColorf3);
+
+                                    ImGui::Checkbox("Enable Diffuse Texture", &renderNewClassEnableDiffuseTexture);
+                                    if (renderNewClassEnableDiffuseTexture)
+                                    {
+                                        ImGui::Combo("##DiffuseTexture", &renderNewClassDiffuseTextureCurrent,
+                                            assetTexture.data(), assetTexture.size());
+                                    }
+
+                                    ImGui::Checkbox("Enable Normal Texture", &renderNewClassEnableNormalTexture);
+                                    if (renderNewClassEnableNormalTexture)
+                                    {
+                                        ImGui::Combo("##NormalTexture", &renderNewClassNormalTextureCurrent,
+                                            assetTexture.data(), assetTexture.size());
+                                    }
+
+                                    ImGui::Checkbox("Enable Specular Texture", &renderNewClassEnableSpecularTexture);
+                                    if (renderNewClassEnableSpecularTexture)
+                                    {
+                                        ImGui::Combo("##SpecularTexture", &renderNewClassSpecularTextureCurrent,
+                                            assetTexture.data(), assetTexture.size());
+                                    }
+                                }
+                                else if (useShader == "Glass")
+                                {
+                                    ImGui::Text("N");
+                                    ImGui::DragFloat("##N", &renderNewClassN, 0.01f, 1.0f, 2.2f);
+                                }
                             }
-
                             ImGui::Separator();
+
+                            bool canAddNewClass = checkSimpleStr(newClassName) &&
+                                !classNameSet.count(newClassName);
+
+                            if (!canAddNewClass) uiBeginDisable();
 
                             if (ImGui::Button("Add"))
                             {
-                                if (checkSimpleStr(newClassName) && !classNameSet.count(newClassName))
+                                addClassToProject(newClassName);
+
+                                ClassItem newClass;
+                                newClass.m_Name = std::string(newClassName);
+                                newClass.m_Render = renderNewClass;
+                                if (renderNewClass)
                                 {
-                                    bool canAddClass = false;
-                                    if (renderNewClass)
+                                    if (Inside(renderNewClassModelCurrent, 0, assetModel.size() - 1))
                                     {
-                                        if (renderNewClassModelCurrent >= 0 &&
-                                            renderNewClassModelCurrent < assetModel.size() &&
-                                            renderNewClassTextureCurrent >= 0 &&
-                                            renderNewClassTextureCurrent < assetTexture.size())
+                                        newClass.m_Model = assetModel[renderNewClassModelCurrent];
+                                    }
+
+                                    std::string useShader = glManager.getSupportShaderAt(renderNewClassShaderCurrent);
+                                    newClass.m_Shader = useShader;
+
+                                    if (useShader == "Default")
+                                    {
+                                        newClass.m_DiffuseColor.x() = renderNewClassDiffuseColorf3[0];
+                                        newClass.m_DiffuseColor.y() = renderNewClassDiffuseColorf3[1];
+                                        newClass.m_DiffuseColor.z() = renderNewClassDiffuseColorf3[2];
+
+                                        newClass.m_EnableDiffuseTexture = renderNewClassEnableDiffuseTexture;
+                                        if (renderNewClassEnableDiffuseTexture &&
+                                            Inside(renderNewClassDiffuseTextureCurrent, 0, assetTexture.size() - 1))
                                         {
-                                            canAddClass = true;
+
+                                            newClass.m_DiffuseTexture = assetTexture[renderNewClassDiffuseTextureCurrent];
+                                        }
+
+                                        newClass.m_EnableNormalTexture = renderNewClassEnableNormalTexture;
+                                        if (renderNewClassEnableNormalTexture &&
+                                            Inside(renderNewClassNormalTextureCurrent, 0, assetTexture.size() - 1))
+                                        {
+                                            newClass.m_NormalTexture = assetTexture[renderNewClassNormalTextureCurrent];
+                                        }
+
+                                        newClass.m_EnableSpecularTexture = renderNewClassEnableSpecularTexture;
+                                        if (renderNewClassEnableSpecularTexture &&
+                                            Inside(renderNewClassSpecularTextureCurrent, 0, assetTexture.size() - 1))
+                                        {
+                                            newClass.m_SpecularTexture = assetTexture[renderNewClassSpecularTextureCurrent];
                                         }
                                     }
-                                    else canAddClass = true;
-
-                                    if (canAddClass)
+                                    else if (useShader == "Glass")
                                     {
-                                        addClassToProject(newClassName);
-
-                                        ClassItem newClass;
-                                        newClass.m_Name = std::string(newClassName);
-                                        newClass.m_Render = renderNewClass;
-                                        if (renderNewClass)
-                                        {
-                                            newClass.m_Model = assetModel[renderNewClassModelCurrent];
-                                            newClass.m_DiffuseTexture = assetTexture[renderNewClassTextureCurrent];
-
-                                            newClass.m_DiffuseColor.x() = renderNewClassDiffuseColorf3[0];
-                                            newClass.m_DiffuseColor.y() = renderNewClassDiffuseColorf3[1];
-                                            newClass.m_DiffuseColor.z() = renderNewClassDiffuseColorf3[2];
-                                        }
-
-                                        classItems.push_back(newClass);
-
-                                        if (newClassAddActor)
-                                        {
-                                            std::string defaultActorName = newClass.m_Name + "_Default";
-                                            if (!actorNameSet.count(defaultActorName))
-                                            {
-                                                ActorItem newActor;
-                                                newActor.m_Name = defaultActorName;
-                                                newActor.m_ClassName = newClass.m_Name;
-                                                newActor.m_Tags.insert(newClass.m_Name);
-
-                                                newActor.m_Location = Eigen::Vector3d(0, 0, 0);
-                                                newActor.m_Rotation = Eigen::Vector3d(0, 0, 0);
-                                                newActor.m_Scale = Eigen::Vector3d(1, 1, 1);
-
-                                                actorItems.push_back(newActor);
-                                            }
-                                        }
-
-                                        collectWorldSettings();
-                                        saveProject(worldSettings, actorItems, classItems,componentItems);
-
-                                        *newClassName    = 0;
-                                        newClassAddActor = false;
-                                        renderNewClass   = false;
-
-                                        ImGui::CloseCurrentPopup();
+                                        newClass.m_N = renderNewClassN;
                                     }
                                 }
-                                else
+
+                                classItems.push_back(newClass);
+
+                                if (newClassAddActor)
                                 {
-                                    Out::Log(pType::ERROR, "Wrong Class Name");
+                                    std::string defaultActorName = newClass.m_Name + "_Default";
+                                    if (!actorNameSet.count(defaultActorName))
+                                    {
+                                        ActorItem newActor;
+                                        newActor.m_Name = defaultActorName;
+                                        newActor.m_ClassName = newClass.m_Name;
+                                        newActor.m_Tags.insert("Actor_" + newClass.m_Name);
+
+                                        newActor.m_Location = Eigen::Vector3d(0, 0, 0);
+                                        newActor.m_Rotation = Eigen::Vector3d(0, 0, 0);
+                                        newActor.m_Scale    = Eigen::Vector3d(1, 1, 1);
+
+                                        actorItems.push_back(newActor);
+                                    }
                                 }
+
+                                collectWorldSettings();
+                                saveProject(worldSettings, actorItems, classItems, componentItems);
+
+                                *newClassName    = 0;
+                                newClassAddActor = false;
+                                renderNewClass   = false;
+
+                                renderNewClassModelCurrent = 0;
+
+                                renderNewClassShaderCurrent = 0;
+
+                                Fill(renderNewClassDiffuseColorf3, Color(1, 1, 1));
+
+                                renderNewClassDiffuseTextureCurrent  = 0;
+                                renderNewClassNormalTextureCurrent   = 0;
+                                renderNewClassSpecularTextureCurrent = 0;
+
+                                renderNewClassN = 1.4;
+
+                                ImGui::CloseCurrentPopup();
                             }
+                            if (!canAddNewClass) uiEndDisable();
+
                             ImGui::SameLine();
                             if (ImGui::Button("Cancel"))
                             {
                                 *newClassName    = 0;
                                 newClassAddActor = false;
                                 renderNewClass   = false;
+
+                                renderNewClassModelCurrent = 0;
+
+                                renderNewClassShaderCurrent = 0;
+
+                                Fill(renderNewClassDiffuseColorf3, Color(1, 1, 1));
+
+                                renderNewClassDiffuseTextureCurrent  = 0;
+                                renderNewClassNormalTextureCurrent   = 0;
+                                renderNewClassSpecularTextureCurrent = 0;
+
+                                renderNewClassN = 1.4;
 
                                 ImGui::CloseCurrentPopup();
                             }
@@ -950,23 +1122,25 @@ namespace EngineCore
                             ImGui::Text("Input the Component Name");
                             ImGui::InputText("", newComponentName, IM_ARRAYSIZE(newComponentName));
 
+                            bool canAddComponent = checkSimpleStr(newComponentName) &&
+                                !componentNameSet.count(std::string(newComponentName));
+
+                            if (!canAddComponent) uiBeginDisable();
                             if (ImGui::Button("Add"))
                             {
-                                if (checkSimpleStr(newComponentName) &&
-                                    !componentNameSet.count(std::string(newComponentName)))
-                                {
-                                    ComponentItem newComponent;
-                                    newComponent.m_Name = std::string(newComponentName);
+                                ComponentItem newComponent;
+                                newComponent.m_Name = std::string(newComponentName);
 
-                                    componentItems.push_back(newComponent);
+                                componentItems.push_back(newComponent);
 
-                                    *newComponentName = 0;
-                                    ImGui::CloseCurrentPopup();
+                                collectWorldSettings();
+                                saveProject(worldSettings, actorItems, classItems, componentItems);
 
-                                    collectWorldSettings();
-                                    saveProject(worldSettings, actorItems, classItems, componentItems);
-                                }
+                                *newComponentName = 0;
+                                ImGui::CloseCurrentPopup();
                             }
+                            if (!canAddComponent) uiEndDisable();
+
                             ImGui::SameLine();
                             if (ImGui::Button("Cancel"))
                             {
@@ -1040,6 +1214,8 @@ namespace EngineCore
                 }
                 ImGui::PushItemWidth(-160);
                 ImGui::InputText("", logBuffer, sizeof(logBuffer), ImGuiInputTextFlags_ReadOnly);
+                ImGui::PopItemWidth();
+
                 ImGui::SameLine();
                 if (ImGui::Button("All Logs"))
                 {

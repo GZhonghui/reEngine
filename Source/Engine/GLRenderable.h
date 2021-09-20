@@ -42,6 +42,11 @@ protected:
     uint32_t m_NormalTextureID;
     uint32_t m_SpecularTextureID;
 
+    std::string m_NowModel;
+    std::string m_NowDiffuseTexture;
+    std::string m_NowNormalTexture;
+    std::string m_NowSpecularTexture;
+
     double m_N;
 
 protected:
@@ -60,12 +65,16 @@ public:
 
     uint32_t getDiffuseTextureID()  const { return m_DiffuseTextureID;  }
     uint32_t getNormalTextureID()   const { return m_NormalTextureID;   }
-    uint32_t getSpeculartextureID() const { return m_SpecularTextureID; }
+    uint32_t getSpecularTextureID() const { return m_SpecularTextureID; }
+
+    void EnableDiffuseTexture (bool Yes) { m_EnableDiffuseTexture  = Yes; }
+    void EnableNormalTexture  (bool Yes) { m_EnableNormalTexture   = Yes; }
+    void EnableSpecularTexture(bool Yes) { m_EnableSpecularTexture = Yes; }
 
 public:
     void reLoadModel(const std::string& Model);
-    void reLoadDiffuseTexture (const std::string& DiffuseTextureName);
-    void reLoadNormalTexture  (const std::string& NormalTextureName);
+    void reLoadDiffuseTexture (const std::string& DiffuseTextureName );
+    void reLoadNormalTexture  (const std::string& NormalTextureName  );
     void reLoadSpecularTexture(const std::string& SpecularTextureName);
 
     void Clear();

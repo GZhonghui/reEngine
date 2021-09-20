@@ -2,9 +2,7 @@
 
 void GLRenderable::reLoadModel(const std::string& Model)
 {
-    if (m_VAOID) glDeleteVertexArrays(1, &m_VAOID);
-    if (m_VBOID) glDeleteBuffers(1, &m_VBOID);
-    if (m_EBOID) glDeleteBuffers(1, &m_EBOID);
+    if (Model == m_NowModel) return;
 
     // Location UV : 8 Float per Vertex
     std::vector<float> VBuffer;
@@ -41,7 +39,12 @@ void GLRenderable::reLoadModel(const std::string& Model)
     else
     {
         Out::Log(pType::ERROR, "Load Model File Failed");
+        return;
     }
+
+    if (m_VAOID) glDeleteVertexArrays(1, &m_VAOID);
+    if (m_VBOID) glDeleteBuffers(1, &m_VBOID);
+    if (m_EBOID) glDeleteBuffers(1, &m_EBOID);
 
     m_ElementCount = EBuffer.size();
 
@@ -64,24 +67,38 @@ void GLRenderable::reLoadModel(const std::string& Model)
 
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
     glEnableVertexAttribArray(2);
+
+    m_NowModel = Model;
 }
 
 void GLRenderable::reLoadDiffuseTexture(const std::string& DiffuseTextureName)
 {
+    if (m_NowDiffuseTexture == DiffuseTextureName) return;
+
     if (m_DiffuseTextureID)  glDeleteTextures(1, &m_DiffuseTextureID);
     m_DiffuseTextureID = GLMisc::GenDefaultTextureWithImageFile((G_IMPORT_PATH + DiffuseTextureName).c_str());
+
+    m_NowDiffuseTexture = DiffuseTextureName;
 }
 
 void GLRenderable::reLoadNormalTexture(const std::string& NormalTextureName)
 {
+    if (m_NowNormalTexture == NormalTextureName) return;
+
     if (m_NormalTextureID)   glDeleteTextures(1, &m_NormalTextureID);
     m_NormalTextureID = GLMisc::GenDefaultTextureWithImageFile((G_IMPORT_PATH + NormalTextureName).c_str());
+
+    m_NowNormalTexture = NormalTextureName;
 }
 
 void GLRenderable::reLoadSpecularTexture(const std::string& SpecularTextureName)
 {
+    if (m_NowSpecularTexture == SpecularTextureName) return;
+
     if (m_SpecularTextureID) glDeleteTextures(1, &m_SpecularTextureID);
     m_SpecularTextureID = GLMisc::GenDefaultTextureWithImageFile((G_IMPORT_PATH + SpecularTextureName).c_str());
+
+    m_NowSpecularTexture = SpecularTextureName;
 }
 
 void GLRenderable::Clear()

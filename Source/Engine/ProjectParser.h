@@ -247,7 +247,7 @@ inline void readProject
 
 inline void saveProject
 (
-    WorldSetting& worldSettings,
+    const WorldSetting& worldSettings,
     const std::vector<ActorItem>& actorItems,
     const std::vector<ClassItem>& classItems,
     const std::vector<ComponentItem>& componentItems
