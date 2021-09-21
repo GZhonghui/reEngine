@@ -84,7 +84,7 @@ namespace EngineCore
         const int   skyboxChoicesCount = glManager.getSkyboxCount();
 
         const double cameraMoveSpeedMin = 1.0;
-        const double cameraMoveSpeedMax = 10.0;
+        const double cameraMoveSpeedMax = 20.0;
 
         // Part3 Const
         const ImVec2 toolboxButtonSize = ImVec2(108, 32);

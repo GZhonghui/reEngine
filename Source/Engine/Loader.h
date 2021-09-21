@@ -47,7 +47,8 @@ namespace Loader
     public:
         bool Load(const char* filePath)
         {
-            const aiScene* scene = Loader->ReadFile(filePath, aiProcess_Triangulate | aiProcess_GenNormals);
+            const aiScene* scene = Loader->ReadFile(filePath,
+                aiProcess_Triangulate | aiProcess_GenNormals | aiProcess_CalcTangentSpace);
 
             //Error
             if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
