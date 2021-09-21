@@ -9,9 +9,11 @@ uniform vec3 cameraPos;
 
 uniform samplerCube skyboxTexture;
 
+uniform float N;
+
 void main()
 {   
-    float Ratio = 1.0 / 1.52;
+    float Ratio = 1.0 / N;
 
     vec3 I = normalize(thisPosition - cameraPos);
     vec3 R = refract(I, normalize(thisNormal), Ratio);

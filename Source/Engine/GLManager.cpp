@@ -429,7 +429,16 @@ void GLManager::ShaderManager::Init()
     m_SupportShadersPath.push_back("GLGlass");
     m_RevSupportShaders[std::string("Glass")] = 1;
 
-    m_SupportShadersChar = "Default\0Glass\0";
+    m_SupportShaders.push_back("Metal");
+    m_SupportShadersPath.push_back("GLMetal");
+    m_RevSupportShaders[std::string("Metal")] = 2;
+
+
+    m_SupportShaders.push_back("Cartoon");
+    m_SupportShadersPath.push_back("GLCartoon");
+    m_RevSupportShaders[std::string("Cartoon")] = 3;
+
+    m_SupportShadersChar = "Default\0Glass\0Metal\0Cartoon\0";
     // HARD CODE
 
     auto loadAGroupShader = [](const std::string& ShaderPath)->uint32_t
@@ -448,14 +457,20 @@ void GLManager::ShaderManager::Init()
         return ShaderProgramID;
     };
     
+    // HARD CODE
     m_DefaultShaderProgramID = loadAGroupShader(m_SupportShadersPath[0]);
     m_GlassShaderProgramID   = loadAGroupShader(m_SupportShadersPath[1]);
+    m_MetalShaderProgramID   = loadAGroupShader(m_SupportShadersPath[2]);
+    m_CartoonShaderProgramID = loadAGroupShader(m_SupportShadersPath[3]);
+    // HARD CODE
 }
 
 void GLManager::ShaderManager::Destroy()
 {
     glDeleteProgram(m_DefaultShaderProgramID);
     glDeleteProgram(m_GlassShaderProgramID);
+    glDeleteProgram(m_MetalShaderProgramID);
+    glDeleteProgram(m_CartoonShaderProgramID);
 }
 
 bool GLManager::Init()
@@ -665,9 +680,32 @@ void GLManager::Render
         glUniform3f(glGetUniformLocation(usedShaderID, "cameraPos"),
             m_CameraLocation.x(), m_CameraLocation.y(), m_CameraLocation.z());
         glUniform1i(glGetUniformLocation(usedShaderID, "skyboxTexture"), 0);
+        glUniform1f(glGetUniformLocation(usedShaderID, "N"), renderObj->m_N);
 
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_CUBE_MAP, m_Skybox.m_SkyboxTextureID);
+    }
+    else if (renderObj->m_Shader == "Metal")
+    {
+        glUseProgram(m_ShaderManager.m_MetalShaderProgramID);
+        usedShaderID = m_ShaderManager.m_MetalShaderProgramID;
+
+        glUniform3f(glGetUniformLocation(usedShaderID, "cameraPos"),
+            m_CameraLocation.x(), m_CameraLocation.y(), m_CameraLocation.z());
+        glUniform1i(glGetUniformLocation(usedShaderID, "skyboxTexture"), 0);
+
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, m_Skybox.m_SkyboxTextureID);
+    }
+    else if (renderObj->m_Shader == "Cartoon")
+    {
+        glUseProgram(m_ShaderManager.m_CartoonShaderProgramID);
+        usedShaderID = m_ShaderManager.m_CartoonShaderProgramID;
+
+        auto pColor = &renderObj->m_DiffuseColor;
+        glUniform3f(glGetUniformLocation(usedShaderID, "diffuseColor"), pColor->x(), pColor->y(), pColor->z());
+
+        glUniform3f(glGetUniformLocation(usedShaderID, "lightDir"), m_LightDir.x(), m_LightDir.y(), m_LightDir.z());
     }
     else
     {

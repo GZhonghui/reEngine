@@ -185,6 +185,8 @@ protected:
     public:
         uint32_t m_DefaultShaderProgramID;
         uint32_t m_GlassShaderProgramID;
+        uint32_t m_MetalShaderProgramID;
+        uint32_t m_CartoonShaderProgramID;
 
         const char* m_SupportShadersChar;
         std::vector<std::string> m_SupportShaders;
