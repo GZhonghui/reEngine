@@ -333,15 +333,15 @@ inline void saveProject
 
             ptree& diffuseNode = classItem.add("DiffuseTexture", "");
             diffuseNode.put("<xmlattr>.Enable", classIndex->m_EnableDiffuseTexture ? True : False);
-            diffuseNode.put("", classIndex->m_DiffuseTexture);
+            if (classIndex->m_EnableDiffuseTexture) diffuseNode.put("", classIndex->m_DiffuseTexture);
 
             ptree& normalNode = classItem.add("NormalTexture", "");
             normalNode.put("<xmlattr>.Enable", classIndex->m_EnableNormalTexture ? True : False);
-            normalNode.put("", classIndex->m_NormalTexture);
+            if (classIndex->m_EnableNormalTexture) normalNode.put("", classIndex->m_NormalTexture);
 
             ptree& specularNode = classItem.add("SpecularTexture", "");
             specularNode.put("<xmlattr>.Enable", classIndex->m_EnableSpecularTexture ? True : False);
-            specularNode.put("", classIndex->m_SpecularTexture);
+            if (classIndex->m_EnableSpecularTexture)specularNode.put("", classIndex->m_SpecularTexture);
 
             classItem.add("N", FloatToStr(classIndex->m_N));
         }

@@ -221,17 +221,17 @@ namespace EngineCore
         // === Update ===
         for (auto actorIndex = actorItems.begin(); actorIndex != actorItems.end(); ++actorIndex)
         {
-            if (!actorNameSet.count(std::string(actorIndex->m_Name.c_str())))
+            if (!actorNameSet.count(actorIndex->m_Name))
             {
-                actorNameSet.insert(std::string(actorIndex->m_Name.c_str()));
+                actorNameSet.insert(actorIndex->m_Name);
                 actorItemsChar.push_back(actorIndex->m_Name.c_str());
             }
         }
         for (auto classIndex = classItems.begin(); classIndex != classItems.end(); ++classIndex)
         {
-            if (!classNameSet.count(std::string(classIndex->m_Name.c_str())))
+            if (!classNameSet.count(classIndex->m_Name))
             {
-                classNameSet.insert(std::string(classIndex->m_Name.c_str()));
+                classNameSet.insert(classIndex->m_Name);
                 classItemsChar.push_back(classIndex->m_Name.c_str());
             }
 
@@ -241,7 +241,7 @@ namespace EngineCore
                 {
                     classesInSceneForRender[classIndex->m_Name] = std::make_shared<GLRenderable>();
 
-                    std::shared_ptr< GLRenderable> thisRenderObj = classesInSceneForRender[classIndex->m_Name];
+                    std::shared_ptr<GLRenderable> thisRenderObj = classesInSceneForRender[classIndex->m_Name];
                     
                     thisRenderObj->setShader(classIndex->m_Shader);
 
@@ -251,15 +251,17 @@ namespace EngineCore
 
                     if (classIndex->m_EnableDiffuseTexture)
                     {
+                        thisRenderObj->EnableDiffuseTexture(true);
                         thisRenderObj->reLoadDiffuseTexture(classIndex->m_DiffuseTexture);
                     }
                     if (classIndex->m_EnableNormalTexture)
                     {
+                        thisRenderObj->EnableNormalTexture(true);
                         thisRenderObj->reLoadNormalTexture(classIndex->m_NormalTexture);
-                        
                     }
                     if (classIndex->m_EnableSpecularTexture)
                     {
+                        thisRenderObj->EnableSpecularTexture(true);
                         thisRenderObj->reLoadSpecularTexture(classIndex->m_SpecularTexture);
                     }
 
@@ -300,8 +302,6 @@ namespace EngineCore
         int assetModelIndex = 0;
         int assetTextureIndex = 0;
 
-        assetModel.clear();
-        assetTexture.clear();
         for (auto assetIdx = 0; assetIdx < assetList.size(); ++assetIdx)
         {
             if (assetTypeList[assetIdx] == aType::MODEL)
@@ -544,7 +544,7 @@ namespace EngineCore
                             if (!canDeleteTag) uiBeginDisable();
                             if (ImGui::Button("Del Tag"))
                             {
-                                Out::Log(pType::MESSAGE, "Delete Tag [%s] for %s", tagOfActorCurrentStr.c_str(),
+                                Out::Log(pType::MESSAGE, "Delete Tag [%s] for [%s]", tagOfActorCurrentStr.c_str(),
                                     pSelectedActor->m_Name.c_str());
                                 actorItems[actorCurrent].m_Tags.erase(tagOfActorCurrentStr);
                             }
@@ -714,72 +714,79 @@ namespace EngineCore
                         ImGui::Combo("##Shader", &classShaderCurrent, avaliableShader, avaliableShaderCount);
                         selectedClass->m_Shader = glManager.getSupportShaderAt(classShaderCurrent);
                         selectedClassRenderObj->setShader(selectedClass->m_Shader);
-                        
-                        ImGui::Text("Diffuse Color");
 
-                        classDiffuseColor.x = selectedClass->m_DiffuseColor.x();
-                        classDiffuseColor.y = selectedClass->m_DiffuseColor.y();
-                        classDiffuseColor.z = selectedClass->m_DiffuseColor.z();
-                        classDiffuseColor.w = 1;
-
-                        const int imageSize = rightWindowWidth - 32;
-
-                        ImGui::ColorEdit3("##DiffuseColor", (float*)&classDiffuseColor);
-                        ImGui::ColorButton("", *(ImVec4*)&classDiffuseColor, 0, ImVec2(imageSize, 48));
-                        selectedClass->m_DiffuseColor.x() = classDiffuseColor.x;
-                        selectedClass->m_DiffuseColor.y() = classDiffuseColor.y;
-                        selectedClass->m_DiffuseColor.z() = classDiffuseColor.z;
-                        selectedClassRenderObj->setDiffuseColor(selectedClass->m_DiffuseColor);
-
-                        classEnableDiffuse = selectedClass->m_EnableDiffuseTexture;
-                        ImGui::Checkbox("Enable Diffuse", &classEnableDiffuse);
-                        selectedClass->m_EnableDiffuseTexture = classEnableDiffuse;
-                        selectedClassRenderObj->EnableDiffuseTexture(classEnableDiffuse);
-
-                        if (classEnableDiffuse)
+                        if (selectedClass->m_Shader == "Default")
                         {
-                            classDiffuseCurrent = revAssetTexture.count(selectedClass->m_DiffuseTexture) ?
-                                revAssetTexture[selectedClass->m_DiffuseTexture] : 0;
+                            ImGui::Text("Diffuse Color");
 
-                            ImGui::Combo("##DiffuseTexture", &classDiffuseCurrent, assetTexture.data(), assetTexture.size());
-                            selectedClass->m_DiffuseTexture = assetTexture[classDiffuseCurrent];
-                            selectedClassRenderObj->reLoadDiffuseTexture(selectedClass->m_DiffuseTexture);
+                            classDiffuseColor.x = selectedClass->m_DiffuseColor.x();
+                            classDiffuseColor.y = selectedClass->m_DiffuseColor.y();
+                            classDiffuseColor.z = selectedClass->m_DiffuseColor.z();
+                            classDiffuseColor.w = 1;
 
-                            ImGui::Image((void*)selectedClassRenderObj->getDiffuseTextureID(), ImVec2(imageSize, imageSize));
+                            const int imageSize = rightWindowWidth - 32;
+
+                            ImGui::ColorEdit3("##DiffuseColor", (float*)&classDiffuseColor);
+                            ImGui::ColorButton("", *(ImVec4*)&classDiffuseColor, 0, ImVec2(imageSize, 48));
+                            selectedClass->m_DiffuseColor.x() = classDiffuseColor.x;
+                            selectedClass->m_DiffuseColor.y() = classDiffuseColor.y;
+                            selectedClass->m_DiffuseColor.z() = classDiffuseColor.z;
+                            selectedClassRenderObj->setDiffuseColor(selectedClass->m_DiffuseColor);
+
+                            classEnableDiffuse = selectedClass->m_EnableDiffuseTexture;
+                            ImGui::Checkbox("Enable Diffuse", &classEnableDiffuse);
+                            selectedClass->m_EnableDiffuseTexture = classEnableDiffuse;
+                            selectedClassRenderObj->EnableDiffuseTexture(classEnableDiffuse);
+
+                            if (classEnableDiffuse)
+                            {
+                                classDiffuseCurrent = revAssetTexture.count(selectedClass->m_DiffuseTexture) ?
+                                    revAssetTexture[selectedClass->m_DiffuseTexture] : 0;
+
+                                ImGui::Combo("##DiffuseTexture", &classDiffuseCurrent, assetTexture.data(), assetTexture.size());
+                                selectedClass->m_DiffuseTexture = assetTexture[classDiffuseCurrent];
+                                selectedClassRenderObj->reLoadDiffuseTexture(selectedClass->m_DiffuseTexture);
+
+                                ImGui::Image((void*)selectedClassRenderObj->getDiffuseTextureID(), ImVec2(imageSize, imageSize));
+                            }
+
+                            classEnableNormal = selectedClass->m_EnableNormalTexture;
+                            ImGui::Checkbox("Enable Normal", &classEnableNormal);
+                            selectedClass->m_EnableNormalTexture = classEnableNormal;
+                            selectedClassRenderObj->EnableNormalTexture(classEnableNormal);
+
+                            if (classEnableNormal)
+                            {
+                                classNormalCurrent = revAssetTexture.count(selectedClass->m_NormalTexture) ?
+                                    revAssetTexture[selectedClass->m_NormalTexture] : 0;
+
+                                ImGui::Combo("##NormalTexture", &classNormalCurrent, assetTexture.data(), assetTexture.size());
+                                selectedClass->m_NormalTexture = assetTexture[classNormalCurrent];
+                                selectedClassRenderObj->reLoadNormalTexture(selectedClass->m_NormalTexture);
+
+                                ImGui::Image((void*)selectedClassRenderObj->getNormalTextureID(), ImVec2(imageSize, imageSize));
+                            }
+
+                            classEnableSpecular = selectedClass->m_EnableSpecularTexture;
+                            ImGui::Checkbox("Enable Specular", &classEnableSpecular);
+                            selectedClass->m_EnableSpecularTexture = classEnableSpecular;
+                            selectedClassRenderObj->EnableSpecularTexture(classEnableSpecular);
+
+                            if (classEnableSpecular)
+                            {
+                                classSpecularCurrent = revAssetTexture.count(selectedClass->m_SpecularTexture) ?
+                                    revAssetTexture[selectedClass->m_SpecularTexture] : 0;
+
+                                ImGui::Combo("##SpecularTexture", &classSpecularCurrent, assetTexture.data(), assetTexture.size());
+                                selectedClass->m_SpecularTexture = assetTexture[classSpecularCurrent];
+                                selectedClassRenderObj->reLoadSpecularTexture(selectedClass->m_SpecularTexture);
+
+                                ImGui::Image((void*)selectedClassRenderObj->getSpecularTextureID(), ImVec2(imageSize, imageSize));
+                            }
                         }
-
-                        classEnableNormal = selectedClass->m_EnableNormalTexture;
-                        ImGui::Checkbox("Enable Normal", &classEnableNormal);
-                        selectedClass->m_EnableNormalTexture = classEnableNormal;
-                        selectedClassRenderObj->EnableNormalTexture(classEnableNormal);
-
-                        if (classEnableNormal)
+                        else if (selectedClass->m_Shader == "Glass")
                         {
-                            classNormalCurrent = revAssetTexture.count(selectedClass->m_NormalTexture) ?
-                                revAssetTexture[selectedClass->m_NormalTexture] : 0;
 
-                            ImGui::Combo("##NormalTexture", &classNormalCurrent, assetTexture.data(), assetTexture.size());
-                            selectedClass->m_NormalTexture = assetTexture[classNormalCurrent];
-                            selectedClassRenderObj->reLoadNormalTexture(selectedClass->m_NormalTexture);
-
-                            ImGui::Image((void*)selectedClassRenderObj->getNormalTextureID(), ImVec2(imageSize, imageSize));
-                        }
-                        
-                        classEnableSpecular = selectedClass->m_EnableSpecularTexture;
-                        ImGui::Checkbox("Enable Specular", &classEnableSpecular);
-                        selectedClass->m_EnableSpecularTexture = classEnableSpecular;
-                        selectedClassRenderObj->EnableSpecularTexture(classEnableSpecular);
-
-                        if (classEnableSpecular)
-                        {
-                            classSpecularCurrent = revAssetTexture.count(selectedClass->m_SpecularTexture) ?
-                                revAssetTexture[selectedClass->m_SpecularTexture] : 0;
-
-                            ImGui::Combo("##SpecularTexture", &classSpecularCurrent, assetTexture.data(), assetTexture.size());
-                            selectedClass->m_SpecularTexture = assetTexture[classSpecularCurrent];
-                            selectedClassRenderObj->reLoadSpecularTexture(selectedClass->m_SpecularTexture);
-
-                            ImGui::Image((void*)selectedClassRenderObj->getSpecularTextureID(), ImVec2(imageSize, imageSize));
                         }
 
                         ImGui::PopItemWidth();

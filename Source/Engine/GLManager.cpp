@@ -427,7 +427,7 @@ void GLManager::ShaderManager::Init()
 
     m_SupportShaders.push_back("Glass");
     m_SupportShadersPath.push_back("GLGlass");
-    m_RevSupportShaders[std::string("Glass")] = 0;
+    m_RevSupportShaders[std::string("Glass")] = 1;
 
     m_SupportShadersChar = "Default\0Glass\0";
     // HARD CODE
@@ -661,6 +661,13 @@ void GLManager::Render
     {
         glUseProgram(m_ShaderManager.m_GlassShaderProgramID);
         usedShaderID = m_ShaderManager.m_GlassShaderProgramID;
+
+        glUniform3f(glGetUniformLocation(usedShaderID, "cameraPos"),
+            m_CameraLocation.x(), m_CameraLocation.y(), m_CameraLocation.z());
+        glUniform1i(glGetUniformLocation(usedShaderID, "skyboxTexture"), 0);
+
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, m_Skybox.m_SkyboxTextureID);
     }
     else
     {

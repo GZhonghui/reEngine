@@ -60,7 +60,7 @@ namespace GLMisc
 
         if (!TextureData)
         {
-            Out::Log(pType::ERROR, "Generate Texture with Image Failed");
+            Out::Log(pType::ERROR, "Generate Texture with Image Failed : %s", texturePath);
             glDeleteTextures(1, &textureID);
 
             return 0;

@@ -34,11 +34,12 @@ void main()
     
     if(enableNormalTexture != 0)
     {
-
+        fixedNormal = texture(normalTexture, thisUV).rgb * 2.0 - 1.0;
     }
 
     fixedNormal =  normalize(fixedNormal);
-    vec3 fixedLightDir = -normalize(lightDir);
+
+    vec3 fixedLightDir = normalize(-lightDir);
 
     const float ambientStrength = 0.1;
     vec3 ambient = ambientStrength * lightColor * lightPower;
