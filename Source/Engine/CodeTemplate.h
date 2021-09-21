@@ -327,7 +327,8 @@ inline void updateInitHeader
 
             for (auto nowComponent = actorItem.m_Components.begin(); nowComponent != actorItem.m_Components.end(); ++nowComponent)
             {
-                fprintf(initHeader, "        newActor->addComponent(std::make_shared<Component>(\"%s\"));\n", actorItem.m_Name.c_str());
+                fprintf(initHeader, "        newActor->addComponent(std::make_shared<%s>(\"%s\"));\n",
+                    nowComponent->c_str(), actorItem.m_Name.c_str());
             }
             
             fprintf(initHeader, "        newActor->setLocation(Eigen::Vector3d(%.6lf, %.6lf, %.6lf));\n",

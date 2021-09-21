@@ -27,6 +27,8 @@
     <ClInclude Include="implClass_Car.h"/>
     <ClCompile Include="implClass_Dog.cpp"/>
     <ClInclude Include="implClass_Dog.h"/>
+    <ClCompile Include="implComponent_Moving.cpp"/>
+    <ClInclude Include="implComponent_Moving.h"/>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

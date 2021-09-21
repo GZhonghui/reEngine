@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project>
   <World>
-    <LightDir x="0.2099999934" y="-1.3700000048" z="1.8600000143"/>
+    <LightDir x="-1.7999999523" y="-3.1600000858" z="0.7699999809"/>
     <LightColor x="0.9999982119" y="1.0000000000" z="0.9999899864"/>
     <LightPower>5.1688680000</LightPower>
-    <Skybox>Creek</Skybox>
+    <Skybox>Water</Skybox>
   </World>
   <Actor>
     <ActorItem Name="Car_Default" ClassName="Car">
@@ -15,9 +15,10 @@
     </ActorItem>
     <ActorItem Name="Dog_Default" ClassName="Dog">
       <Tag>Actor_Dog</Tag>
+      <Component>Moving</Component>
       <Location x="0.0000000000" y="0.0000000000" z="0.0000000000"/>
-      <Rotation x="0.0000000000" y="0.0000000000" z="0.0000000000"/>
-      <Scale x="1.0000000000" y="1.0000000000" z="1.0000000000"/>
+      <Rotation x="0.0000000000" y="30.2999992371" z="0.0000000000"/>
+      <Scale x="0.3000000119" y="0.3000000119" z="0.3000000119"/>
     </ActorItem>
   </Actor>
   <Class>
@@ -33,7 +34,7 @@
     <ClassItem Name="Dog" Render="True">
       <Model>Dog.obj</Model>
       <Shader>Default</Shader>
-      <DiffuseColor x="1.0000000000" y="0.9999899864" z="0.9999899864"/>
+      <DiffuseColor x="0.9999982119" y="0.9999899864" z="1.0000000000"/>
       <DiffuseTexture Enable="True">Dog_Diffuse.png</DiffuseTexture>
       <NormalTexture Enable="False"/>
       <SpecularTexture Enable="False"/>
@@ -41,5 +42,6 @@
     </ClassItem>
   </Class>
   <Component>
+    <ComponentItem Name="Moving"/>
   </Component>
 </Project>

@@ -117,6 +117,8 @@ namespace EngineCore
         static int componentOfActorCurrent = -1;
         static std::string componentOfActorCurrentStr;
 
+        static int actorAddComponentCurrent = 0;
+
         static int classShaderCurrent = 0;
 
         static int classModelCurrent = 0;
@@ -214,6 +216,7 @@ namespace EngineCore
             
             AssetManager::getAssetList(assetList, assetTypeList);
         }
+        // Update Once
 
         // === Update ===
         for (auto actorIndex = actorItems.begin(); actorIndex != actorItems.end(); ++actorIndex)
@@ -238,7 +241,7 @@ namespace EngineCore
                 {
                     classesInSceneForRender[classIndex->m_Name] = std::make_shared<GLRenderable>();
 
-                    auto thisRenderObj = classesInSceneForRender[classIndex->m_Name];
+                    std::shared_ptr< GLRenderable> thisRenderObj = classesInSceneForRender[classIndex->m_Name];
                     
                     thisRenderObj->setShader(classIndex->m_Shader);
 
@@ -507,7 +510,7 @@ namespace EngineCore
                             }
                             if (ImGui::BeginPopup("New Tag", popWinFlag))
                             {
-                                ImGui::Text("Guide for Add a Tag for %s", pSelectedActor->m_Name.c_str());
+                                ImGui::Text("Add a Tag for [%s]", pSelectedActor->m_Name.c_str());
                                 ImGui::Separator();
                                 ImGui::Text("Input the Tag Name");
                                 ImGui::InputText("", newTagName, IM_ARRAYSIZE(newTagName));
@@ -608,16 +611,6 @@ namespace EngineCore
                     ImGui::Separator();
                     if (pSelectedActor)
                     {
-                        if (ImGui::Button("Add Component"))
-                        {
-
-                        }
-                        ImGui::SameLine();
-                        if (ImGui::Button("Del Component"))
-                        {
-
-                        }
-
                         int componentIndex = 0;
                         for (auto i = pSelectedActor->m_Components.begin(); i != pSelectedActor->m_Components.end(); ++i)
                         {
@@ -629,6 +622,52 @@ namespace EngineCore
                             }
                             componentIndex += 1;
                         }
+
+                        bool canAddComponent = !componentItems.empty();
+                        if (!canAddComponent) uiBeginDisable();
+                        if (ImGui::Button("Add Component"))
+                        {
+                            ImGui::OpenPopup("Add Component");
+                        }
+                        if (!canAddComponent) uiEndDisable();
+                        if (ImGui::BeginPopup("Add Component", popWinFlag))
+                        {
+                            ImGui::Text("Add Compnent For [%s]", pSelectedActor->m_Name);
+                            ImGui::Separator();
+                            ImGui::Text("Select Component");
+                            ImGui::Combo("##SelectComponent", &actorAddComponentCurrent,
+                                componentItemsChar.data(), componentItems.size());
+
+                            bool canClickAdd = Inside(actorAddComponentCurrent, 0, componentItems.size() - 1) &&
+                                !pSelectedActor->m_Components.count(componentItems[actorAddComponentCurrent].m_Name);
+                            if (!canClickAdd) uiBeginDisable();
+                            if (ImGui::Button("Add"))
+                            {
+                                pSelectedActor->m_Components.insert(componentItems[actorAddComponentCurrent].m_Name);
+
+                                actorAddComponentCurrent = 0;
+                                ImGui::CloseCurrentPopup();
+                            }
+                            if (!canClickAdd) uiEndDisable();
+
+                            ImGui::SameLine();
+                            if (ImGui::Button("Cancel"))
+                            {
+                                actorAddComponentCurrent = 0;
+                                ImGui::CloseCurrentPopup();
+                            }
+                            ImGui::EndPopup();
+                        }
+
+                        ImGui::SameLine();
+
+                        bool canDeleteComponent = Inside(componentOfActorCurrent, 0, pSelectedActor->m_Components.size() - 1);
+                        if (!canDeleteComponent) uiBeginDisable();
+                        if (ImGui::Button("Del Component"))
+                        {
+                            pSelectedActor->m_Components.erase(componentOfActorCurrentStr);
+                        }
+                        if (!canDeleteComponent) uiEndDisable();
                     }
                     else
                     {
@@ -667,7 +706,7 @@ namespace EngineCore
                             revAssetModel[selectedClass->m_Model] : 0;
                         ImGui::Combo("##Model", &classModelCurrent, assetModel.data(), assetModel.size());
                         selectedClass->m_Model = assetModel[classModelCurrent];
-                        selectedClassRenderObj->reLoadModel(classItems[classCurrent].m_Model);
+                        selectedClassRenderObj->reLoadModel(selectedClass->m_Model);
 
                         ImGui::Text("Shader");
 
@@ -1167,6 +1206,8 @@ namespace EngineCore
                                 newComponent.m_Name = std::string(newComponentName);
 
                                 componentItems.push_back(newComponent);
+
+                                addComponentToProject(newComponentName);
 
                                 collectWorldSettings();
                                 saveProject(worldSettings, actorItems, classItems, componentItems);
