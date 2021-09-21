@@ -716,7 +716,35 @@ void GLManager::Render
     glUniformMatrix4fv(glGetUniformLocation(usedShaderID, "V"), 1, GL_FALSE, glm::value_ptr(MVP[1]));
     glUniformMatrix4fv(glGetUniformLocation(usedShaderID, "P"), 1, GL_FALSE, glm::value_ptr(MVP[2]));
 
+    if (Selected)
+    {
+        glEnable(GL_STENCIL_TEST);
+
+        glStencilMask(0xFF);
+        glClear(GL_STENCIL_BUFFER_BIT);
+
+        glStencilOp(GL_REPLACE, GL_REPLACE, GL_REPLACE);
+        glStencilFunc(GL_ALWAYS, 1, 0xFF);
+    }
+
     renderObj->Draw();
+
+    if (Selected)
+    {
+        glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+        glStencilMask(0x00);
+        glDisable(GL_DEPTH_TEST);
+
+        glUseProgram(m_Outline.m_OutlineShaderID);
+        glUniformMatrix4fv(glGetUniformLocation(m_Outline.m_OutlineShaderID, "M"), 1, GL_FALSE, glm::value_ptr(MVP[0]));
+        glUniformMatrix4fv(glGetUniformLocation(m_Outline.m_OutlineShaderID, "V"), 1, GL_FALSE, glm::value_ptr(MVP[1]));
+        glUniformMatrix4fv(glGetUniformLocation(m_Outline.m_OutlineShaderID, "P"), 1, GL_FALSE, glm::value_ptr(MVP[2]));
+
+        renderObj->Draw();
+
+        glDisable(GL_STENCIL_TEST);
+        glEnable(GL_DEPTH_TEST);
+    }
 
     if (LineMode) glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 

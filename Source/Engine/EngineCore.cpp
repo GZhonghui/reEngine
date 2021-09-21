@@ -116,14 +116,28 @@ namespace EngineCore
         int actorIndex = 0;
         for (auto i = actorItems.begin(); i != actorItems.end(); ++i)
         {
+            if (actorIndex == coreSelectedActorInEditorScene)
+            {
+                actorIndex += 1;
+                continue;
+            }
             if (classesInSceneForRender.count(i->m_ClassName) && classesInSceneForRender[i->m_ClassName])
             {
                 glManager.Render(classesInSceneForRender[i->m_ClassName],
                     Transform(i->m_Location, i->m_Rotation, i->m_Scale),
-                    actorIndex == coreSelectedActorInEditorScene,
-                    coreRenderModeInEditorScene);
+                    false, coreRenderModeInEditorScene);
             }
             ++actorIndex;
+        }
+        if (Inside(coreSelectedActorInEditorScene, 0, classItems.size() - 1))
+        {
+            auto i = &actorItems[coreSelectedActorInEditorScene];
+            if (classesInSceneForRender.count(i->m_ClassName) && classesInSceneForRender[i->m_ClassName])
+            {
+                glManager.Render(classesInSceneForRender[i->m_ClassName],
+                    Transform(i->m_Location, i->m_Rotation, i->m_Scale),
+                    true, coreRenderModeInEditorScene);
+            }
         }
 
         glManager.EndRenderEditor();

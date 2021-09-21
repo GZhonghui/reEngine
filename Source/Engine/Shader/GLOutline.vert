@@ -10,5 +10,9 @@ uniform mat4 P;
 
 void main()
 {
+    vec3 fixedNormal = normalize(mat3(transpose(inverse(M))) * aNormal);
+    
     gl_Position = P * V * M * vec4(aPos, 1.0);
+
+    gl_Position.xyz = gl_Position.xyz + 0.01 * fixedNormal * gl_Position.w;
 }

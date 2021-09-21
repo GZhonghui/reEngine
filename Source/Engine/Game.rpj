@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project>
   <World>
-    <LightDir x="-2.8900001049" y="-3.8900001049" z="3.9300000668"/>
-    <LightColor x="0.9999982119" y="1.0000000000" z="0.9999899864"/>
-    <LightPower>8.0787740000</LightPower>
+    <LightDir x="1.8099999428" y="-0.9399999976" z="1.5299999714"/>
+    <LightColor x="1.0000000000" y="0.9999917746" z="0.9999899864"/>
+    <LightPower>4.2301890000</LightPower>
     <Skybox>Water</Skybox>
   </World>
   <Actor>
@@ -15,9 +15,9 @@
     </ActorItem>
     <ActorItem Name="Dog_01" ClassName="Dog">
       <Tag>Actor_Dog</Tag>
-      <Location x="3.5099999905" y="-1.1699999571" z="9.3000001907"/>
-      <Rotation x="0.0000000000" y="42.0999984741" z="0.0000000000"/>
-      <Scale x="0.5000000000" y="0.5000000000" z="0.5000000000"/>
+      <Location x="-0.8299999833" y="-1.4700000286" z="14.6599998474"/>
+      <Rotation x="0.0000000000" y="-97.1999969482" z="0.0000000000"/>
+      <Scale x="1.0000000000" y="1.0000000000" z="1.0000000000"/>
     </ActorItem>
     <ActorItem Name="Cat_Default" ClassName="Cat">
       <Tag>Actor_Cat</Tag>
@@ -37,11 +37,11 @@
       <N>1.4000000000</N>
     </ClassItem>
     <ClassItem Name="Dog" Render="True">
-      <Model>Dog.obj</Model>
+      <Model>Tree.obj</Model>
       <Shader>Default</Shader>
-      <DiffuseColor x="0.9999982119" y="0.9999899864" z="1.0000000000"/>
-      <DiffuseTexture Enable="True">Dog_Diffuse.png</DiffuseTexture>
-      <NormalTexture Enable="True">Barrel_Normal.png</NormalTexture>
+      <DiffuseColor x="0.9999899864" y="1.0000000000" z="0.9999923706"/>
+      <DiffuseTexture Enable="True">Tree_Diffuse.png</DiffuseTexture>
+      <NormalTexture Enable="False"/>
       <SpecularTexture Enable="False"/>
       <N>1.4000000000</N>
     </ClassItem>
