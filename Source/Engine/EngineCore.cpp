@@ -7,7 +7,7 @@ bool Event::shouldQuit;
 bool Event::windowResized;
 bool Event::mouseAsCursor;
 
-float Event::cameraMoveSpeed;
+double Event::cameraMoveSpeed;
 
 namespace EngineCore
 {
@@ -104,7 +104,7 @@ namespace EngineCore
 
     uint32_t RenderEditorScene(uint32_t viewWidth, uint32_t viewHeight)
     {
-        glManager.BeginRenderEditor(viewWidth, viewHeight, Event::getCameraLocation(), Event::getCameraDir());
+        glManager.BeginRenderEditor(viewWidth, viewHeight);
 
         glManager.RenderSkybox();
 
@@ -150,7 +150,7 @@ namespace EngineCore
         int nowWidth, nowHeight;
         glfwGetFramebufferSize(mainWindow, &nowWidth, &nowHeight);
 
-        glManager.BeginRenderGame(nowWidth, nowHeight, Event::getCameraLocation(), Event::getCameraDir());
+        glManager.BeginRenderGame(nowWidth, nowHeight);
 
         glManager.RenderSkybox();
         glManager.RenderGrid();

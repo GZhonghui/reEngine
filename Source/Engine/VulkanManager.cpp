@@ -1187,14 +1187,10 @@ bool VulkanManager::RenderUI()
 
             if (ImGui::CollapsingHeader("Game Info"))
             {
-                ImGui::Text("Camera Move Speed");
-                ImGui::SliderFloat("", &Event::cameraMoveSpeed, 1.0f, 10.0f, "Speed = %.3f");
-                ImGui::Separator();
-
                 ImGui::Text("Camera Position");
-                ImGui::Text("X = %.3f", Event::mainCamera.m_Position.x());
-                ImGui::Text("Y = %.3f", Event::mainCamera.m_Position.y());
-                ImGui::Text("Z = %.3f", Event::mainCamera.m_Position.z());
+                ImGui::Text("X = %.3f", Event::mainCamera.getPosition().x());
+                ImGui::Text("Y = %.3f", Event::mainCamera.getPosition().y());
+                ImGui::Text("Z = %.3f", Event::mainCamera.getPosition().z());
                 ImGui::Separator();
 
                 ImGui::Text("reEngine");

@@ -55,11 +55,11 @@ namespace EngineCore
         const float rightWindowWidth = 256;
         const float toolBoxHeight    = 90;
         const float assetHeight      = 172;
-        const float actorListHeight = displayH - assetHeight - logHeight;
-        const float detailHeight    = displayH >> 1;
-        const float infoHeight      = displayH - detailHeight - logHeight;
-        const float centerWidth     = displayW - leftWindowWidth - rightWindowWidth;
-        const float centerHeight    = displayH - toolBoxHeight - logHeight;
+        const float actorListHeight  = displayH - assetHeight - logHeight;
+        const float detailHeight     = displayH >> 1;
+        const float infoHeight       = displayH - detailHeight - logHeight;
+        const float centerWidth      = displayW - leftWindowWidth - rightWindowWidth;
+        const float centerHeight     = displayH - toolBoxHeight - logHeight;
 
         const auto mainWinFlag =
             ImGuiWindowFlags_NoResize |
@@ -71,9 +71,9 @@ namespace EngineCore
             ImGuiWindowFlags_AlwaysAutoResize |
             ImGuiWindowFlags_NoCollapse;
 
-        const ImVec4 textColor = ImVec4(colorGreen.x(), colorGreen.y(), colorGreen.z(), 1.0);
+        const ImVec4 textColorGreen = ImVec4(colorGreen.x(), colorGreen.y(), colorGreen.z(), 1.0);
 
-        const char* avaliableShader = glManager.getSupportShaderList();
+        const char* avaliableShader      = glManager.getSupportShaderList();
         const int   avaliableShaderCount = glManager.getSupportShaderCount();
 
         // Part 2 Const
@@ -136,11 +136,12 @@ namespace EngineCore
         static bool classEnableSpecular  = false;
         static int  classSpecularCurrent = 0;
 
-        static double cameraMoveSpeed = 3.0;
+        static float cameraMoveSpeed = 10.0;
+        static float cameraFOV = 60;
 
-        static float  lightDirf3[3];
-        static float  lightColorf3[3];
-        static double lightPower = 1.0;
+        static float lightDirf3[3];
+        static float lightColorf3[3];
+        static float lightPower = 1.0;
 
         static int  skyboxCurrent = 0;
         static bool renderGrid = true;
@@ -186,6 +187,8 @@ namespace EngineCore
 
         // === Exchange Whit Others
         Event::cameraMoveSpeed = cameraMoveSpeed;
+
+        Event::mainCamera.setFOV(cameraFOV);
         // === Exchange Whit Others
 
         // === LOCAL ===
@@ -408,7 +411,7 @@ namespace EngineCore
                             {
                                 assetTypeStr = "Texture";
                             }
-                            ImGui::TextColored(textColor, "%s", assetTypeStr.c_str());
+                            ImGui::TextColored(textColorGreen, "%s", assetTypeStr.c_str());
 
                             ImGui::TableSetColumnIndex(3);
                             if (ImGui::Selectable(assetList[i].c_str(), selectedAssetID == i,
@@ -483,7 +486,7 @@ namespace EngineCore
                     ActorItem* pSelectedActor = Inside(actorCurrent, 0, actorItems.size() - 1) ?
                         &actorItems[actorCurrent] : nullptr;
 
-                    ImGui::TextColored(textColor, "=== Actor Details ===");
+                    ImGui::TextColored(textColorGreen, "=== Actor Details ===");
                     ImGui::Separator();
 
                     if (pSelectedActor)
@@ -561,7 +564,7 @@ namespace EngineCore
                     }
                     ImGui::Text("");
 
-                    ImGui::TextColored(textColor, "=== Actor Transform ===");
+                    ImGui::TextColored(textColorGreen, "=== Actor Transform ===");
                     ImGui::Separator();
                     if (pSelectedActor)
                     {
@@ -607,7 +610,7 @@ namespace EngineCore
                     }
                     ImGui::Text("");
 
-                    ImGui::TextColored(textColor, "=== Actor Components ===");
+                    ImGui::TextColored(textColorGreen, "=== Actor Components ===");
                     ImGui::Separator();
                     if (pSelectedActor)
                     {
@@ -682,7 +685,7 @@ namespace EngineCore
                     std::shared_ptr<GLRenderable> selectedClassRenderObj = selectedClass ?
                         classesInSceneForRender[selectedClass->m_Name] : nullptr;
 
-                    ImGui::TextColored(textColor, "=== Class Details ===");
+                    ImGui::TextColored(textColorGreen, "=== Class Details ===");
                     ImGui::Separator();
                     
                     if (selectedClass)
@@ -695,7 +698,7 @@ namespace EngineCore
                     }
                     ImGui::Text("");
 
-                    ImGui::TextColored(textColor, "=== Class Visibility===");
+                    ImGui::TextColored(textColorGreen, "=== Class Visibility===");
                     ImGui::Separator();
                     if (selectedClass && selectedClass->m_Render)
                     {
@@ -799,7 +802,7 @@ namespace EngineCore
                 }
                 else if (leftEnableTab == 2)
                 {
-                    ImGui::TextColored(textColor, "=== Component Details ===");
+                    ImGui::TextColored(textColorGreen, "=== Component Details ===");
                     ImGui::Separator();
 
                     if (Inside(componentCurrent, 0, componentItems.size() - 1))
@@ -819,10 +822,10 @@ namespace EngineCore
             ImGui::SetNextWindowPos(ImVec2(displayW - rightWindowWidth, detailHeight), ImGuiCond_Always);
             if (ImGui::Begin("Infos", nullptr, mainWinFlag | ImGuiWindowFlags_AlwaysVerticalScrollbar))
             {
-                ImGui::TextColored(textColor, "=== Camera ===");
+                ImGui::TextColored(textColorGreen, "=== Camera ===");
                 ImGui::Separator();
-                auto cameraLocation = Event::getCameraLocation();
-                auto cameraDir = Event::getCameraDir();
+                auto cameraPos = Event::mainCamera.getPosition();
+                auto cameraDir = Event::mainCamera.getForward();
 
                 if (Event::mouseAsCursor)
                 {
@@ -833,20 +836,23 @@ namespace EngineCore
                     ImGui::TextColored(ImVec4(1, 1, 0, 1), "> [M]oving");
                 }
 
-                ImGui::Text("Location (%6.2lf,%6.2lf,%6.2lf)", cameraLocation.x(), cameraLocation.y(), cameraLocation.z());
+                ImGui::Text("%lf", Event::mainCamera.m_uAngle);
+                ImGui::Text("Location (%6.2lf,%6.2lf,%6.2lf)", cameraPos.x(), cameraPos.y(), cameraPos.z());
                 ImGui::Text("Forward  (%6.2lf,%6.2lf,%6.2lf)", cameraDir.x(), cameraDir.y(), cameraDir.z());
+                ImGui::PushItemWidth(-FLT_MIN);
                 ImGui::Text("Speed");
                 ImGui::SameLine();
-                ImGui::PushItemWidth(-FLT_MIN);
-                ImGui::SliderScalar("##CameraMoveSpeed", ImGuiDataType_Double,
-                    &cameraMoveSpeed, &cameraMoveSpeedMin, &cameraMoveSpeedMax);
+                ImGui::SliderFloat("##CameraMoveSpeed", &cameraMoveSpeed, 1.0f, 30.0f);
+                ImGui::Text("FOV  ");
+                ImGui::SameLine();
+                ImGui::SliderFloat("##CameraFOV", &cameraFOV, 45.0f, 75.0f);
                 ImGui::PopItemWidth();
                 ImGui::Text("");
 
-                ImGui::TextColored(textColor, "=== Light ===");
+                ImGui::TextColored(textColorGreen, "=== Light ===");
                 ImGui::Separator();
 
-                auto glLightDir = glManager.getLightDir();
+                auto glLightDir   = glManager.getLightDir();
                 auto glLightColor = glManager.getLightColor();
                 auto glLightPower = glManager.getLightPower();
 
@@ -863,7 +869,7 @@ namespace EngineCore
                 ImGui::ColorEdit3("##LightColor", lightColorf3);
 
                 ImGui::Text("Power");
-                ImGui::SliderScalar("##LightPower", ImGuiDataType_Double, &lightPower, &lightPowerMin, &lightPowerMax);
+                ImGui::SliderFloat("##LightPower", &lightPower, 0.1f, 20.0f);
                 ImGui::PopItemWidth();
 
                 glManager.setLightDir(Direction(lightDirf3[0], lightDirf3[1], lightDirf3[2]));
@@ -871,7 +877,7 @@ namespace EngineCore
                 glManager.setLightPower(lightPower);
                 ImGui::Text("");
 
-                ImGui::TextColored(textColor, "=== Skybox ===");
+                ImGui::TextColored(textColorGreen, "=== Skybox ===");
                 ImGui::Separator();
 
                 skyboxCurrent = glManager.getNowSkybox();
@@ -883,12 +889,12 @@ namespace EngineCore
                 glManager.ChangeSkybox(skyboxCurrent);
                 ImGui::Text("");
 
-                ImGui::TextColored(textColor, "=== Grid ===");
+                ImGui::TextColored(textColorGreen, "=== Grid ===");
                 ImGui::Separator();
                 ImGui::Checkbox("Render Grid", &renderGrid);
                 ImGui::Text("");
 
-                ImGui::TextColored(textColor, "=== Mode ===");
+                ImGui::TextColored(textColorGreen, "=== Mode ===");
                 ImGui::Separator();
                 if (ImGui::RadioButton("Fill", renderMode == 0))
                 {

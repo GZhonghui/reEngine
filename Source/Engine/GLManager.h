@@ -15,7 +15,6 @@ public:
 private:
     const double NearZ  = 0.100;
     const double FarZ   = 300.0;
-    const double Aspect = 60.00;
 
 protected:
     uint32_t m_SceneFBO;
@@ -30,7 +29,7 @@ protected:
     uint32_t m_ViewWidth;
     uint32_t m_ViewHeight;
     
-    Point     m_CameraLocation;
+    Point     m_CameraPos;
     Direction m_CameraDir;
     glm::mat4 m_P;
 
@@ -213,10 +212,10 @@ public:
     bool Destroy();
 
 public:
-    void BeginRenderEditor(uint32_t viewW, uint32_t viewH, const Point& CameraL, const Direction& CameraD);
+    void BeginRenderEditor(uint32_t viewW, uint32_t viewH);
     void EndRenderEditor();
 
-    void BeginRenderGame(uint32_t viewW, uint32_t viewH, const Point& CameraL, const Direction& CameraD);
+    void BeginRenderGame(uint32_t viewW, uint32_t viewH);
     void EndRenderGame();
 
 public:

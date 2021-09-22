@@ -9,48 +9,29 @@ class Event
 {
 public:
     Event() = default;
-    ~Event() = default;
-
-protected:
-    static Camera mainCamera;
+    virtual ~Event() = default;
 
 public:
+    static Camera mainCamera;
+
     static bool shouldQuit;
     static bool windowResized;
     static bool mouseAsCursor;
 
-    static float cameraMoveSpeed;
-
-protected:
-    static void resetCamera()
-    {
-        mainCamera.setPosition(Point(0, 3, -5));
-        mainCamera.lookAt(Point(0, 3, 0));
-    }
+    static double cameraMoveSpeed;
 
 public:
     static void initEventState()
     {
-        resetCamera();
+        mainCamera.Init();
 
-        shouldQuit = false;
+        shouldQuit    = false;
         windowResized = false;
         mouseAsCursor = true;
 
-        cameraMoveSpeed = 3.0f;
+        cameraMoveSpeed = 3.0;
 
         Out::Log(pType::MESSAGE, "Inited Event");
-    }
-
-public:
-    static Point getCameraLocation()
-    {
-        return mainCamera.m_Position;
-    }
-
-    static Direction getCameraDir()
-    {
-        return mainCamera.m_Forward;
     }
 
 public:
@@ -65,11 +46,7 @@ public:
         }
         else
         {
-            // Push Some Key
-            if (key == GLFW_KEY_Q && action == GLFW_PRESS)
-            {
-                // shouldQuit = true;
-            }
+            if (key == GLFW_KEY_Q && action == GLFW_PRESS);
         }
     }
 
@@ -84,38 +61,8 @@ public:
         }
         else
         {
-            const double rotateSpeed = 0.1;
-
-            static double Pitch = 0;
-            static double Yaw = 90;
-
-            static double lastX = x;
-            static double lastY = y;
-
-            double offsetX = x - lastX;
-            double offsetY = y - lastY;
-
-            lastX = x;
-            lastY = y;
-
-            if (mouseAsCursor) return;
-
-            offsetX *= rotateSpeed;
-            offsetY *= rotateSpeed;
-
-            Yaw += offsetX;
-            Pitch += offsetY;
-
-            Pitch = std::min(std::max(-89.0, Pitch), 89.0);
-
-            Direction forward;
-            forward.x() = std::cos(glm::radians(Yaw) * std::cos(glm::radians(Pitch)));
-            forward.y() = std::sin(glm::radians(-Pitch));
-            forward.z() = std::sin(glm::radians(Yaw)) * std::cos(glm::radians(Pitch));
-
-            mainCamera.m_Forward = forward.normalized();
+            mainCamera.Cursor(x, y, mouseAsCursor);
         }
-        
     }
 
     static void glfwMouseButtonCallback
@@ -176,36 +123,35 @@ public:
         }
         else
         {
-            const float moveSpeed = cameraMoveSpeed;
-
             using namespace std::chrono;
 
             static auto lastTime = high_resolution_clock::now();
 
-            auto nowTime = high_resolution_clock::now();
+            auto nowTime   = high_resolution_clock::now();
             auto deltaTime = duration<float, seconds::period>(nowTime - lastTime).count();
 
             lastTime = nowTime;
 
             if (mouseAsCursor) return;
 
-            Direction cameraRight = mainCamera.m_Forward.cross(cameraUP);
+            Direction cameraForward = mainCamera.getForward();
+            Direction cameraRight   = mainCamera.getRight();
 
             if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
             {
-                mainCamera.Move(mainCamera.m_Forward * -1 * deltaTime * moveSpeed);
+                mainCamera.Move(cameraForward * deltaTime * cameraMoveSpeed * -1);
             }
             else if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
             {
-                mainCamera.Move(mainCamera.m_Forward * deltaTime * moveSpeed);
+                mainCamera.Move(cameraForward * deltaTime * cameraMoveSpeed);
             }
             else if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
             {
-                mainCamera.Move(cameraRight * -1 * deltaTime * moveSpeed);
+                mainCamera.Move(cameraRight * deltaTime * cameraMoveSpeed * -1);
             }
             else if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
             {
-                mainCamera.Move(cameraRight * deltaTime * moveSpeed);
+                mainCamera.Move(cameraRight * deltaTime * cameraMoveSpeed);
             }
         }
     }

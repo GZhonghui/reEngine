@@ -182,8 +182,8 @@ void GLManager::Grid::Init()
 
     std::vector<float> V;
 
-    const int   GridSize   = 100;
-    const float GridOffset = 0.1;
+    const int   GridSize   = 40;
+    const float GridOffset = 0.5;
     const float GridStart  =  GridSize * -0.5 * GridOffset;
     const float GridEnd    = -GridStart;
     
@@ -534,14 +534,14 @@ bool GLManager::Destroy()
     return true;
 }
 
-void GLManager::BeginRenderEditor(uint32_t viewW, uint32_t viewH, const Point& CameraL, const Direction& CameraD)
+void GLManager::BeginRenderEditor(uint32_t viewW, uint32_t viewH)
 {
-    m_ViewWidth      = viewW;
-    m_ViewHeight     = viewH;
-    m_CameraLocation = CameraL;
-    m_CameraDir      = CameraD;
+    m_ViewWidth  = viewW;
+    m_ViewHeight = viewH;
+    m_CameraPos  = Event::mainCamera.getPosition();
+    m_CameraDir  = Event::mainCamera.getForward();
 
-    m_P = glm::perspective(glm::radians(Aspect), (double)m_ViewWidth / m_ViewHeight, NearZ, FarZ);
+    m_P = glm::perspective(glm::radians(Event::mainCamera.getFOV()), (double)m_ViewWidth / m_ViewHeight, NearZ, FarZ);
 
     glBindFramebuffer(GL_FRAMEBUFFER, m_SceneFBO);
 
@@ -566,14 +566,14 @@ void GLManager::EndRenderEditor()
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void GLManager::BeginRenderGame(uint32_t viewW, uint32_t viewH, const Point& CameraL, const Direction& CameraD)
+void GLManager::BeginRenderGame(uint32_t viewW, uint32_t viewH)
 {
-    m_ViewWidth      = viewW;
-    m_ViewHeight     = viewH;
-    m_CameraLocation = CameraL;
-    m_CameraDir      = CameraD;
+    m_ViewWidth  = viewW;
+    m_ViewHeight = viewH;
+    m_CameraPos  = Event::mainCamera.getPosition();
+    m_CameraDir  = Event::mainCamera.getForward();
 
-    m_P = glm::perspective(glm::radians(Aspect), (double)m_ViewWidth / m_ViewHeight, NearZ, FarZ);
+    m_P = glm::perspective(glm::radians(Event::mainCamera.getFOV()), (double)m_ViewWidth / m_ViewHeight, NearZ, FarZ);
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -678,7 +678,7 @@ void GLManager::Render
         usedShaderID = m_ShaderManager.m_GlassShaderProgramID;
 
         glUniform3f(glGetUniformLocation(usedShaderID, "cameraPos"),
-            m_CameraLocation.x(), m_CameraLocation.y(), m_CameraLocation.z());
+            m_CameraPos.x(), m_CameraPos.y(), m_CameraPos.z());
         glUniform1i(glGetUniformLocation(usedShaderID, "skyboxTexture"), 0);
         glUniform1f(glGetUniformLocation(usedShaderID, "N"), renderObj->m_N);
 
@@ -691,7 +691,7 @@ void GLManager::Render
         usedShaderID = m_ShaderManager.m_MetalShaderProgramID;
 
         glUniform3f(glGetUniformLocation(usedShaderID, "cameraPos"),
-            m_CameraLocation.x(), m_CameraLocation.y(), m_CameraLocation.z());
+            m_CameraPos.x(), m_CameraPos.y(), m_CameraPos.z());
         glUniform1i(glGetUniformLocation(usedShaderID, "skyboxTexture"), 0);
 
         glActiveTexture(GL_TEXTURE0);
