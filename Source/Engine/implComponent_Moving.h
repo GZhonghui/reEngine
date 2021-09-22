@@ -1,6 +1,8 @@
 #include "Component.h"
 #include "EngineAPI.h"
 
+namespace UserComponent
+{
 class Moving : public Component
 {
 public:
@@ -10,4 +12,5 @@ public:
     virtual void Init();
     virtual void Update(float Delta);
     virtual void Destroy();
+};
 };

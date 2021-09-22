@@ -111,6 +111,8 @@ inline void addClassToProject(const char* className)
         fprintf(headerFile, "#include \"Actor.h\"\n");
         fprintf(headerFile, "#include \"EngineAPI.h\"\n");
         fprintf(headerFile, "\n");
+        fprintf(headerFile, "namespace UserClass\n");
+        fprintf(headerFile, "{\n");
         fprintf(headerFile, "class %s : public Actor\n", className);
         fprintf(headerFile, "{\n");
         fprintf(headerFile, "public:\n");
@@ -126,6 +128,7 @@ inline void addClassToProject(const char* className)
         fprintf(headerFile, "        return \"%s\";\n", className);
         fprintf(headerFile, "    }\n");
         fprintf(headerFile, "};\n");
+        fprintf(headerFile, "};\n");
 
         fclose(headerFile);
     }
@@ -136,6 +139,8 @@ inline void addClassToProject(const char* className)
     {
         fprintf(sourceFile, "#include \"%s\"\n", headerFileName.c_str());
         fprintf(sourceFile, "\n");
+        fprintf(headerFile, "namespace UserClass\n");
+        fprintf(headerFile, "{\n");
         fprintf(sourceFile, "void %s::Init()\n", className);
         fprintf(sourceFile, "{\n");
         fprintf(sourceFile, "\n");
@@ -150,6 +155,7 @@ inline void addClassToProject(const char* className)
         fprintf(sourceFile, "{\n");
         fprintf(sourceFile, "\n");
         fprintf(sourceFile, "}\n");
+        fprintf(headerFile, "};\n");
 
         fclose(sourceFile);
     }
@@ -191,6 +197,8 @@ inline void addComponentToProject(const char* componentName)
         fprintf(headerFile, "#include \"Component.h\"\n");
         fprintf(headerFile, "#include \"EngineAPI.h\"\n");
         fprintf(headerFile, "\n");
+        fprintf(headerFile, "namespace UserComponent\n");
+        fprintf(headerFile, "{\n");
         fprintf(headerFile, "class %s : public Component\n", componentName);
         fprintf(headerFile, "{\n");
         fprintf(headerFile, "public:\n");
@@ -200,6 +208,7 @@ inline void addComponentToProject(const char* componentName)
         fprintf(headerFile, "    virtual void Init();\n");
         fprintf(headerFile, "    virtual void Update(float Delta);\n");
         fprintf(headerFile, "    virtual void Destroy();\n");
+        fprintf(headerFile, "};\n");
         fprintf(headerFile, "};\n");
 
         fclose(headerFile);
@@ -211,6 +220,8 @@ inline void addComponentToProject(const char* componentName)
     {
         fprintf(sourceFile, "#include \"%s\"\n", headerFileName.c_str());
         fprintf(sourceFile, "\n");
+        fprintf(headerFile, "namespace UserComponent\n");
+        fprintf(headerFile, "{\n");
         fprintf(sourceFile, "void %s::Init()\n", componentName);
         fprintf(sourceFile, "{\n");
         fprintf(sourceFile, "\n");
@@ -225,6 +236,7 @@ inline void addComponentToProject(const char* componentName)
         fprintf(sourceFile, "{\n");
         fprintf(sourceFile, "\n");
         fprintf(sourceFile, "}\n");
+        fprintf(headerFile, "};\n");
 
         fclose(sourceFile);
     }
@@ -317,7 +329,7 @@ inline void updateInitHeader
         auto addActor = [initHeader](const ActorItem& actorItem)
         {
             fprintf(initHeader, "    {\n");
-            fprintf(initHeader, "        auto newActor = std::make_shared<%s>(\"%s\");\n",
+            fprintf(initHeader, "        auto newActor = std::make_shared<UserClass::%s>(\"%s\");\n",
                 actorItem.m_ClassName.c_str(), actorItem.m_Name.c_str());
 
             for (auto nowTag = actorItem.m_Tags.begin(); nowTag != actorItem.m_Tags.end(); ++nowTag)
@@ -327,7 +339,7 @@ inline void updateInitHeader
 
             for (auto nowComponent = actorItem.m_Components.begin(); nowComponent != actorItem.m_Components.end(); ++nowComponent)
             {
-                fprintf(initHeader, "        newActor->addComponent(std::make_shared<%s>(\"%s\"));\n",
+                fprintf(initHeader, "        newActor->addComponent(std::make_shared<UserComponent::%s>(\"%s\"));\n",
                     nowComponent->c_str(), actorItem.m_Name.c_str());
             }
             

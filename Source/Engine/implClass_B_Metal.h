@@ -1,11 +1,13 @@
 #include "Actor.h"
 #include "EngineAPI.h"
 
-class Car : public Actor
+namespace UserClass
+{
+class B_Metal : public Actor
 {
 public:
-    Car(const std::string& Name) : Actor(Name) { }
-    virtual ~Car() = default;
+    B_Metal(const std::string& Name) : Actor(Name) { }
+    virtual ~B_Metal() = default;
 public:
     virtual void Init();
     virtual void Update(float Delta);
@@ -13,6 +15,7 @@ public:
 public:
     virtual const char* getType() const noexcept
     {
-        return "Car";
+        return "B_Metal";
     }
+};
 };

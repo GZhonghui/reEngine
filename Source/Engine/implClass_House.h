@@ -3,11 +3,11 @@
 
 namespace UserClass
 {
-class Dog : public Actor
+class House : public Actor
 {
 public:
-    Dog(const std::string& Name) : Actor(Name) { }
-    virtual ~Dog() = default;
+    House(const std::string& Name) : Actor(Name) { }
+    virtual ~House() = default;
 public:
     virtual void Init();
     virtual void Update(float Delta);
@@ -15,7 +15,7 @@ public:
 public:
     virtual const char* getType() const noexcept
     {
-        return "Dog";
+        return "House";
     }
 };
 };

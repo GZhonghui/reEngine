@@ -1,5 +1,7 @@
 #include "implComponent_Moving.h"
 
+namespace UserComponent
+{
 void Moving::Init()
 {
 
@@ -14,3 +16,4 @@ void Moving::Destroy()
 {
 
 }
+};

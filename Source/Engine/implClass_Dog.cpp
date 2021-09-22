@@ -1,5 +1,7 @@
 #include "implClass_Dog.h"
 
+namespace UserClass
+{
 void Dog::Init()
 {
 
@@ -14,3 +16,4 @@ void Dog::Destroy()
 {
 
 }
+};
