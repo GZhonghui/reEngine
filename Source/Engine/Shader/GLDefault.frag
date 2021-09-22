@@ -2,6 +2,7 @@
 
 in vec2 thisUV;
 in vec3 thisNormal;
+in mat3 thisTBN;
 
 out vec4 FragColor;
 
@@ -35,6 +36,7 @@ void main()
     if(enableNormalTexture != 0)
     {
         fixedNormal = texture(normalTexture, thisUV).rgb * 2.0 - 1.0;
+        fixedNormal = thisTBN * fixedNormal;
     }
 
     fixedNormal =  normalize(fixedNormal);

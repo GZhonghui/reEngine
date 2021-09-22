@@ -4,7 +4,7 @@ void GLRenderable::reLoadModel(const std::string& Model)
 {
     if (Model == m_NowModel) return;
 
-    // Location UV : 8 Float per Vertex
+    // Location UV : 14 Float per Vertex
     std::vector<float> VBuffer;
     std::vector<unsigned int> EBuffer;
 
@@ -14,7 +14,7 @@ void GLRenderable::reLoadModel(const std::string& Model)
     {
         for (auto meshIndex = modelLoader.m_Meshs.begin(); meshIndex != modelLoader.m_Meshs.end(); ++meshIndex)
         {
-            int VertexNumber = VBuffer.size() / 8;
+            int VertexNumber = VBuffer.size() / 14;
             for (auto faceIndex = (*meshIndex)->Faces.begin(); faceIndex != (*meshIndex)->Faces.end(); ++faceIndex)
             {
                 EBuffer.push_back((*faceIndex)->x() + VertexNumber);
@@ -33,6 +33,12 @@ void GLRenderable::reLoadModel(const std::string& Model)
                 VBuffer.push_back((*vertexIndex)->m_Normal.z());
                 VBuffer.push_back((*vertexIndex)->m_TextureCoords.x());
                 VBuffer.push_back((*vertexIndex)->m_TextureCoords.y());
+                VBuffer.push_back((*vertexIndex)->m_Tangent.x());
+                VBuffer.push_back((*vertexIndex)->m_Tangent.y());
+                VBuffer.push_back((*vertexIndex)->m_Tangent.z());
+                VBuffer.push_back((*vertexIndex)->m_Bitangent.x());
+                VBuffer.push_back((*vertexIndex)->m_Bitangent.y());
+                VBuffer.push_back((*vertexIndex)->m_Bitangent.z());
             }
         }
     }
@@ -59,14 +65,20 @@ void GLRenderable::reLoadModel(const std::string& Model)
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EBOID);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * EBuffer.size(), EBuffer.data(), GL_STATIC_DRAW);
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 14 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 14 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
 
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 14 * sizeof(float), (void*)(6 * sizeof(float)));
     glEnableVertexAttribArray(2);
+
+    glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 14 * sizeof(float), (void*)(8 * sizeof(float)));
+    glEnableVertexAttribArray(3);
+
+    glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, 14 * sizeof(float), (void*)(11 * sizeof(float)));
+    glEnableVertexAttribArray(4);
 
     m_NowModel = Model;
 }

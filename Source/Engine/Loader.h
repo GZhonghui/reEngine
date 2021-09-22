@@ -15,6 +15,8 @@ namespace Loader
         Point m_Location;
         Direction m_Normal;
         TextureCoords m_TextureCoords;
+        Direction m_Tangent;
+        Direction m_Bitangent;
     };
 
     class Mesh
@@ -78,6 +80,14 @@ namespace Loader
                 ThisVertex->m_Normal.x() = mesh->mNormals[i].x;
                 ThisVertex->m_Normal.y() = mesh->mNormals[i].y;
                 ThisVertex->m_Normal.z() = mesh->mNormals[i].z;
+
+                ThisVertex->m_Tangent.x() = mesh->mTangents[i].x;
+                ThisVertex->m_Tangent.y() = mesh->mTangents[i].y;
+                ThisVertex->m_Tangent.z() = mesh->mTangents[i].z;
+
+                ThisVertex->m_Bitangent.x() = mesh->mBitangents[i].x;
+                ThisVertex->m_Bitangent.y() = mesh->mBitangents[i].y;
+                ThisVertex->m_Bitangent.z() = mesh->mBitangents[i].z;
 
                 if (mesh->mTextureCoords[0])
                 {
