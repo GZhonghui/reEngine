@@ -836,14 +836,13 @@ namespace EngineCore
                     ImGui::TextColored(ImVec4(1, 1, 0, 1), "> [M]oving");
                 }
 
-                ImGui::Text("%lf", Event::mainCamera.m_uAngle);
                 ImGui::Text("Location (%6.2lf,%6.2lf,%6.2lf)", cameraPos.x(), cameraPos.y(), cameraPos.z());
                 ImGui::Text("Forward  (%6.2lf,%6.2lf,%6.2lf)", cameraDir.x(), cameraDir.y(), cameraDir.z());
                 ImGui::PushItemWidth(-FLT_MIN);
                 ImGui::Text("Speed");
                 ImGui::SameLine();
                 ImGui::SliderFloat("##CameraMoveSpeed", &cameraMoveSpeed, 1.0f, 30.0f);
-                ImGui::Text("FOV  ");
+                ImGui::Text(" FOV ");
                 ImGui::SameLine();
                 ImGui::SliderFloat("##CameraFOV", &cameraFOV, 45.0f, 75.0f);
                 ImGui::PopItemWidth();
@@ -869,7 +868,7 @@ namespace EngineCore
                 ImGui::ColorEdit3("##LightColor", lightColorf3);
 
                 ImGui::Text("Power");
-                ImGui::SliderFloat("##LightPower", &lightPower, 0.1f, 20.0f);
+                ImGui::SliderFloat("##LightPower", &lightPower, 0.1f, 8.0f);
                 ImGui::PopItemWidth();
 
                 glManager.setLightDir(Direction(lightDirf3[0], lightDirf3[1], lightDirf3[2]));

@@ -605,8 +605,8 @@ void GLManager::Render
     // Transform
     MVP[0] = glm::mat4(1);
     MVP[0] = glm::translate(MVP[0], Convert(ObjTransform.Location));
-    MVP[0] = glm::rotate(MVP[0], glm::radians((float)ObjTransform.Rotation.x()), glm::vec3(1, 0, 0));
     MVP[0] = glm::rotate(MVP[0], glm::radians((float)ObjTransform.Rotation.y()), glm::vec3(0, 1, 0));
+    MVP[0] = glm::rotate(MVP[0], glm::radians((float)ObjTransform.Rotation.x()), glm::vec3(1, 0, 0));
     MVP[0] = glm::rotate(MVP[0], glm::radians((float)ObjTransform.Rotation.z()), glm::vec3(0, 0, 1));
 
     ModelWithoutScale = MVP[0];
@@ -629,6 +629,9 @@ void GLManager::Render
         glUniform3f(glGetUniformLocation(usedShaderID, "lightDir"), m_LightDir.x(), m_LightDir.y(), m_LightDir.z());
         glUniform3f(glGetUniformLocation(usedShaderID, "lightColor"), m_LightColor.x(), m_LightColor.y(), m_LightColor.z());
         glUniform1f(glGetUniformLocation(usedShaderID, "lightPower"), m_LightPower);
+
+        auto cameraPos = Event::mainCamera.getPosition();
+        glUniform3f(glGetUniformLocation(usedShaderID, "viewLocation"), cameraPos.x(), cameraPos.y(), cameraPos.z());
 
         auto pColor = &renderObj->m_DiffuseColor;
         glUniform3f(glGetUniformLocation(usedShaderID, "diffuseColor"), pColor->x(), pColor->y(), pColor->z());

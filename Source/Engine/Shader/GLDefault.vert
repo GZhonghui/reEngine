@@ -9,6 +9,7 @@ layout (location = 4) in vec3 aBitangent;
 out vec2 thisUV;
 out vec3 thisNormal;
 out mat3 thisTBN;
+out vec3 thisLocation;
 
 uniform mat4 M;
 uniform mat4 V;

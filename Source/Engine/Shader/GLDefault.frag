@@ -3,6 +3,7 @@
 in vec2 thisUV;
 in vec3 thisNormal;
 in mat3 thisTBN;
+in vec3 thisLocation;
 
 out vec4 FragColor;
 
@@ -20,6 +21,8 @@ uniform sampler2D specularTexture;
 uniform vec3  lightDir;
 uniform vec3  lightColor;
 uniform float lightPower;
+
+uniform vec3 viewLocation;
 
 void main()
 {   
@@ -41,15 +44,33 @@ void main()
 
     fixedNormal =  normalize(fixedNormal);
 
+    vec3 specularColor = vec3(1.0);
+
+    if(enableSpecularTexture != 0)
+    {
+        specularColor = texture(specularTexture, thisUV).rgb;
+    }
+
     vec3 fixedLightDir = normalize(-lightDir);
 
-    const float ambientStrength = 0.1;
-    vec3 ambient = ambientStrength * lightColor * lightPower;
+    vec3 LL = lightColor * lightPower;
 
+    const float ambientStrength  = 0.1;
+    const float diffuseStrength  = 1.0;
+    const float specularStrength = 0.5;
+
+    vec3 ambientPart = ambientStrength * LL *objColor;
+  
     float diff = max(dot(fixedNormal, fixedLightDir), 0.0);
-    vec3 diffuse = diff * lightColor * lightPower;
+    vec3  diffusePart = diffuseStrength * diff * LL * objColor;
 
-    vec3 lightPart = ambient + diff;
+    
+    vec3  viewDir = normalize(viewLocation - thisLocation);
+    vec3  reflectDir = reflect(-fixedLightDir, fixedNormal);
+    float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32);
+    vec3  specularPart = specularStrength * spec * LL * specularColor;
 
-    FragColor = vec4(objColor * lightPart, 1.0);
+    vec3 Final = ambientPart + diffusePart + specularPart;
+
+    FragColor = vec4(Final, 1.0);
 }
