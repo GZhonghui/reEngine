@@ -27,12 +27,11 @@ Please Watch this [Youtube Video](https://www.youtube.com/channel/UCa0G_UHT3j2vz
 ```
 
 ### 🚩Editor
-![Editor](readMe/Editor_01.gif)
-![Editor](readMe/Editor_02.gif)
-![Editor](readMe/Editor_03.png)
+![Editor](readMe/Editor_01.mini.gif)
+![Editor](readMe/Editor_02.mini.gif)
+![Editor](readMe/Editor_03.mini.png)
 
 ### 🚩Game
-![Game](readMe/Game.jpg)
 
 ## Features
 ### ✔Vulkan Backend
