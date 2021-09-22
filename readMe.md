@@ -39,6 +39,7 @@ Please Watch this [Youtube Video](https://www.youtube.com/channel/UCa0G_UHT3j2vz
 ### ✔OpenGL Core Backend
 ### ✔C++ Scripts
 ### ✔Import Assets
+### ✔Camera
 ### ✔Editor by ImGui
 
 ## Credits
