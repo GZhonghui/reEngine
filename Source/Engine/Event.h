@@ -24,8 +24,8 @@ public:
 protected:
     static void resetCamera()
     {
-        mainCamera.setPosition(Point(0, 8, 12));
-        mainCamera.lookAt(Point(0, 0, 0));
+        mainCamera.setPosition(Point(0, 3, -5));
+        mainCamera.lookAt(Point(0, 3, 0));
     }
 
 public:
@@ -84,13 +84,10 @@ public:
         }
         else
         {
-            // 摄像机目前还有BUG 待修复
-            // 1.初始就给Yaw Pitch设定一个固定的值是不对的
-            // 2.因为摄像机的UP方向是固定的 所以抬头低头到一定程度的时候会出现BUG
-            const double rotateSpeed = 0.1f;
+            const double rotateSpeed = 0.1;
 
-            static double yaw = 90.0;
-            static double pitch = 0.0;
+            static double Pitch = 0;
+            static double Yaw = 90;
 
             static double lastX = x;
             static double lastY = y;
@@ -106,15 +103,15 @@ public:
             offsetX *= rotateSpeed;
             offsetY *= rotateSpeed;
 
-            yaw += offsetX;
-            pitch += offsetY;
+            Yaw += offsetX;
+            Pitch += offsetY;
 
-            pitch = std::min(std::max(-75.0, pitch), 75.0);
+            Pitch = std::min(std::max(-89.0, Pitch), 89.0);
 
             Direction forward;
-            forward.x() = std::cos(glm::radians(yaw) * std::cos(glm::radians(pitch)));
-            forward.y() = std::sin(glm::radians(-pitch));
-            forward.z() = std::sin(glm::radians(yaw)) * std::cos(glm::radians(pitch));
+            forward.x() = std::cos(glm::radians(Yaw) * std::cos(glm::radians(Pitch)));
+            forward.y() = std::sin(glm::radians(-Pitch));
+            forward.z() = std::sin(glm::radians(Yaw)) * std::cos(glm::radians(Pitch));
 
             mainCamera.m_Forward = forward.normalized();
         }

@@ -16,8 +16,8 @@ public:
     UniformMVP() = default;
     UniformMVP
     (
-        const glm::mat4& model, const glm::mat4& view, const glm::mat4& project
-    ) : m_Model(model), m_View(view), m_Project(project) {}
+        const glm::mat4& Model, const glm::mat4& View, const glm::mat4& Project
+    ) : m_Model(Model), m_View(View), m_Project(Project) {}
 
 public:
     ~UniformMVP() = default;
@@ -66,6 +66,7 @@ public:
 
 public:
     friend class Event;
+
     friend class VulkanManager;
     friend class GLManager;
 };

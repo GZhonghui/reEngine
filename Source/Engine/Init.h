@@ -41,14 +41,6 @@ void initScene(std::vector<std::shared_ptr<Actor>>* actorsInScene)
         actorsInScene->push_back(newActor);
     }
     {
-        auto newActor = std::make_shared<Dog>("Dog_01");
-        newActor->insertTag("Actor_Dog");
-        newActor->setLocation(Eigen::Vector3d(-0.830000, -1.470000, 14.660000));
-        newActor->setRotation(Eigen::Vector3d(0.000000, -97.199997, 0.000000));
-        newActor->setScale(Eigen::Vector3d(1.000000, 1.000000, 1.000000));
-        actorsInScene->push_back(newActor);
-    }
-    {
         auto newActor = std::make_shared<Cat>("Cat_Default");
         newActor->insertTag("Actor_Cat");
         newActor->setLocation(Eigen::Vector3d(14.870000, -1.340000, 5.520000));

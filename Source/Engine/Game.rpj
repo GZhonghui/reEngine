@@ -13,12 +13,6 @@
       <Rotation x="0.0000000000" y="0.0000000000" z="0.0000000000"/>
       <Scale x="3.0000000000" y="3.0000000000" z="3.0000000000"/>
     </ActorItem>
-    <ActorItem Name="Dog_01" ClassName="Dog">
-      <Tag>Actor_Dog</Tag>
-      <Location x="-0.8299999833" y="-1.4700000286" z="14.6599998474"/>
-      <Rotation x="0.0000000000" y="-97.1999969482" z="0.0000000000"/>
-      <Scale x="1.0000000000" y="1.0000000000" z="1.0000000000"/>
-    </ActorItem>
     <ActorItem Name="Cat_Default" ClassName="Cat">
       <Tag>Actor_Cat</Tag>
       <Location x="14.8699998856" y="-1.3400000334" z="5.5199999809"/>

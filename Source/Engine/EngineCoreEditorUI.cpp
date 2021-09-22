@@ -637,6 +637,7 @@ namespace EngineCore
                             ImGui::Text("Select Component");
                             ImGui::Combo("##SelectComponent", &actorAddComponentCurrent,
                                 componentItemsChar.data(), componentItems.size());
+                            ImGui::Separator();
 
                             bool canClickAdd = Inside(actorAddComponentCurrent, 0, componentItems.size() - 1) &&
                                 !pSelectedActor->m_Components.count(componentItems[actorAddComponentCurrent].m_Name);
