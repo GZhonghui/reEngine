@@ -41,11 +41,11 @@ Please Watch this Video (Working)
 ### ✔C++ Interface
 ### ✔Assets Manager
 ### ✔Component System
-### ✔Quaternion Camera
 ### ✔Input Event System
-### ✔Support Multiple Shaders
+### ✔Quaternion Camera
 ### ✔Customize Skybox
-### ✔Lighting system
+### ✔Multiple Shaders
+### ✔Lighting System
 ### ✔Editor by ImGui
 
 ## Credits
