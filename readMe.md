@@ -19,15 +19,16 @@ Please Watch this Video (Working)
 05. Create Classes
 06. Create Actors
 07. Adjust Actors in Scene
-08. Create Components
-09. Attach Components to Your Actor
-10. Save Project then Close the Editor
-11. Reload Visual Studio Project
-12. Code for Classes and Components' Behavior
-13. Edit the Config.h, Switch to Game Mode
-14. Compile
-15. Run (as Game)
-16. You Can Switch Back to Editor Mode to Debug
+08. Add Tag to Your Actors
+09. Create Components
+10. Attach Components to Your Actor
+11. Save Project then Close the Editor
+12. Reload Visual Studio Project
+13. Code for Classes and Components' Behavior
+14. Edit the Config.h, Switch to Game Mode
+15. Compile
+16. Run (as Game)
+17. You Can Switch Back to Editor Mode to Debug
 ```
 
 ### 🚩Editor
@@ -47,6 +48,7 @@ Please Watch this Video (Working)
 ### ✔Multiple Shaders
 ### ✔Lighting System
 ### ✔Editor by ImGui
+### ✔Tag System
 
 ## Credits
 > This Project Depends on the Following Libs
