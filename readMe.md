@@ -10,28 +10,27 @@
 ![Layout](readMe/Layout.png)
 
 ## Tutorial
-Please Watch this [Youtube Video](https://www.youtube.com/channel/UCa0G_UHT3j2vzTHHy_2CN2w)
+Please Watch this Video(Working)
 ```
 01. Clone this Repository
-02. Compile with Visual Studio 2019
+02. Compile (Only Support Windows for Now)
 03. Run (as Editor)
-04. Create Classes and Import Assets
-05. Create Actors
-06. Design the Scene
-07. Save Project then Close the Editor
-08. Reload Visual Studio Project
-09. Code
-10. Edit the Config.h, Switch to Build Game Mode
-11. Compile
-12. Run (as Game)
+04. Prepare and Import Assets
+05. Create Classes
+06. Create Actors
+07. Place Actors in Scene
+08. Save Project then Close the Editor
+09. Reload Visual Studio Project
+10. Code for Class's Behavior
+11. Edit the Config.h, Switch to Build Game Mode
+12. Compile
+13. Run (as Game)
 ```
 
 ### 🚩Editor
-![Editor](readMe/Editor_01.mini.gif)
-![Editor](readMe/Editor_02.mini.gif)
-![Editor](readMe/Editor_03.mini.png)
-
-### 🚩Game
+![Editor](readMe/Editor_01.gif)
+![Editor](readMe/Editor_02.gif)
+![Editor](readMe/Editor_03.png)
 
 ## Features
 ### ✔Vulkan Backend
