@@ -10,7 +10,7 @@
 ![Layout](readMe/Layout.png)
 
 ## Tutorial
-Please Watch this Video(Working)
+Please Watch this Video (Working)
 ```
 01. Clone this Repository
 02. Compile (Only Support Windows for Now)
@@ -35,9 +35,10 @@ Please Watch this Video(Working)
 ## Features
 ### ✔Vulkan Backend
 ### ✔OpenGL Core Backend
-### ✔C++ Scripts
-### ✔Import Assets
-### ✔Camera
+### ✔C++ Interface
+### ✔Assets Manager
+### ✔Quaternion Camera
+### ✔Input Event Process
 ### ✔Editor by ImGui
 
 ## Credits
