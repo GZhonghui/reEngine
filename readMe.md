@@ -10,7 +10,6 @@
 ![Layout](readMe/Layout.png)
 
 ## Tutorial
-Please Watch this Video (Working)
 ```
 01. Clone this Repository
 02. Compile via Visual Studio (Only Support Windows for Now)
