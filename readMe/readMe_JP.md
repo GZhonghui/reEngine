@@ -31,7 +31,14 @@
 ### 🚩エディター
 ![Editor](Editor_01.gif)
 ![Editor](Editor_02.gif)
-![Editor](Editor_03.png)
+![Editor](Editor_03.gif)
+![Editor](Editor_04.gif)
+![Editor](Editor_05.gif)
+![Editor](Editor_06.gif)
+![Editor](Editor_07.gif)
+![Editor](Editor_08.gif)
+![Editor](Editor_09.png)
+![Editor](Editor_10.png)
 
 ## 特徴
 ### ✔OpenGL Coreバックエンド

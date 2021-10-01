@@ -33,7 +33,14 @@
 ### 🚩Editor
 ![Editor](readMe/Editor_01.gif)
 ![Editor](readMe/Editor_02.gif)
-![Editor](readMe/Editor_03.png)
+![Editor](readMe/Editor_03.gif)
+![Editor](readMe/Editor_04.gif)
+![Editor](readMe/Editor_05.gif)
+![Editor](readMe/Editor_06.gif)
+![Editor](readMe/Editor_07.gif)
+![Editor](readMe/Editor_08.gif)
+![Editor](readMe/Editor_09.png)
+![Editor](readMe/Editor_10.png)
 
 ## Features
 ### ✔OpenGL Core Backend
