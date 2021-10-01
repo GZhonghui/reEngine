@@ -10,23 +10,22 @@
 
 ## 使用
 ```
-01. Clone this Repository
-02. Compile via Visual Studio (Only Support Windows for Now)
-03. Run (as Editor)
-04. Prepare and Import Assets
-05. Create Classes
-06. Create Actors
-07. Adjust Actors in Scene
-08. Add Tag to Your Actors
-09. Create Components
-10. Attach Components to Your Actor
-11. Save Project then Close the Editor
-12. Reload Visual Studio Project
-13. Code for Classes and Components' Behavior
-14. Edit the Config.h, Switch to Game Mode
-15. Compile
-16. Run (as Game)
-17. You Can Switch Back to Editor Mode to Debug
+01. 下载代码
+02. 用Visual Studio编译
+03. 运行编辑器
+04. 准备并导入素材
+05. 创建Class
+06. 创建Actor
+07. 在Scene中调整Actor的属性
+08. 可以为Actor添加自定义的Tag
+09. 创建Component
+10. 将Component添加到Actor上
+11. 保存并关闭编辑器
+12. 重新加载Visual Studio工程
+13. 为Class和Component编写代码
+14. 编辑Config.h, 切换到编译游戏模式
+16. 运行游戏
+17. 你可以随时切换回编辑器模式来调试
 ```
 
 ### 🚩编辑器
