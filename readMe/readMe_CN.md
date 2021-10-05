@@ -29,16 +29,28 @@
 ```
 
 ### 🚩编辑器
-![Editor](Editor_01.gif)
-![Editor](Editor_02.gif)
-![Editor](Editor_03.gif)
-![Editor](Editor_04.gif)
-![Editor](Editor_05.gif)
-![Editor](Editor_06.gif)
-![Editor](Editor_07.gif)
-![Editor](Editor_08.gif)
-![Editor](Editor_09.png)
-![Editor](Editor_10.png)
+| 截图 |
+:-:
+| 编辑器界面 & 更换天空盒 |
+| ![Editor](readMe/Editor_01.gif) |
+| 资源管理器 |
+| ![Editor](readMe/Editor_02.gif) |
+| 创建新Class |
+| ![Editor](readMe/Editor_03.gif) |
+| 多种Shader可以随时调整更换 |
+| ![Editor](readMe/Editor_04.gif) |
+| 标签系统 |
+| ![Editor](readMe/Editor_05.gif) |
+| 四元数相机 |
+| ![Editor](readMe/Editor_06.gif) |
+| 光照系统 |
+| ![Editor](readMe/Editor_07.gif) |
+| 包含多个Actor的场景 |
+| ![Editor](readMe/Editor_08.gif) |
+| 以线框模式渲染 |
+| ![Editor](readMe/Editor_09.png) |
+| 关于 |
+| ![Editor](readMe/Editor_10.png) |
 
 ## 特性
 ### ✔OpenGL Core渲染后端
