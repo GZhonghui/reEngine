@@ -3,7 +3,7 @@
 ---
 > More Projects from the reFamily [**reRender**](https://github.com/GZhonghui/reRender)/[**reSimulate**](https://github.com/GZhonghui/reSimulate)
 
-## 約
+## について
 **reEngine**はオープンソースのゲームエンジンです
 
 ![Layout](Layout.png)
@@ -29,16 +29,28 @@
 ```
 
 ### 🚩エディター
-![Editor](Editor_01.gif)
-![Editor](Editor_02.gif)
-![Editor](Editor_03.gif)
-![Editor](Editor_04.gif)
-![Editor](Editor_05.gif)
-![Editor](Editor_06.gif)
-![Editor](Editor_07.gif)
-![Editor](Editor_08.gif)
-![Editor](Editor_09.png)
-![Editor](Editor_10.png)
+| スクリーンショット |
+:-:
+| エディターUIとスカイボックスのカスタマイズ |
+| ![Editor](readMe/Editor_01.gif) |
+| 資産マネージャー |
+| ![Editor](readMe/Editor_02.gif) |
+| 新Classの追加 |
+| ![Editor](readMe/Editor_03.gif) |
+| 複数のシェーダー |
+| ![Editor](readMe/Editor_04.gif) |
+| タグシステム |
+| ![Editor](readMe/Editor_05.gif) |
+| 四季折々のカメラ |
+| ![Editor](readMe/Editor_06.gif) |
+| 照明システム |
+| ![Editor](readMe/Editor_07.gif) |
+| 複雑なシーン |
+| ![Editor](readMe/Editor_08.gif) |
+| ラインモードでのレンダリング |
+| ![Editor](readMe/Editor_09.png) |
+| について |
+| ![Editor](readMe/Editor_10.png) |
 
 ## 特徴
 ### ✔OpenGL Coreバックエンド
