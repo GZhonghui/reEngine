@@ -31,16 +31,28 @@
 ```
 
 ### 🚩Editor
-![Editor](readMe/Editor_01.gif)
-![Editor](readMe/Editor_02.gif)
-![Editor](readMe/Editor_03.gif)
-![Editor](readMe/Editor_04.gif)
-![Editor](readMe/Editor_05.gif)
-![Editor](readMe/Editor_06.gif)
-![Editor](readMe/Editor_07.gif)
-![Editor](readMe/Editor_08.gif)
-![Editor](readMe/Editor_09.png)
-![Editor](readMe/Editor_10.png)
+| Screenshots |
+:-:
+| Editor UI & Customize Skybox |
+| ![Editor](readMe/Editor_01.gif) |
+| Assets Manager |
+|![Editor](readMe/Editor_02.gif) |
+| Add a new Class |
+|![Editor](readMe/Editor_03.gif) |
+| Multiple Shaders |
+|![Editor](readMe/Editor_04.gif) |
+| Tag System |
+|![Editor](readMe/Editor_05.gif) |
+| Quaternion Camera |
+|![Editor](readMe/Editor_06.gif) |
+| Lighting System |
+|![Editor](readMe/Editor_07.gif) |
+| A Complicated Scene |
+|![Editor](readMe/Editor_08.gif) |
+| Render as Line Mode |
+|![Editor](readMe/Editor_09.png) |
+| About |
+|![Editor](readMe/Editor_10.png) |
 
 ## Features
 ### ✔OpenGL Core Backend
