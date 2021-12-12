@@ -56,7 +56,6 @@
 
 ## Features
 ### ✔OpenGL Core Backend
-### ✔Vulkan Backend (Working)
 ### ✔C++ Interface
 ### ✔Assets Manager
 ### ✔Component System
@@ -67,6 +66,7 @@
 ### ✔Lighting System
 ### ✔Editor by ImGui
 ### ✔Tag System
+### 📌Vulkan Backend
 
 ## Credits
 > This Project Depends on the Following Libs
