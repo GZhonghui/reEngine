@@ -30,7 +30,7 @@
 17. You Can Switch Back to Editor Mode to Debug
 ```
 
-### 🚩Editor
+### Editor
 | Screenshots |
 :-:
 | Editor UI & Customize Skybox |
@@ -55,18 +55,17 @@
 | ![Editor](readMe/Editor_10.png) |
 
 ## Features
-### ✔OpenGL Core Backend
-### ✔C++ Interface
-### ✔Assets Manager
-### ✔Component System
-### ✔Input Event System
-### ✔Quaternion Camera
-### ✔Customize Skybox
-### ✔Multiple Shaders
-### ✔Lighting System
-### ✔Editor by ImGui
-### ✔Tag System
-### 📌Vulkan Backend
+- OpenGL Core Backend
+- C++ Interface
+- Assets Manager
+- Component System
+- Input Event System
+- Quaternion Camera
+- Customize Skybox
+- Multiple Shaders
+- Lighting System
+- Editor by ImGui
+- Tag System
 
 ## Credits
 > This Project Depends on the Following Libs
