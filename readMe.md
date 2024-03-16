@@ -9,7 +9,7 @@
 
 ![Layout](readMe/Layout.png)
 
-## Tutorial
+## Usage
 ```
 01. Clone this Repository
 02. Compile via Visual Studio (Only Support Windows for Now)
@@ -30,7 +30,7 @@
 17. You Can Switch Back to Editor Mode to Debug
 ```
 
-### Editor
+## Editor
 | Screenshots |
 :-:
 | Editor UI & Customize Skybox |
